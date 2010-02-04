@@ -3,22 +3,15 @@ package net.intensicode.droid.audio;
 import android.content.res.*;
 import android.media.AudioManager;
 import android.media.*;
+import net.intensicode.ReleaseProperties;
 import net.intensicode.core.*;
 import net.intensicode.util.*;
 
 import java.io.IOException;
 
-public final class SoundPoolBackend implements SoundBackend
+public final class SoundPoolBackend implements AudioBackend
     {
     public static final int DEFAULT_NUMBER_OF_CHANNELS = 5; // 4 sounds + 1 music expected
-
-    public String musicFolder = "music";
-
-    public String musicSuffix = ".mp3";
-
-    public String soundFolder = "sound";
-
-    public String soundSuffix = ".mp3";
 
 
     public SoundPoolBackend( final AssetManager aAssetManager )
@@ -33,7 +26,7 @@ public final class SoundPoolBackend implements SoundBackend
         //#endif
         }
 
-    // From SoundBackend
+    // From AudioBackend
 
     public final int numberOfChannels()
         {
@@ -42,7 +35,7 @@ public final class SoundPoolBackend implements SoundBackend
 
     public final MusicResource loadMusic( final String aMusicName ) throws IOException
         {
-        final String resourceFilePath = makeResourceFilePath( musicFolder, aMusicName, musicSuffix );
+        final String resourceFilePath = makeResourceFilePath( ReleaseProperties.MUSIC_FOLDER, aMusicName, ReleaseProperties.MUSIC_FORMAT_SUFFIX );
         //#if DEBUG
         Log.debug( "loading music resource {}", resourceFilePath );
         //#endif
@@ -51,7 +44,7 @@ public final class SoundPoolBackend implements SoundBackend
 
     public final SoundResource loadSound( final String aSoundName ) throws IOException
         {
-        final String resourceFilePath = makeResourceFilePath( soundFolder, aSoundName, soundSuffix );
+        final String resourceFilePath = makeResourceFilePath( ReleaseProperties.SOUND_FOLDER, aSoundName, ReleaseProperties.SOUND_FORMAT_SUFFIX );
         //#if DEBUG
         Log.debug( "loading sound resource {}", resourceFilePath );
         //#endif
@@ -74,7 +67,7 @@ public final class SoundPoolBackend implements SoundBackend
         {
         final AssetFileDescriptor fd = myAssetManager.openFd( aResourceFilePath );
         final int soundID = mySoundPool.load( fd, DEFAULT_SOUND_PRIORITY );
-        return new SoundPoolAudioResource( mySoundPool, soundID );
+        return new SoundPoolAudioResource( mySoundPool, soundID, aResourceFilePath );
         }
 
 

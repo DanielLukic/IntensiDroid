@@ -4,7 +4,7 @@ import net.intensicode.core.*;
 
 import java.io.IOException;
 
-public interface SoundBackend
+public interface AudioBackend
     {
     int numberOfChannels();
 

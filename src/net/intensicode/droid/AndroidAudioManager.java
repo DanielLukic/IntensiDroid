@@ -3,8 +3,8 @@ package net.intensicode.droid;
 import android.content.Context;
 import android.media.MediaPlayer;
 import net.intensicode.core.*;
-import net.intensicode.util.Log;
 import net.intensicode.droid.audio.*;
+import net.intensicode.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -92,6 +92,9 @@ public final class AndroidAudioManager implements AudioManager, MediaPlayer.OnEr
 
     public final MusicResource loadMusic( final String aMusicName ) throws IOException
         {
+        //#if DEBUG
+        Log.debug( "loading music resource {}", aMusicName );
+        //#endif
         final MusicResource resource = myMusicBackend.loadMusic( aMusicName );
         registerMusicResource( resource );
         return resource;
@@ -99,6 +102,9 @@ public final class AndroidAudioManager implements AudioManager, MediaPlayer.OnEr
 
     public final SoundResource loadSound( final String aSoundName ) throws IOException
         {
+        //#if DEBUG
+        Log.debug( "loading sound resource {}", aSoundName );
+        //#endif
         final SoundResource resource = mySoundBackend.loadSound( aSoundName );
         registerSoundResource( resource );
         return resource;
@@ -143,9 +149,9 @@ public final class AndroidAudioManager implements AudioManager, MediaPlayer.OnEr
 
     private boolean myMasterSoundMutedFlag;
 
-    private final SoundBackend myMusicBackend;
+    private final AudioBackend myMusicBackend;
 
-    private final SoundBackend mySoundBackend;
+    private final AudioBackend mySoundBackend;
 
     private final ArrayList<MusicResource> myMusicResources = new ArrayList<MusicResource>();
 

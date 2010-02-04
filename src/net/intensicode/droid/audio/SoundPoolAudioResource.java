@@ -6,10 +6,11 @@ import net.intensicode.util.Log;
 
 public final class SoundPoolAudioResource implements AudioResource, MusicResource, SoundResource
     {
-    public SoundPoolAudioResource( final SoundPool aSoundPool, final int aSoundID )
+    public SoundPoolAudioResource( final SoundPool aSoundPool, final int aSoundID, final String aResourceFilePath )
         {
         mySoundPool = aSoundPool;
         mySoundID = aSoundID;
+        myResourceFilePath = aResourceFilePath;
         setVolume( 100 );
         }
 
@@ -38,9 +39,17 @@ public final class SoundPoolAudioResource implements AudioResource, MusicResourc
         if ( myPlayingFlag ) stop();
 
         final float volume = myMutedFlag ? 0.0f : myVolume;
-        myPlayID = mySoundPool.play( mySoundID, volume, volume, STREAM_PRIORITY, DO_NOT_LOOP, PLAYBACK_RATE );
+        do
+            {
+            myPlayID = mySoundPool.play( mySoundID, volume, volume, STREAM_PRIORITY, DO_NOT_LOOP, PLAYBACK_RATE );
+            //#if DEBUG
+            if ( myPlayID == 0 ) sleepTenthOfOneSecond();
+            //#endif
+            }
+        while ( myPlayID == 0 && ++myPlayRetries < MAX_PLAY_RETRIES );
+
         //#if DEBUG
-        if ( myPlayID == 0 ) Log.debug( "failed playing sound {}", mySoundID );
+        if ( myPlayID == 0 ) Log.debug( "failed playing sound {}: {}", mySoundID, myResourceFilePath );
         //#endif
 
         myPlayingFlag = myPlayID != PLAY_FAILED;
@@ -62,14 +71,32 @@ public final class SoundPoolAudioResource implements AudioResource, MusicResourc
         if ( myPlayingFlag ) mySoundPool.resume( myPlayID );
         }
 
+    // Implementation
+
+    private static void sleepTenthOfOneSecond()
+        {
+        try
+            {
+            Thread.sleep( 100 );
+            }
+        catch ( InterruptedException e )
+            {
+            e.printStackTrace();
+            }
+        }
+
 
     private int myPlayID;
+
+    private int myPlayRetries;
 
     private float myVolume;
 
     private boolean myMutedFlag;
 
     private final int mySoundID;
+
+    private final String myResourceFilePath;
 
     private boolean myPlayingFlag;
 
@@ -82,4 +109,6 @@ public final class SoundPoolAudioResource implements AudioResource, MusicResourc
     private static final int STREAM_PRIORITY = 0;
 
     private static final float PLAYBACK_RATE = 1.0f;
+
+    private static final int MAX_PLAY_RETRIES = 10;
     }

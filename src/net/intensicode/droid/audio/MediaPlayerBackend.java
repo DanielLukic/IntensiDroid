@@ -2,22 +2,15 @@ package net.intensicode.droid.audio;
 
 import android.content.res.*;
 import android.media.MediaPlayer;
+import net.intensicode.ReleaseProperties;
 import net.intensicode.core.*;
 import net.intensicode.util.Log;
 
 import java.io.IOException;
 
-public final class MediaPlayerBackend implements SoundBackend, MediaPlayer.OnErrorListener
+public final class MediaPlayerBackend implements AudioBackend
     {
     public static final int NUMBER_OF_CHANNELS = 1;
-
-    public String musicFolder = "music";
-
-    public String musicSuffix = ".mp3";
-
-    public String soundFolder = "sound";
-
-    public String soundSuffix = ".mp3";
 
 
     public MediaPlayerBackend( final AssetManager aAssetManager )
@@ -25,7 +18,7 @@ public final class MediaPlayerBackend implements SoundBackend, MediaPlayer.OnErr
         myAssetManager = aAssetManager;
         }
 
-    // From SoundBackend
+    // From AudioBackend
 
     public final int numberOfChannels()
         {
@@ -34,26 +27,16 @@ public final class MediaPlayerBackend implements SoundBackend, MediaPlayer.OnErr
 
     public final MusicResource loadMusic( final String aMusicName ) throws IOException
         {
-        final String resourceFilePath = makeResourceFilePath( musicFolder, aMusicName, musicSuffix );
+        final String resourceFilePath = makeResourceFilePath( ReleaseProperties.MUSIC_FOLDER, aMusicName, ReleaseProperties.MUSIC_FORMAT_SUFFIX );
         final MediaPlayer player = createAndPrepareMediaPlayer( resourceFilePath );
         return new MediaPlayerAudioResource( player );
         }
 
     public final SoundResource loadSound( final String aSoundName ) throws IOException
         {
-        final String resourceFilePath = makeResourceFilePath( soundFolder, aSoundName, soundSuffix );
+        final String resourceFilePath = makeResourceFilePath( ReleaseProperties.SOUND_FOLDER, aSoundName, ReleaseProperties.SOUND_FORMAT_SUFFIX );
         final MediaPlayer player = createAndPrepareMediaPlayer( resourceFilePath );
         return new MediaPlayerAudioResource( player );
-        }
-
-    // From OnErrorListener
-
-    public boolean onError( final MediaPlayer aMediaPlayer, final int i, final int i1 )
-        {
-        //#if DEBUG
-        Log.debug( "media player error {} {}", i, i1 );
-        //#endif
-        return false;
         }
 
     // Implementation
@@ -75,8 +58,7 @@ public final class MediaPlayerBackend implements SoundBackend, MediaPlayer.OnErr
         //#endif
         final AssetFileDescriptor fd = myAssetManager.openFd( aMusicResourceFilePath );
         final MediaPlayer player = new MediaPlayer();
-        player.setOnErrorListener( this );
-        player.setDataSource( fd.getFileDescriptor() );
+        player.setDataSource( fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength() );
         player.prepare();
         return player;
         }

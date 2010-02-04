@@ -2,13 +2,29 @@ package net.intensicode.droid.audio;
 
 import android.media.MediaPlayer;
 import net.intensicode.core.*;
+import net.intensicode.util.Log;
 
-public final class MediaPlayerAudioResource implements MusicResource, SoundResource, AudioResource
+public final class MediaPlayerAudioResource implements MusicResource, SoundResource, AudioResource, MediaPlayer.OnErrorListener
     {
     public MediaPlayerAudioResource( final MediaPlayer aPlayer )
         {
         myPlayer = aPlayer;
-        setVolume( 50 );
+        myPlayer.setOnErrorListener( this );
+        myPlayer.setLooping( true );
+        setVolume( 75 );
+        }
+
+    // From OnErrorListener
+
+    public boolean onError( final MediaPlayer aMediaPlayer, final int aWhat, final int aExtra )
+        {
+        if ( aWhat == MediaPlayer.MEDIA_ERROR_SERVER_DIED )
+            {
+            //#if DEBUG
+            Log.debug( "media server died - should wait and start playing if necessary" );
+            //#endif
+            }
+        return true;
         }
 
     // From MusicResource
