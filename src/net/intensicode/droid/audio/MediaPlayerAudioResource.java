@@ -1,16 +1,15 @@
 package net.intensicode.droid.audio;
 
 import android.media.MediaPlayer;
-import net.intensicode.core.*;
+import net.intensicode.core.AudioResourceEx;
 import net.intensicode.util.Log;
 
-public final class MediaPlayerAudioResource implements MusicResource, SoundResource, AudioResource, MediaPlayer.OnErrorListener
+public final class MediaPlayerAudioResource implements AudioResourceEx, MediaPlayer.OnErrorListener
     {
     public MediaPlayerAudioResource( final MediaPlayer aPlayer )
         {
         myPlayer = aPlayer;
         myPlayer.setOnErrorListener( this );
-        myPlayer.setLooping( true );
         setVolume( 75 );
         }
 
@@ -27,7 +26,22 @@ public final class MediaPlayerAudioResource implements MusicResource, SoundResou
         return true;
         }
 
-    // From MusicResource
+    // From AudioResourceEx
+
+    public void enable()
+        {
+        }
+
+    public void disable()
+        {
+        }
+
+    // From AudioResource
+
+    public void setLoopForever()
+        {
+        myPlayer.setLooping( true );
+        }
 
     public final void setVolume( final int aVolumeInPercent )
         {

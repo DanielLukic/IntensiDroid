@@ -1,10 +1,9 @@
 package net.intensicode.droid.audio;
 
 import android.content.res.*;
-import android.media.AudioManager;
 import android.media.*;
 import net.intensicode.ReleaseProperties;
-import net.intensicode.core.*;
+import net.intensicode.core.AudioResourceEx;
 import net.intensicode.util.*;
 
 import java.io.IOException;
@@ -33,22 +32,22 @@ public final class SoundPoolBackend implements AudioBackend
         return myNumberOfChannels;
         }
 
-    public final MusicResource loadMusic( final String aMusicName ) throws IOException
+    public final AudioResourceEx loadMusic( final String aMusicName ) throws IOException
         {
         final String resourceFilePath = makeResourceFilePath( ReleaseProperties.MUSIC_FOLDER, aMusicName, ReleaseProperties.MUSIC_FORMAT_SUFFIX );
         //#if DEBUG
         Log.debug( "loading music resource {}", resourceFilePath );
         //#endif
-        return (MusicResource) createAudioResource( resourceFilePath );
+        return createAudioResource( resourceFilePath );
         }
 
-    public final SoundResource loadSound( final String aSoundName ) throws IOException
+    public final AudioResourceEx loadSound( final String aSoundName ) throws IOException
         {
         final String resourceFilePath = makeResourceFilePath( ReleaseProperties.SOUND_FOLDER, aSoundName, ReleaseProperties.SOUND_FORMAT_SUFFIX );
         //#if DEBUG
         Log.debug( "loading sound resource {}", resourceFilePath );
         //#endif
-        return (SoundResource) createAudioResource( resourceFilePath );
+        return createAudioResource( resourceFilePath );
         }
 
     // Implementation
@@ -63,7 +62,7 @@ public final class SoundPoolBackend implements AudioBackend
         return builder.toString();
         }
 
-    private AudioResource createAudioResource( final String aResourceFilePath ) throws IOException
+    private AudioResourceEx createAudioResource( final String aResourceFilePath ) throws IOException
         {
         final AssetFileDescriptor fd = myAssetManager.openFd( aResourceFilePath );
         final int soundID = mySoundPool.load( fd, DEFAULT_SOUND_PRIORITY );

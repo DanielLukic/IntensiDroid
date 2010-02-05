@@ -3,7 +3,7 @@ package net.intensicode.droid.audio;
 import android.content.res.*;
 import android.media.MediaPlayer;
 import net.intensicode.ReleaseProperties;
-import net.intensicode.core.*;
+import net.intensicode.core.AudioResourceEx;
 import net.intensicode.util.Log;
 
 import java.io.IOException;
@@ -25,14 +25,14 @@ public final class MediaPlayerBackend implements AudioBackend
         return NUMBER_OF_CHANNELS;
         }
 
-    public final MusicResource loadMusic( final String aMusicName ) throws IOException
+    public final AudioResourceEx loadMusic( final String aMusicName ) throws IOException
         {
         final String resourceFilePath = makeResourceFilePath( ReleaseProperties.MUSIC_FOLDER, aMusicName, ReleaseProperties.MUSIC_FORMAT_SUFFIX );
         final MediaPlayer player = createAndPrepareMediaPlayer( resourceFilePath );
         return new MediaPlayerAudioResource( player );
         }
 
-    public final SoundResource loadSound( final String aSoundName ) throws IOException
+    public final AudioResourceEx loadSound( final String aSoundName ) throws IOException
         {
         final String resourceFilePath = makeResourceFilePath( ReleaseProperties.SOUND_FOLDER, aSoundName, ReleaseProperties.SOUND_FORMAT_SUFFIX );
         final MediaPlayer player = createAndPrepareMediaPlayer( resourceFilePath );

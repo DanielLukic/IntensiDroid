@@ -1,6 +1,6 @@
 package net.intensicode.droid.audio;
 
-import net.intensicode.core.*;
+import net.intensicode.core.AudioResourceEx;
 
 import java.io.IOException;
 
@@ -8,7 +8,7 @@ public interface AudioBackend
     {
     int numberOfChannels();
 
-    MusicResource loadMusic( String aMusicName ) throws IOException;
+    AudioResourceEx loadMusic( String aMusicName ) throws IOException;
 
-    SoundResource loadSound( String aSoundName ) throws IOException;
+    AudioResourceEx loadSound( String aSoundName ) throws IOException;
     }

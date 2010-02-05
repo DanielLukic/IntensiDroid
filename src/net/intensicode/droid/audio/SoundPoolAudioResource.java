@@ -1,10 +1,10 @@
 package net.intensicode.droid.audio;
 
 import android.media.SoundPool;
-import net.intensicode.core.*;
+import net.intensicode.core.AudioResourceEx;
 import net.intensicode.util.Log;
 
-public final class SoundPoolAudioResource implements AudioResource, MusicResource, SoundResource
+public final class SoundPoolAudioResource implements AudioResourceEx
     {
     public SoundPoolAudioResource( final SoundPool aSoundPool, final int aSoundID, final String aResourceFilePath )
         {
@@ -14,7 +14,22 @@ public final class SoundPoolAudioResource implements AudioResource, MusicResourc
         setVolume( 100 );
         }
 
+    // From AudioResourceEx
+
+    public void enable()
+        {
+        }
+
+    public void disable()
+        {
+        }
+
     // From AudioResource
+
+    public void setLoopForever()
+        {
+        mySoundPool.setLoop( mySoundID, LOOP_FOREVER );
+        }
 
     public final void setVolume( final int aVolumeInPercent )
         {
@@ -111,4 +126,6 @@ public final class SoundPoolAudioResource implements AudioResource, MusicResourc
     private static final float PLAYBACK_RATE = 1.0f;
 
     private static final int MAX_PLAY_RETRIES = 10;
+
+    private static final int LOOP_FOREVER = -1;
     }
