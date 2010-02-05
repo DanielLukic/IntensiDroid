@@ -16,6 +16,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     // From SystemContext
 
+    public final GameSystem getGameSystem()
+        {
+        return myGameSystem;
+        }
+
     public void onApplicationShouldPause( final GameSystem aGameSystem )
         {
         // Default implementation does nothing..
