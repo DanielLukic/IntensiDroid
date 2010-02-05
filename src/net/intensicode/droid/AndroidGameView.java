@@ -3,7 +3,7 @@ package net.intensicode.droid;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.view.*;
-import net.intensicode.core.DirectScreen;
+import net.intensicode.core.*;
 import net.intensicode.util.*;
 
 
@@ -11,7 +11,7 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
     {
     public AndroidCanvasGraphics graphics;
 
-    public AndroidGameEngine engine;
+    public GameSystem system;
 
 
     public AndroidGameView( final Context aContext )
@@ -101,7 +101,6 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         //#if DEBUG
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
         //#endif
-
         mySurfaceHolder.setType( SurfaceHolder.SURFACE_TYPE_HARDWARE );
         }
 
@@ -110,8 +109,7 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         //#if DEBUG
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
         //#endif
-
-        engine.showNotify();
+        system.resume();
         }
 
     public final void surfaceDestroyed( final SurfaceHolder aSurfaceHolder )
@@ -119,8 +117,7 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         //#if DEBUG
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
         //#endif
-
-        engine.hideNotify();
+        system.pause();
         }
 
 

@@ -100,7 +100,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         view.setOnKeyListener( keys );
 
         view.graphics = graphics;
-        view.engine = engine;
+        view.system = system;
 
         system.resources = resources;
         system.graphics = graphics;
