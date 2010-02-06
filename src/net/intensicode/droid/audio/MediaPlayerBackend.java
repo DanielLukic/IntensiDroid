@@ -21,14 +21,14 @@ public final class MediaPlayerBackend implements AudioBackend
         {
         final String resourceFilePath = makeResourceFilePath( ReleaseProperties.MUSIC_FOLDER, aMusicName, ReleaseProperties.MUSIC_FORMAT_SUFFIX );
         final MediaPlayer player = createAndPrepareMediaPlayer( resourceFilePath );
-        return new MediaPlayerAudioResource( player );
+        return new MediaPlayerAudioResource( player, resourceFilePath );
         }
 
     public final AudioResourceEx loadSound( final String aSoundName ) throws IOException
         {
         final String resourceFilePath = makeResourceFilePath( ReleaseProperties.SOUND_FOLDER, aSoundName, ReleaseProperties.SOUND_FORMAT_SUFFIX );
         final MediaPlayer player = createAndPrepareMediaPlayer( resourceFilePath );
-        return new MediaPlayerAudioResource( player );
+        return new MediaPlayerAudioResource( player, resourceFilePath );
         }
 
     // Implementation

@@ -6,87 +6,106 @@ import net.intensicode.util.Log;
 
 public final class SoundPoolAudioResource implements AudioResourceEx
     {
-    public SoundPoolAudioResource( final SoundPool aSoundPool, final int aSoundID, final String aResourceFilePath )
+    public SoundPoolAudioResource( final SoundPool aSoundPool, final int aSoundID, final String aResourcePath )
         {
         mySoundPool = aSoundPool;
         mySoundID = aSoundID;
-        myResourceFilePath = aResourceFilePath;
-        setVolume( 100 );
+        myResourcePath = aResourcePath;
         }
 
     // From AudioResourceEx
 
-    public void enable()
+    public final void enable()
         {
+        if ( myEnabledFlag ) return;
+
+        myEnabledFlag = true;
+
+        if ( myWasPlayingFlag ) resume();
         }
 
-    public void disable()
+    public final void disable()
         {
+        if ( !myEnabledFlag ) return;
+
+        myWasPlayingFlag = myLoopingFlag;
+        myEnabledFlag = false;
+
+        if ( isProbablyPlaying() ) pause();
         }
 
     // From AudioResource
 
-    public void setLoopForever()
+    public final void setLoopForever()
         {
+        myLoopingFlag = true;
         mySoundPool.setLoop( mySoundID, LOOP_FOREVER );
         }
 
     public final void setVolume( final int aVolumeInPercent )
         {
         myVolume = aVolumeInPercent * 1.0f / 100;
-        if ( myPlayingFlag ) mySoundPool.setVolume( myPlayID, myVolume, myVolume );
+        if ( isProbablyPlaying() ) mySoundPool.setVolume( myPlayID, myVolume, myVolume );
         }
 
     public final void mute()
         {
         myMutedFlag = true;
-        if ( myPlayingFlag ) mySoundPool.setVolume( myPlayID, 0, 0 );
+        if ( isProbablyPlaying() ) mySoundPool.setVolume( myPlayID, 0, 0 );
         }
 
     public final void unmute()
         {
-        if ( myPlayingFlag ) mySoundPool.setVolume( myPlayID, myVolume, myVolume );
         myMutedFlag = false;
+        if ( isProbablyPlaying() ) mySoundPool.setVolume( myPlayID, myVolume, myVolume );
         }
 
-    public final void play()
+    public final void start()
         {
-        if ( myPlayingFlag ) stop();
+        if ( isProbablyPlaying() ) stop();
 
         final float volume = myMutedFlag ? 0.0f : myVolume;
         do
             {
             myPlayID = mySoundPool.play( mySoundID, volume, volume, STREAM_PRIORITY, DO_NOT_LOOP, PLAYBACK_RATE );
             //#if DEBUG
-            if ( myPlayID == 0 ) sleepTenthOfOneSecond();
+            if ( isNotPlaying() ) sleepTenthOfOneSecond();
             //#endif
             }
-        while ( myPlayID == 0 && ++myPlayRetries < MAX_PLAY_RETRIES );
+        while ( isNotPlaying() && ++myPlayRetries < MAX_PLAY_RETRIES );
 
         //#if DEBUG
-        if ( myPlayID == 0 ) Log.debug( "failed playing sound {}: {}", mySoundID, myResourceFilePath );
+        if ( isNotPlaying() ) Log.debug( "failed playing sound {}: {}", mySoundID, myResourcePath );
         //#endif
-
-        myPlayingFlag = myPlayID != PLAY_FAILED;
         }
 
     public final void stop()
         {
-        if ( myPlayingFlag ) mySoundPool.stop( myPlayID );
-        myPlayingFlag = false;
+        if ( isProbablyPlaying() ) mySoundPool.stop( myPlayID );
+        myPlayID = NOT_PLAYING;
         }
 
     public final void pause()
         {
-        if ( myPlayingFlag ) mySoundPool.pause( myPlayID );
+        if ( isProbablyPlaying() ) mySoundPool.pause( myPlayID );
         }
 
     public final void resume()
         {
-        if ( myPlayingFlag ) mySoundPool.resume( myPlayID );
+        if ( isProbablyPlaying() ) mySoundPool.resume( myPlayID );
         }
 
     // Implementation
+
+    private boolean isProbablyPlaying()
+        {
+        return myPlayID != NOT_PLAYING;
+        }
+
+    private boolean isNotPlaying()
+        {
+        return myPlayID == NOT_PLAYING;
+        }
 
     private static void sleepTenthOfOneSecond()
         {
@@ -109,17 +128,21 @@ public final class SoundPoolAudioResource implements AudioResourceEx
 
     private boolean myMutedFlag;
 
+    private boolean myLoopingFlag;
+
+    private boolean myWasPlayingFlag;
+
+    private boolean myEnabledFlag = true;
+
     private final int mySoundID;
 
-    private final String myResourceFilePath;
-
-    private boolean myPlayingFlag;
+    private final String myResourcePath;
 
     private final SoundPool mySoundPool;
 
     private static final int DO_NOT_LOOP = 0;
 
-    private static final int PLAY_FAILED = 0;
+    private static final int NOT_PLAYING = 0;
 
     private static final int STREAM_PRIORITY = 0;
 

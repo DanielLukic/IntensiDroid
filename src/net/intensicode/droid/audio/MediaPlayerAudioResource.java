@@ -6,11 +6,11 @@ import net.intensicode.util.Log;
 
 public final class MediaPlayerAudioResource implements AudioResourceEx, MediaPlayer.OnErrorListener
     {
-    public MediaPlayerAudioResource( final MediaPlayer aPlayer )
+    public MediaPlayerAudioResource( final MediaPlayer aPlayer, final String aResourcePath )
         {
         myPlayer = aPlayer;
         myPlayer.setOnErrorListener( this );
-        setVolume( 75 );
+        myResourcePath = aResourcePath;
         }
 
     // From OnErrorListener
@@ -28,26 +28,38 @@ public final class MediaPlayerAudioResource implements AudioResourceEx, MediaPla
 
     // From AudioResourceEx
 
-    public void enable()
+    public final void enable()
         {
+        if ( myEnabledFlag ) return;
+
+        myEnabledFlag = true;
+
+        if ( myPlayingFlag ) myPlayer.start();
         }
 
-    public void disable()
+    public final void disable()
         {
+        if ( !myEnabledFlag ) return;
+
+        myPlayingFlag = myPlayer.isPlaying();
+        myEnabledFlag = false;
+
+        if ( myPlayer.isPlaying() ) myPlayer.pause();
         }
 
     // From AudioResource
 
-    public void setLoopForever()
+    public final void setLoopForever()
         {
         myPlayer.setLooping( true );
         }
 
     public final void setVolume( final int aVolumeInPercent )
         {
+        myCurrentVolume = aVolumeInPercent;
+
         final float scaledVolume = aVolumeInPercent * 1.0f / 100;
         myPlayer.setVolume( scaledVolume, scaledVolume );
-        myCurrentVolume = aVolumeInPercent;
         }
 
     public final void mute()
@@ -60,29 +72,44 @@ public final class MediaPlayerAudioResource implements AudioResourceEx, MediaPla
         setVolume( myCurrentVolume );
         }
 
-    public final void play()
+    public final void start()
         {
         if ( myPlayer.isPlaying() ) stop();
-        myPlayer.start();
+        if ( myEnabledFlag ) myPlayer.start();
+        else triggerPlayAfterEnable();
         }
 
     public final void stop()
         {
-        myPlayer.stop();
+        if ( myPlayer.isPlaying() ) myPlayer.stop();
         }
 
     public final void pause()
         {
-        myPlayer.pause();
+        if ( myPlayer.isPlaying() ) myPlayer.pause();
         }
 
     public final void resume()
         {
-        myPlayer.start();
+        if ( myEnabledFlag ) myPlayer.start();
+        else triggerPlayAfterEnable();
+        }
+
+    // Implementation
+
+    private void triggerPlayAfterEnable()
+        {
+        myPlayingFlag = true;
         }
 
 
     private int myCurrentVolume;
 
+    private boolean myPlayingFlag;
+
+    private boolean myEnabledFlag = true;
+
     private final MediaPlayer myPlayer;
+
+    private final String myResourcePath;
     }
