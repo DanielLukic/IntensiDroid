@@ -55,13 +55,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         setContentView( myGameView );
         }
 
-    public final void onPause()
-        {
-        super.onPause();
-        myGameSystem.pause();
-        // Note that onResume should not call resume. Android "is different"..
-        }
-
     // Implementation
 
     private void setWindowFeatures()
