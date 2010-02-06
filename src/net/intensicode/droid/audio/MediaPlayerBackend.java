@@ -10,20 +10,12 @@ import java.io.IOException;
 
 public final class MediaPlayerBackend implements AudioBackend
     {
-    public static final int NUMBER_OF_CHANNELS = 1;
-
-
     public MediaPlayerBackend( final AssetManager aAssetManager )
         {
         myAssetManager = aAssetManager;
         }
 
     // From AudioBackend
-
-    public final int numberOfChannels()
-        {
-        return NUMBER_OF_CHANNELS;
-        }
 
     public final AudioResourceEx loadMusic( final String aMusicName ) throws IOException
         {

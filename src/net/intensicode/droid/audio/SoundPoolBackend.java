@@ -10,13 +10,12 @@ import java.io.IOException;
 
 public final class SoundPoolBackend implements AudioBackend
     {
-    public static final int DEFAULT_NUMBER_OF_CHANNELS = 5; // 4 sounds + 1 music expected
+    public static final int DEFAULT_NUMBER_OF_CHANNELS = 4;
 
 
     public SoundPoolBackend( final AssetManager aAssetManager )
         {
         myAssetManager = aAssetManager;
-        myNumberOfChannels = DEFAULT_NUMBER_OF_CHANNELS;
         mySoundPool = new SoundPool( DEFAULT_NUMBER_OF_CHANNELS, AudioManager.STREAM_MUSIC, DEFAULT_SOUND_CONVERSION_QUALITY );
 
         //#if DEBUG
@@ -26,11 +25,6 @@ public final class SoundPoolBackend implements AudioBackend
         }
 
     // From AudioBackend
-
-    public final int numberOfChannels()
-        {
-        return myNumberOfChannels;
-        }
 
     public final AudioResourceEx loadMusic( final String aMusicName ) throws IOException
         {
@@ -69,8 +63,6 @@ public final class SoundPoolBackend implements AudioBackend
         return new SoundPoolAudioResource( mySoundPool, soundID, aResourceFilePath );
         }
 
-
-    private final int myNumberOfChannels;
 
     private final SoundPool mySoundPool;
 
