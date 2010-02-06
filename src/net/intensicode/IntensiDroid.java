@@ -77,11 +77,13 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     private synchronized void createGameViewAndGameSystem()
         {
+        final String resourcesSubFolder = determineResourcesSubFolder();
+
         final AndroidGameSystem system = new AndroidGameSystem( this );
         final AndroidGameEngine engine = new AndroidGameEngine( system );
         final AndroidGameView view = new AndroidGameView( this );
         final AndroidCanvasGraphics graphics = new AndroidCanvasGraphics();
-        final AndroidResourcesManager resources = new AndroidResourcesManager( getAssets() );
+        final AndroidResourcesManager resources = new AndroidResourcesManager( getAssets(), resourcesSubFolder );
         //#ifdef TOUCH_SUPPORTED
         final AndroidTouchHandler touch = new AndroidTouchHandler( system, view );
         //#endif
@@ -110,7 +112,50 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         myGameSystem = system;
         }
 
+    private String determineResourcesSubFolder()
+        {
+        final Display display = getWindowManager().getDefaultDisplay();
+        final int orientation = display.getOrientation();
+        if ( orientation == ORIENTATION_PORTRAIT && looksLikePortrait() ) return SUB_FOLDER_PORTRAIT;
+        if ( orientation == ORIENTATION_LANDSCAPE && looksLikeLandscape() ) return SUB_FOLDER_LANDSCAPE;
+        if ( looksLikePortrait() ) return SUB_FOLDER_PORTRAIT;
+        if ( looksLikeLandscape() ) return SUB_FOLDER_LANDSCAPE;
+        if ( looksLikeSquare() ) return SUB_FOLDER_SQUARE;
+        return NO_SUB_FOLDER;
+        }
+
+    private boolean looksLikePortrait()
+        {
+        final Display display = getWindowManager().getDefaultDisplay();
+        return display.getWidth() < display.getHeight();
+        }
+
+    private boolean looksLikeLandscape()
+        {
+        final Display display = getWindowManager().getDefaultDisplay();
+        return display.getWidth() > display.getHeight();
+        }
+
+    private boolean looksLikeSquare()
+        {
+        final Display display = getWindowManager().getDefaultDisplay();
+        return display.getWidth() == display.getHeight();
+        }
+
+
     private GameSystem myGameSystem;
 
     private SurfaceView myGameView;
+
+    private static final int ORIENTATION_PORTRAIT = 0;
+
+    private static final int ORIENTATION_LANDSCAPE = 1;
+
+    private static final String SUB_FOLDER_SQUARE = "s";
+
+    private static final String SUB_FOLDER_PORTRAIT = "p";
+
+    private static final String SUB_FOLDER_LANDSCAPE = "l";
+
+    private static final String NO_SUB_FOLDER = null;
     }

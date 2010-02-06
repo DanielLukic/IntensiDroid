@@ -4,15 +4,27 @@ import android.content.res.AssetManager;
 import android.graphics.*;
 import net.intensicode.core.*;
 import net.intensicode.graphics.*;
-import net.intensicode.util.Assert;
+import net.intensicode.util.*;
 
 import java.io.*;
 
 public final class AndroidResourcesManager extends ResourcesManager
     {
-    public AndroidResourcesManager( final AssetManager aAssetManager )
+    public AndroidResourcesManager( final AssetManager aAssetManager, final String aSubFolderOrNull )
         {
         myAssetManager = aAssetManager;
+        mySubFolderOrNull = aSubFolderOrNull;
+
+        try
+            {
+            for ( final String entry : myAssetManager.list( "" ) ) Log.debug( "list root: {}", entry );
+            for ( final String entry : myAssetManager.list( "l" ) ) Log.debug( "list l: {}", entry );
+            for ( final String entry : myAssetManager.list( "p" ) ) Log.debug( "list p: {}", entry );
+            }
+        catch ( IOException e )
+            {
+            e.printStackTrace();
+            }
         }
 
     // From ResourcesManager
@@ -48,13 +60,32 @@ public final class AndroidResourcesManager extends ResourcesManager
         {
         try
             {
-            return myAssetManager.open( aResourcePath, AssetManager.ACCESS_STREAMING );
+            final String assetPath = getAssetPath( aResourcePath );
+            return myAssetManager.open( assetPath, AssetManager.ACCESS_STREAMING );
             }
         catch ( final IOException e )
             {
-            return null;
+            try
+                {
+                return myAssetManager.open( aResourcePath, AssetManager.ACCESS_STREAMING );
+                }
+            catch ( final IOException e1 )
+                {
+                return null;
+                }
             }
         }
+
+    // Implementation
+
+    private String getAssetPath( final String aResourcePath )
+        {
+        if ( mySubFolderOrNull == null ) return aResourcePath;
+        return new File( mySubFolderOrNull, aResourcePath ).getPath();
+        }
+
+
+    private final String mySubFolderOrNull;
 
     private final AssetManager myAssetManager;
     }
