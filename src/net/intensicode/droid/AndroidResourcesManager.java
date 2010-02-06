@@ -14,17 +14,6 @@ public final class AndroidResourcesManager extends ResourcesManager
         {
         myAssetManager = aAssetManager;
         mySubFolderOrNull = aSubFolderOrNull;
-
-        try
-            {
-            for ( final String entry : myAssetManager.list( "" ) ) Log.debug( "list root: {}", entry );
-            for ( final String entry : myAssetManager.list( "l" ) ) Log.debug( "list l: {}", entry );
-            for ( final String entry : myAssetManager.list( "p" ) ) Log.debug( "list p: {}", entry );
-            }
-        catch ( IOException e )
-            {
-            e.printStackTrace();
-            }
         }
 
     // From ResourcesManager
