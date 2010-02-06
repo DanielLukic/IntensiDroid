@@ -2,6 +2,8 @@ package net.intensicode.droid;
 
 import net.intensicode.util.Log;
 
+import java.util.regex.*;
+
 public final class AndroidLog extends Log
     {
     //#ifdef DEBUG
@@ -9,13 +11,13 @@ public final class AndroidLog extends Log
     protected final void doTrace()
         {
         final StringBuffer buffer = new StringBuffer( "TRACE" );
-        prependCodeHint( buffer );
+        addCodeHint( buffer );
         android.util.Log.i( LOG_TAG, buffer.toString() );
         }
 
     protected final void doDebug( final StringBuffer aBufferWithMessage )
         {
-        prependCodeHint( aBufferWithMessage );
+        addCodeHint( aBufferWithMessage );
         android.util.Log.d( LOG_TAG, aBufferWithMessage.toString(), null );
         }
 
@@ -23,16 +25,17 @@ public final class AndroidLog extends Log
 
     protected final void doError( final StringBuffer aBufferWithMessage, final Throwable aThrowable )
         {
-        prependCodeHint( aBufferWithMessage );
+        addCodeHint( aBufferWithMessage );
         android.util.Log.e( LOG_TAG, aBufferWithMessage.toString(), aThrowable );
         }
 
     // Implementation
 
-    private static void prependCodeHint( final StringBuffer aBuffer )
+    private static void addCodeHint( final StringBuffer aBuffer )
         {
-        aBuffer.insert( 0, ":\n" );
-        aBuffer.insert( 0, makeCodeHintString() );
+        while ( aBuffer.length() < FORMATTED_MESSAGE_MAX_LENGTH ) aBuffer.append( ' ' );
+        aBuffer.append( ' ' );
+        aBuffer.append( makeCodeHintString() );
         }
 
     private static String makeCodeHintString()
@@ -42,9 +45,12 @@ public final class AndroidLog extends Log
         for ( int i = 0; i < stackTrace.length; i++ )
             {
             final StackTraceElement element = stackTrace[ i ];
-            if ( element.getClassName().endsWith( "Log" ) ) continue;
+            final String classNameWithPackage = element.getClassName();
+            if ( classNameWithPackage.endsWith( "Log" ) ) continue;
+            final int lastDotPos = classNameWithPackage.lastIndexOf( '.' );
+            final String classNameOnly = classNameWithPackage.substring( lastDotPos + 1, classNameWithPackage.length() );
             final StringBuffer buffer = new StringBuffer();
-            buffer.append( element.getClassName() );
+            buffer.append( classNameOnly );
             buffer.append( "#" );
             buffer.append( element.getMethodName() );
             buffer.append( "[" );
@@ -58,4 +64,6 @@ public final class AndroidLog extends Log
     private static String EMPTY_STRING = "";
 
     private static final String LOG_TAG = "INTENSIGAME";
+
+    private static final int FORMATTED_MESSAGE_MAX_LENGTH = 80;
     }
