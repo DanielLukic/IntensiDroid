@@ -57,29 +57,44 @@ public final class AndroidCanvasGraphics extends DirectGraphics
 
     public final void drawLine( final int aX1, final int aY1, final int aX2, final int aY2 )
         {
+        //#if DEBUG
+        Assert.isNotNull( "locked canvas should be set", lockedCanvas );
+        //#endif
         myActivePaint.setStyle( Paint.Style.STROKE );
         lockedCanvas.drawLine( aX1, aY1, aX2, aY2, myActivePaint );
         }
 
     public final void drawRect( final int aX, final int aY, final int aWidth, final int aHeight )
         {
+        //#if DEBUG
+        Assert.isNotNull( "locked canvas should be set", lockedCanvas );
+        //#endif
         myActivePaint.setStyle( Paint.Style.STROKE );
         lockedCanvas.drawRect( aX, aY, aX + aWidth, aY + aHeight, myActivePaint );
         }
 
     public final void drawRGB( final int[] aARGB32, final int aOffsetX, final int aScanlineSize, final int aX, final int aY, final int aWidth, final int aHeight, final boolean aUseAlpha )
         {
+        //#if DEBUG
+        Assert.isNotNull( "locked canvas should be set", lockedCanvas );
+        //#endif
         lockedCanvas.drawBitmap( aARGB32, aOffsetX, aScanlineSize, aX, aY, aWidth, aHeight, aUseAlpha, myImagePaint );
         }
 
     public final void fillRect( final int aX, final int aY, final int aWidth, final int aHeight )
         {
+        //#if DEBUG
+        Assert.isNotNull( "locked canvas should be set", lockedCanvas );
+        //#endif
         myActivePaint.setStyle( Paint.Style.FILL );
         lockedCanvas.drawRect( aX, aY, aX + aWidth, aY + aHeight, myActivePaint );
         }
 
     public final void fillTriangle( final int aX1, final int aY1, final int aX2, final int aY2, final int aX3, final int aY3 )
         {
+        //#if DEBUG
+        Assert.isNotNull( "locked canvas should be set", lockedCanvas );
+        //#endif
         myTrianglePath.reset();
         myTrianglePath.moveTo( aX1, aY1 );
         myTrianglePath.lineTo( aX2, aY2 );
@@ -143,6 +158,9 @@ public final class AndroidCanvasGraphics extends DirectGraphics
 
     public final void drawSubstring( final String aText, final int aStart, final int aEnd, final int aX, final int aY )
         {
+        //#if DEBUG
+        Assert.isNotNull( "locked canvas should be set", lockedCanvas );
+        //#endif
         lockedCanvas.drawText( aText, aStart, aEnd, aX, aY - myFontMetrics.ascent, myActivePaint );
         }
 
