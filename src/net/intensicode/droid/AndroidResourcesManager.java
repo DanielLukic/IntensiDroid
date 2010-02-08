@@ -33,7 +33,10 @@ public final class AndroidResourcesManager extends ResourcesManager
     public final ImageResource createImageResource( final int aWidth, final int aHeight )
         {
         final Bitmap bitmap = Bitmap.createBitmap( aWidth, aHeight, Bitmap.Config.ARGB_8888 );
-        return new AndroidImageResource( bitmap );
+        final AndroidImageResource image = new AndroidImageResource( bitmap );
+        image.getGraphics().setColorRGB24( 0xFFFFFF ); // j2me default..
+        image.getGraphics().fillRect( 0, 0, aWidth, aHeight );
+        return image;
         }
 
     public final ImageResource loadImageResource( final String aResourcePath ) throws IOException
