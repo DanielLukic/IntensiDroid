@@ -61,7 +61,8 @@ public final class AndroidCanvasGraphics extends DirectGraphics
         Assert.isNotNull( "locked canvas should be set", lockedCanvas );
         //#endif
         myActivePaint.setStyle( Paint.Style.STROKE );
-        lockedCanvas.drawLine( aX1, aY1, aX2, aY2, myActivePaint );
+        if ( aX1 == aX2 && aY1 == aY1 ) lockedCanvas.drawPoint( aX1, aY1, myActivePaint );
+        else lockedCanvas.drawLine( aX1, aY1, aX2, aY2, myActivePaint );
         }
 
     public final void drawRect( final int aX, final int aY, final int aWidth, final int aHeight )
