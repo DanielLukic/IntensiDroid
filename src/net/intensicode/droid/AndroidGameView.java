@@ -75,23 +75,21 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
     public final void beginFrame()
         {
         //#if DEBUG
-        Assert.isNull( "locked canvas should not be set", graphics.lockedCanvas );
         Assert.isNotNull( "surface holder should be initialized", mySurfaceHolder );
         //#endif
 
         final Canvas canvas = graphics.lockedCanvas = mySurfaceHolder.lockCanvas();
-        canvas.scale( getWidth() * 1.0f / width(), getHeight() * 1.0f / height() );
+        if ( canvas != null ) canvas.scale( getWidth() * 1.0f / width(), getHeight() * 1.0f / height() );
+        else Log.error( "lockCanvas failed with null object", null );
         }
 
     public final void endFrame()
         {
         //#if DEBUG
-        Assert.isNotNull( "locked canvas should be set", graphics.lockedCanvas );
         Assert.isNotNull( "surface holder should be initialized", mySurfaceHolder );
         //#endif
 
         mySurfaceHolder.unlockCanvasAndPost( graphics.lockedCanvas );
-        graphics.lockedCanvas = null;
         }
 
     // From SurfaceHolder.Callback
