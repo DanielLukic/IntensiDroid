@@ -15,7 +15,7 @@ public final class AndroidKeysHandler extends KeysHandler implements View.OnKeyL
 
     public final boolean onKey( final View aView, final int aKeyCode, final KeyEvent aKeyEvent )
         {
-        final int keyID = mapKeyCodeToKeyId( aKeyCode, aKeyCode );
+        final int keyID = mapKeyCodeToKeyId( aKeyCode );
         if ( keyID == INVALID ) return false;
 
         final int action = aKeyEvent.getAction();
@@ -30,20 +30,10 @@ public final class AndroidKeysHandler extends KeysHandler implements View.OnKeyL
 
     // Implementation
 
-    private int mapKeyCodeToKeyId( final int aKeyCode, final int aGameAction )
+    private int mapKeyCodeToKeyId( final int aKeyCode )
         {
         lastCode = aKeyCode;
-        lastAction = aGameAction;
-
-        if ( aGameAction == leftCode ) return LEFT;
-        if ( aGameAction == rightCode ) return RIGHT;
-        if ( aGameAction == upCode ) return UP;
-        if ( aGameAction == downCode ) return DOWN;
-        if ( aGameAction == fireCode ) return STICK_DOWN;
-        if ( aGameAction == fireCodeA ) return FIRE1;
-        if ( aGameAction == fireCodeB ) return FIRE2;
-        if ( aGameAction == fireCodeC ) return FIRE3;
-        if ( aGameAction == fireCodeD ) return FIRE4;
+        lastAction = 0;
 
         if ( aKeyCode == leftCode ) return LEFT;
         if ( aKeyCode == rightCode ) return RIGHT;
