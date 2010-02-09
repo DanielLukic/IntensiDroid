@@ -12,6 +12,15 @@ public final class AndroidImageResource implements ImageResource
 
     public final Bitmap bitmap;
 
+    public TexturePurger texturePurger;
+
+    public int textureId;
+
+    public int textureWidth;
+
+    public int textureHeight;
+
+
     public AndroidImageResource( final Bitmap aBitmap )
         {
         this( NO_RESOURCE_PATH, aBitmap );
@@ -51,6 +60,12 @@ public final class AndroidImageResource implements ImageResource
     public final void getRGB( final int[] aBuffer, final int aOffsetX, final int aScanlineSize, final int aX, final int aY, final int aWidth, final int aHeight )
         {
         bitmap.getPixels( aBuffer, aOffsetX, aScanlineSize, aX, aY, aWidth, aHeight );
+        }
+
+    public final void purge()
+        {
+        bitmap.recycle();
+        if ( textureId != 0 ) texturePurger.purge( this );
         }
 
     private AndroidCanvasGraphics myGraphics;
