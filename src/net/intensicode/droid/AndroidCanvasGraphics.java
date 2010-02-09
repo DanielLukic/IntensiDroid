@@ -1,22 +1,13 @@
 package net.intensicode.droid;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Rect;
-import net.intensicode.core.DirectGraphics;
-import net.intensicode.core.FontResource;
-import net.intensicode.core.ImageResource;
-import net.intensicode.util.Assert;
-import net.intensicode.util.Position;
-import net.intensicode.util.Rectangle;
-
+import android.graphics.*;
+import net.intensicode.core.*;
+import net.intensicode.util.*;
 
 
 public final class AndroidCanvasGraphics extends DirectGraphics
     {
     public Canvas lockedCanvas;
-
 
 
     public AndroidCanvasGraphics()
@@ -172,7 +163,6 @@ public final class AndroidCanvasGraphics extends DirectGraphics
         myCharSequence.append( aCharCode );
         lockedCanvas.drawText( myCharSequence, 0, 1, aX, aY - myFontMetrics.ascent, myActivePaint );
         }
-
 
 
     private Path myTrianglePath = new Path();
