@@ -2,11 +2,11 @@ package net.intensicode.droid.opengl;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import net.intensicode.core.DirectScreen;
+import android.graphics.PixelFormat;
+import net.intensicode.core.*;
 import net.intensicode.util.*;
-import net.intensicode.droid.AndroidGameEngine;
 
-import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.egl.*;
 import javax.microedition.khronos.opengles.GL10;
 
 
@@ -14,12 +14,16 @@ public final class OpenglGameView extends GLSurfaceView implements DirectScreen,
     {
     public OpenglGraphics graphics;
 
-    public AndroidGameEngine engine;
+    public GameSystem system;
 
 
     public OpenglGameView( final Context aContext )
         {
         super( aContext );
+
+        //#if DEBUG
+        setDebugFlags( DEBUG_CHECK_GL_ERROR );
+        //#endif
 
         setClickable( false );
         setFocusable( true );
@@ -30,7 +34,33 @@ public final class OpenglGameView extends GLSurfaceView implements DirectScreen,
         setWillNotCacheDrawing( false );
         setWillNotDraw( false );
 
-        setEGLConfigChooser( RED_BITS, GREEN_BITS, BLUE_BITS, ALPHA_BITS, DEPTH_BITS, STENCIL_BITS );
+//        setEGLConfigChooser( RED_BITS, GREEN_BITS, BLUE_BITS, ALPHA_BITS, DEPTH_BITS, STENCIL_BITS );
+//        setEGLConfigChooser(8, 8, 8, 8, 0, 0);
+
+        // Fix for Samsung Galaxy.. Seems to be OK with other devices, too..
+        setEGLConfigChooser(
+                new GLSurfaceView.EGLConfigChooser()
+                {
+                public EGLConfig chooseConfig( EGL10 egl, EGLDisplay display )
+                    {
+                    int[] attributes = new int[]{
+                            //EGL10.EGL_RED_SIZE,
+                            //5,
+                            //EGL10.EGL_BLUE_SIZE,
+                            //5,
+                            //EGL10.EGL_GREEN_SIZE,
+                            //6,
+                            EGL10.EGL_DEPTH_SIZE,
+                            16,
+                            EGL10.EGL_NONE
+                    };
+                    EGLConfig[] configs = new EGLConfig[1];
+                    int[] result = new int[1];
+                    egl.eglChooseConfig( display, attributes, configs, 1, result );
+                    return configs[ 0 ];
+                    }
+                }
+        );
 
         setRenderer( this );
         setRenderMode( RENDERMODE_CONTINUOUSLY );
@@ -89,47 +119,47 @@ public final class OpenglGameView extends GLSurfaceView implements DirectScreen,
         // Everything is handled in onDrawFrame.
         }
 
-    // From Rendered
+    // From Renderer
 
     public final void onSurfaceCreated( final GL10 aGL10, final EGLConfig aEGLConfig )
         {
-        aGL10.glShadeModel( GL10.GL_SMOOTH );             //Enable Smooth Shading
-        aGL10.glClearColor( 0.0f, 0.0f, 0.0f, 0.5f );     //Black Background
-        aGL10.glClearDepthf( 1.0f );                     //Depth Buffer Setup
-        aGL10.glEnable( GL10.GL_DEPTH_TEST );             //Enables Depth Testing
-        aGL10.glDepthFunc( GL10.GL_LEQUAL );             //The Type Of Depth Testing To Do
+        aGL10.glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+        aGL10.glShadeModel( GL10.GL_SMOOTH );
+        aGL10.glDisable( GL10.GL_DITHER );
+        aGL10.glEnable( GL10.GL_BLEND );
+        aGL10.glBlendFunc( GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA );
+        aGL10.glHint( GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST );
+        aGL10.glClear( GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT );
 
-        //Really Nice Perspective Calculations
-        aGL10.glHint( GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST );
+        graphics.onSurfaceCreated( aGL10 );
         }
 
     public final void onSurfaceChanged( final GL10 aGL10, final int aWidth, final int aHeight )
         {
-        aGL10.glViewport( 0, 0, aWidth, aHeight );     //Reset The Current Viewport
-        aGL10.glMatrixMode( GL10.GL_PROJECTION );     //Select The Projection Matrix
-        aGL10.glLoadIdentity();                     //Reset The Projection Matrix
-
+        aGL10.glViewport( 0, 0, aWidth, aHeight );
+        aGL10.glMatrixMode( GL10.GL_PROJECTION );
+        aGL10.glLoadIdentity();
         aGL10.glOrthof( 0, width(), 0, height(), -1, 1 );
+        aGL10.glTranslatef( 0, height(), 0 );
+        aGL10.glScalef( 1.0f, -1.0f, 1.0f );
+        aGL10.glMatrixMode( GL10.GL_MODELVIEW );
 
-        aGL10.glMatrixMode( GL10.GL_MODELVIEW );     //Select The Modelview Matrix
-        aGL10.glLoadIdentity();                     //Reset The Modelview Matrix
+        graphics.onSurfaceChanged( aGL10, aWidth, aHeight );
         }
-
-    private final Square mySquare = new Square();
 
     public final void onDrawFrame( final GL10 aGL10 )
         {
-        graphics.gl = aGL10;
+        graphics.onBeginFrame();
 
-//        engine.runSingleLoop();
+        aGL10.glMatrixMode( GL10.GL_MODELVIEW );
+        aGL10.glLoadIdentity();
 
-        //Clear Screen And Depth Buffer
-        aGL10.glClear( GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT );
-        aGL10.glLoadIdentity();                    //Reset The Current Modelview Matrix
+        aGL10.glClear( GL10.GL_COLOR_BUFFER_BIT );
 
-        mySquare.draw( aGL10, 32, 48, 32, 48 );
+        system.engine.runSingleLoop();
+//        system.runSingleLoop();
 
-        graphics.gl = null;
+        graphics.onEndFrame();
         }
 
 
@@ -137,15 +167,15 @@ public final class OpenglGameView extends GLSurfaceView implements DirectScreen,
 
     private final Position myTransformedPosition = new Position();
 
-    private static final int RED_BITS = 8;
+    private static final int RED_BITS = 5;
 
-    private static final int GREEN_BITS = 8;
+    private static final int GREEN_BITS = 6;
 
-    private static final int BLUE_BITS = 8;
+    private static final int BLUE_BITS = 5;
 
-    private static final int ALPHA_BITS = 8;
+    private static final int ALPHA_BITS = 5;
 
-    private static final int DEPTH_BITS = 0;
+    private static final int DEPTH_BITS = 16;
 
-    private static final int STENCIL_BITS = 1;
+    private static final int STENCIL_BITS = 0;
     }
