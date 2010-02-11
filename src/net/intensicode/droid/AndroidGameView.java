@@ -20,6 +20,7 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
 
         mySurfaceHolder = getHolder();
         mySurfaceHolder.addCallback( this );
+        mySurfaceHolder.setType( SurfaceHolder.SURFACE_TYPE_HARDWARE );
 
         setClickable( false );
         setFocusable( true );
@@ -92,6 +93,14 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         mySurfaceHolder.unlockCanvasAndPost( graphics.lockedCanvas );
         }
 
+    public final void initialize()
+        {
+        }
+
+    public final void cleanup()
+        {
+        }
+
     // From SurfaceHolder.Callback
 
     public final void surfaceCreated( final SurfaceHolder aSurfaceHolder )
@@ -99,7 +108,6 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         //#if DEBUG
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
         //#endif
-        mySurfaceHolder.setType( SurfaceHolder.SURFACE_TYPE_HARDWARE );
         }
 
     public final void surfaceChanged( final SurfaceHolder aSurfaceHolder, final int aFormat, final int aWidth, final int aHeight )
@@ -107,7 +115,7 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         //#if DEBUG
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
         //#endif
-        system.resume();
+        system.start();
         }
 
     public final void surfaceDestroyed( final SurfaceHolder aSurfaceHolder )
@@ -115,7 +123,7 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         //#if DEBUG
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
         //#endif
-        system.pause();
+        system.stop();
         }
 
 
