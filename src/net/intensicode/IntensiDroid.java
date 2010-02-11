@@ -46,6 +46,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         Assert.isFalse( "game system already initialized", isGameSystemCreated() );
         //#endif
 
+        showDeviceSpecs();
+
         setWindowFeatures();
         setAudioFeatures();
 
@@ -56,6 +58,20 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         }
 
     // Implementation
+
+    private void showDeviceSpecs()
+        {
+        //#if DEBUG
+        Log.debug( "Board: {}", android.os.Build.BOARD );
+        Log.debug( "Brand: {}", android.os.Build.BRAND );
+        Log.debug( "Device: {}", android.os.Build.DEVICE );
+        Log.debug( "Display: {}", android.os.Build.DISPLAY );
+        Log.debug( "Model: {}", android.os.Build.MODEL );
+        Log.debug( "Product: {}", android.os.Build.PRODUCT );
+        Log.debug( "Tags: {}", android.os.Build.TAGS );
+        Log.debug( "Type: {}", android.os.Build.TYPE );
+        //#endif
+        }
 
     private void setWindowFeatures()
         {
