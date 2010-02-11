@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
+import net.intensicode.droid.opengl.*;
 import net.intensicode.util.*;
 
 public abstract class IntensiDroid extends DebugLifeCycleActivity implements SystemContext
@@ -97,11 +98,15 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
         final AndroidGameSystem system = new AndroidGameSystem( this );
         final AndroidGameEngine engine = new AndroidGameEngine( system );
-        final AndroidGameView view = new AndroidGameView( this );
-        final AndroidCanvasGraphics graphics = new AndroidCanvasGraphics();
+
+        final VideoSystem videoSystem = createVideoSystem( system );
+        final SurfaceView view = videoSystem.view;
+        final DirectScreen screen = videoSystem.screen;
+        final DirectGraphics graphics = videoSystem.graphics;
+
         final AndroidResourcesManager resources = new AndroidResourcesManager( getAssets(), resourcesSubFolder );
         //#ifdef TOUCH_SUPPORTED
-        final AndroidTouchHandler touch = new AndroidTouchHandler( system, view );
+        final AndroidTouchHandler touch = new AndroidTouchHandler( system, screen );
         //#endif
         final AndroidKeysHandler keys = new AndroidKeysHandler();
         final AndroidStorageManager storage = new AndroidStorageManager( this );
@@ -110,14 +115,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         view.setOnTouchListener( touch );
         view.setOnKeyListener( keys );
 
-        view.graphics = graphics;
-        view.system = system;
-
         system.resources = resources;
         system.graphics = graphics;
         system.storage = storage;
         system.engine = engine;
-        system.screen = view;
+        system.screen = screen;
         //#ifdef TOUCH_SUPPORTED
         system.touch = touch;
         //#endif
@@ -126,6 +128,48 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
         myGameView = view;
         myGameSystem = system;
+        }
+
+    private VideoSystem createVideoSystem( final GameSystem aGameSystem )
+        {
+        if ( useOpenglIfPossible() )
+            {
+            return createOpenglVideoSystem( aGameSystem );
+            }
+        else
+            {
+            return createCanvasVideoSystem( aGameSystem );
+            }
+        }
+
+    private VideoSystem createOpenglVideoSystem( final GameSystem aGameSystem )
+        {
+        final OpenglGameView screen = new OpenglGameView( this );
+        final OpenglGraphics graphics = new OpenglGraphics();
+
+        screen.graphics = graphics;
+        screen.system = aGameSystem;
+
+        final VideoSystem videoSystem = new VideoSystem();
+        videoSystem.graphics = graphics;
+        videoSystem.screen = screen;
+        videoSystem.view = screen;
+        return videoSystem;
+        }
+
+    private VideoSystem createCanvasVideoSystem( final GameSystem aGameSystem )
+        {
+        final AndroidGameView screen = new AndroidGameView( this );
+        final AndroidCanvasGraphics graphics = new AndroidCanvasGraphics();
+
+        screen.graphics = graphics;
+        screen.system = aGameSystem;
+
+        final VideoSystem videoSystem = new VideoSystem();
+        videoSystem.graphics = graphics;
+        videoSystem.screen = screen;
+        videoSystem.view = screen;
+        return videoSystem;
         }
 
     private String determineResourcesSubFolder()
@@ -174,4 +218,14 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
     private static final String SUB_FOLDER_LANDSCAPE = "l";
 
     private static final String NO_SUB_FOLDER = null;
+
+
+    private class VideoSystem
+        {
+        public SurfaceView view;
+
+        public DirectScreen screen;
+
+        public DirectGraphics graphics;
+        }
     }
