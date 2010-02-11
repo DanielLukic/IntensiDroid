@@ -17,7 +17,7 @@ public class AndroidTouchEventWrapper implements TouchEvent
 
         final float x = aMotionEvent.getX();
         final float y = aMotionEvent.getY();
-        final Position transformed = myDirectScreen.toTarget( (int) Math.round( x ), (int) Math.round( y ) );
+        final Position transformed = myDirectScreen.toTarget( Math.round( x ), Math.round( y ) );
         myEventPosition.setTo( transformed );
         }
 
