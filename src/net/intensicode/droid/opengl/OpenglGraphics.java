@@ -13,14 +13,6 @@ import java.util.ArrayList;
 
 public final class OpenglGraphics extends DirectGraphics implements TexturePurger
     {
-    public OpenglGraphics()
-        {
-        myFillRectSquare.set( 0, 0, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f );
-        myFillRectSquare.set( 1, 0, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f );
-        myFillRectSquare.set( 0, 1, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f );
-        myFillRectSquare.set( 1, 1, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f );
-        }
-
     final void onSurfaceCreated( final GL10 aGL10 )
         {
         myGL = aGL10;
@@ -62,10 +54,13 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
         myHeight = aHeight;
         }
 
+    final void releaseGL()
+        {
+        myGL = null;
+        }
+
     final void onBeginFrame()
         {
-        showGlError();
-
         myGL.glEnableClientState( GL10.GL_VERTEX_ARRAY );
 
         mMatrix4x4[ 1 ] = mMatrix4x4[ 2 ] = mMatrix4x4[ 4 ] = mMatrix4x4[ 6 ] = mMatrix4x4[ 8 ] = mMatrix4x4[ 9 ] = 0.0f;
@@ -81,8 +76,6 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
         enableTexturing();
 
-        showGlError();
-
         myTextureStateChanges = myTextureBindCalls = myTextureCropResets = 0;
         }
 
@@ -95,14 +88,6 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
     private boolean myTextureActive;
 
     private int myTextureId;
-
-    private void showGlError()
-        {
-        final int error = myGL.glGetError();
-        //#if DEBUG
-        if ( error != 0 ) Log.debug( "gl error: {}", error );
-        //#endif
-        }
 
     private void enableTexturing()
         {
@@ -124,16 +109,12 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
     final void onEndFrame()
         {
-        showGlError();
-
         disableTexturing();
 
         myGL.glDisableClientState( GL10.GL_VERTEX_ARRAY );
 
-        showGlError();
-
         //#if DEBUG
-        if ( myTextureStateChanges > 10 ) Log.debug( "gl texture state changes: {}", myTextureStateChanges );
+        if ( myTextureStateChanges > 12 ) Log.debug( "gl texture state changes: {}", myTextureStateChanges );
         if ( myTextureBindCalls > 20 ) Log.debug( "gl texture bind calls: {}", myTextureBindCalls );
         if ( myTextureCropResets > 5 ) Log.debug( "gl texture crop resets: {}", myTextureCropResets );
         //#endif
@@ -197,10 +178,11 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
     private void fillColoredRect( final int aX, final int aY, final int aWidth, final int aHeight )
         {
         if ( myTextureActive ) disableTexturing();
+        if ( myBuffersDirty ) updateBuffers();
         myFillRectSquare.draw( myGL, aX, aY, aWidth, aHeight, false );
         }
 
-    private final Grid myFillRectSquare = new Grid( 2, 2 );
+    private final StaticSquare myFillRectSquare = new StaticSquare();
 
     public final void drawRect( final int aX, final int aY, final int aWidth, final int aHeight )
         {
@@ -219,10 +201,16 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
     public final void fillTriangle( final int aX1, final int aY1, final int aX2, final int aY2, final int aX3, final int aY3 )
         {
-        //#if DEBUG
-        Log.debug( "fillTriangle not implemented, yet" );
-        //#endif
+        myTriangle.set( 0, aX1, aY1 );
+        myTriangle.set( 1, aX2, aY2 );
+        myTriangle.set( 2, aX3, aY3 );
+        myTriangle.draw( myGL );
+        myBuffersDirty = true;
         }
+
+    private final MutableTriangle myTriangle = new MutableTriangle();
+
+    private boolean myBuffersDirty = true;
 
     public final void blendImage( final ImageResource aImage, final int aX, final int aY, final int aAlpha256 )
         {
@@ -255,6 +243,7 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
             }
         else
             {
+            if ( myBuffersDirty ) updateBuffers();
             myFillRectSquare.draw( myGL, aX, aY, aWidth, aHeight, true );
             }
         }
@@ -343,6 +332,7 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
             myGL.glMatrixMode( GL10.GL_MODELVIEW );
 
+            if ( myBuffersDirty ) updateBuffers();
             myFillRectSquare.draw( myGL, aTargetX, aTargetY, aSourceRect.width, aSourceRect.height, true );
 
             myGL.glMatrixMode( GL10.GL_TEXTURE );
@@ -352,14 +342,22 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
             }
         }
 
+    private void updateBuffers()
+        {
+        myFillRectSquare.updateBuffers( myGL, true );
+        myBuffersDirty = false;
+        }
+
     private float[] mMatrix4x4 = new float[]{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 
     public final void drawSubstring( final String aText, final int aStart, final int aEnd, final int aX, final int aY )
         {
+        throw new RuntimeException( "nyi" );
         }
 
     public void drawChar( final char aCharCode, final int aX, final int aY )
         {
+        throw new RuntimeException( "nyi" );
         }
 
     // Implementation
@@ -395,9 +393,9 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
         final Bitmap originalBitmap = aImageResource.bitmap;
 
         final int originalWidth = originalBitmap.getWidth();
-        final int properWidth = Math.min( 512, findNextPowerOfTwo( originalWidth ) );
+        final int properWidth = findClosestPowerOfTwo( originalWidth );
         final int originalHeight = originalBitmap.getHeight();
-        final int properHeight = Math.min( 256, findNextPowerOfTwo( originalHeight ) );
+        final int properHeight = findClosestPowerOfTwo( originalHeight );
 
         final Bitmap bitmap = makeProperBitmap( originalBitmap, properWidth, properHeight );
 
@@ -447,12 +445,17 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
             }
 
         if ( bitmap != originalBitmap ) bitmap.recycle(); // only the created ones..
+        }
 
-        int error = myGL.glGetError();
-        if ( error != GL10.GL_NO_ERROR )
-            {
-            Log.error( "failed loading texture - open myGL error {}", error, null );
-            }
+    private int findClosestPowerOfTwo( final int aOriginalValue )
+        {
+        final int nextPowerOfTwo = Math.min( 256, findNextPowerOfTwo( aOriginalValue ) );
+        final int deltaToNext = Math.abs( nextPowerOfTwo - aOriginalValue );
+        final int previousPowerOfTwo = nextPowerOfTwo / 2;
+        if ( previousPowerOfTwo < 2 ) return nextPowerOfTwo;
+        final int deltaToPrevious = Math.abs( previousPowerOfTwo - aOriginalValue );
+        if ( deltaToNext < deltaToPrevious ) return nextPowerOfTwo;
+        else return previousPowerOfTwo;
         }
 
     private int findNextPowerOfTwo( int aPositiveInteger )

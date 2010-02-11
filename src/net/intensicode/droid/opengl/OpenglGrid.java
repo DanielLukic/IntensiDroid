@@ -21,11 +21,11 @@ import java.nio.*;
 
 /**
  * A 2D rectangular mesh. Can be drawn textured or untextured.
- * This version is modified from the original Grid.java (found in
+ * This version is modified from the original OpenglGrid.java (found in
  * the SpriteText package in the APIDemos Android sample) to support hardware
  * vertex buffers.
  */
-class Grid
+class OpenglGrid
     {
     private FloatBuffer mVertexBuffer;
 
@@ -45,7 +45,7 @@ class Grid
 
     private int mTextureCoordBufferIndex;
 
-    public Grid( int vertsAcross, int vertsDown )
+    public OpenglGrid( int vertsAcross, int vertsDown )
         {
         mW = vertsAcross;
         mH = vertsDown;

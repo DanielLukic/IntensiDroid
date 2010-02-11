@@ -1,16 +1,16 @@
 package net.intensicode.droid.opengl;
 
 import android.content.Context;
-import android.opengl.GLSurfaceView;
-import android.graphics.PixelFormat;
+import android.os.Build;
+import android.view.*;
 import net.intensicode.core.*;
 import net.intensicode.util.*;
 
-import javax.microedition.khronos.egl.*;
+import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.opengles.GL10;
 
 
-public final class OpenglGameView extends GLSurfaceView implements DirectScreen, GLSurfaceView.Renderer
+public final class OpenglGameView extends SurfaceView implements DirectScreen, SurfaceHolder.Callback
     {
     public OpenglGraphics graphics;
 
@@ -21,9 +21,9 @@ public final class OpenglGameView extends GLSurfaceView implements DirectScreen,
         {
         super( aContext );
 
-        //#if DEBUG
-        setDebugFlags( DEBUG_CHECK_GL_ERROR );
-        //#endif
+        mySurfaceHolder = getHolder();
+        mySurfaceHolder.addCallback( this );
+        mySurfaceHolder.setType( SurfaceHolder.SURFACE_TYPE_GPU );
 
         setClickable( false );
         setFocusable( true );
@@ -33,37 +33,6 @@ public final class OpenglGameView extends GLSurfaceView implements DirectScreen,
         setLongClickable( false );
         setWillNotCacheDrawing( false );
         setWillNotDraw( false );
-
-//        setEGLConfigChooser( RED_BITS, GREEN_BITS, BLUE_BITS, ALPHA_BITS, DEPTH_BITS, STENCIL_BITS );
-//        setEGLConfigChooser(8, 8, 8, 8, 0, 0);
-
-        // Fix for Samsung Galaxy.. Seems to be OK with other devices, too..
-        setEGLConfigChooser(
-                new GLSurfaceView.EGLConfigChooser()
-                {
-                public EGLConfig chooseConfig( EGL10 egl, EGLDisplay display )
-                    {
-                    int[] attributes = new int[]{
-                            //EGL10.EGL_RED_SIZE,
-                            //5,
-                            //EGL10.EGL_BLUE_SIZE,
-                            //5,
-                            //EGL10.EGL_GREEN_SIZE,
-                            //6,
-                            EGL10.EGL_DEPTH_SIZE,
-                            16,
-                            EGL10.EGL_NONE
-                    };
-                    EGLConfig[] configs = new EGLConfig[1];
-                    int[] result = new int[1];
-                    egl.eglChooseConfig( display, attributes, configs, 1, result );
-                    return configs[ 0 ];
-                    }
-                }
-        );
-
-        setRenderer( this );
-        setRenderMode( RENDERMODE_CONTINUOUSLY );
         }
 
     // From DirectScreen
@@ -102,26 +71,115 @@ public final class OpenglGameView extends GLSurfaceView implements DirectScreen,
 
     public Position toTarget( final int aNativeX, final int aNativeY )
         {
-        myTransformedPosition.x = (int) ( aNativeX / getWidth() * width() );
-        myTransformedPosition.y = (int) ( aNativeY / getHeight() * height() );
+        myTransformedPosition.x = aNativeX * width() / getWidth();
+        myTransformedPosition.y = aNativeY * height() / getHeight();
         return myTransformedPosition;
         }
 
     public final void beginFrame()
         {
-        // Because of the GLSurfaceView/Rendered architecture this will do nothing.
-        // Everything is handled in onDrawFrame.
+        //#if DEBUG
+        Assert.notNull( "opengl handle", myGL );
+        //#endif
+
+        graphics.onBeginFrame();
+
+        myGL.glMatrixMode( GL10.GL_MODELVIEW );
+        myGL.glLoadIdentity();
+
+        myGL.glClear( GL10.GL_COLOR_BUFFER_BIT );
         }
 
     public final void endFrame()
         {
-        // Because of the GLSurfaceView/Rendered architecture this will do nothing.
-        // Everything is handled in onDrawFrame.
+        //#if DEBUG
+        Assert.notNull( "opengl handle", myGL );
+        //#endif
+
+        graphics.onEndFrame();
+
+        final int state = myEglHelper.swapAndReturnContextState();
+        if ( state == EglHelper.CONTEXT_LOST )
+            {
+            //#if DEBUG
+            Log.debug( "graphics context lost" );
+            //#endif
+            myEglHelper.finish();
+            }
         }
 
-    // From Renderer
+    public final void initialize()
+        {
+        initializeGraphics();
+        }
 
-    public final void onSurfaceCreated( final GL10 aGL10, final EGLConfig aEGLConfig )
+    public final void cleanup()
+        {
+        graphics.releaseGL();
+        myEglHelper.finish();
+        myGL = null;
+        }
+
+    // From SurfaceHolder.Callback
+
+    public final void surfaceCreated( final SurfaceHolder aSurfaceHolder )
+        {
+        //#if DEBUG
+        Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
+        //#endif
+        }
+
+    public final void surfaceChanged( final SurfaceHolder aSurfaceHolder, final int aFormat, final int aWidth, final int aHeight )
+        {
+        //#if DEBUG
+        Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
+        //#endif
+        system.start();
+        }
+
+    public final void surfaceDestroyed( final SurfaceHolder aSurfaceHolder )
+        {
+        //#if DEBUG
+        Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
+        //#endif
+        system.stop();
+        }
+
+    // Implementation
+
+    private void initializeGraphics()
+        {
+        myEglHelper.start( getEglConfiguration() );
+        myGL = (GL10) myEglHelper.createOrUpdateSurface( mySurfaceHolder );
+        onSurfaceCreated( myGL );
+        onSurfaceChanged( myGL, getWidth(), getHeight() );
+        }
+
+    private int[] getEglConfiguration()
+        {
+        if ( isSamsungGalaxy() )
+            {
+            // Samsung Galaxy needs this and other devices seem to be OK with it:
+            return new int[]{ EGL10.EGL_DEPTH_SIZE, SAMSUNG_GALAXY_DEPTH_BITS, EGL10.EGL_NONE };
+            }
+
+        return new int[]{ EGL10.EGL_RED_SIZE, REQUIRED_RED_BITS,
+                          EGL10.EGL_GREEN_SIZE, REQUIRED_GREEN_BITS,
+                          EGL10.EGL_BLUE_SIZE, REQUIRED_BLUE_BITS,
+                          EGL10.EGL_ALPHA_SIZE, REQUIRED_ALPHA_BITS,
+                          EGL10.EGL_DEPTH_SIZE, REQUIRED_DEPTH_BITS,
+                          EGL10.EGL_STENCIL_SIZE, REQUIRED_STENCIL_BITS,
+                          EGL10.EGL_NONE };
+        }
+
+    private boolean isSamsungGalaxy()
+        {
+        final boolean isSamsung = Build.BRAND.toLowerCase().indexOf( "samsung" ) != -1;
+        final boolean isGalaxy = Build.MODEL.toLowerCase().indexOf( "galaxy" ) != -1;
+        return isSamsung && isGalaxy;
+        }
+
+    private void onSurfaceCreated( final GL10 aGL10 )
         {
         aGL10.glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
         aGL10.glShadeModel( GL10.GL_SMOOTH );
@@ -134,7 +192,7 @@ public final class OpenglGameView extends GLSurfaceView implements DirectScreen,
         graphics.onSurfaceCreated( aGL10 );
         }
 
-    public final void onSurfaceChanged( final GL10 aGL10, final int aWidth, final int aHeight )
+    private void onSurfaceChanged( final GL10 aGL10, final int aWidth, final int aHeight )
         {
         aGL10.glViewport( 0, 0, aWidth, aHeight );
         aGL10.glMatrixMode( GL10.GL_PROJECTION );
@@ -147,35 +205,28 @@ public final class OpenglGameView extends GLSurfaceView implements DirectScreen,
         graphics.onSurfaceChanged( aGL10, aWidth, aHeight );
         }
 
-    public final void onDrawFrame( final GL10 aGL10 )
-        {
-        graphics.onBeginFrame();
 
-        aGL10.glMatrixMode( GL10.GL_MODELVIEW );
-        aGL10.glLoadIdentity();
+    private GL10 myGL;
 
-        aGL10.glClear( GL10.GL_COLOR_BUFFER_BIT );
-
-        system.engine.runSingleLoop();
-//        system.runSingleLoop();
-
-        graphics.onEndFrame();
-        }
-
+    private final SurfaceHolder mySurfaceHolder;
 
     private final Size myTargetSize = new Size();
 
+    private final EglHelper myEglHelper = new EglHelper();
+
     private final Position myTransformedPosition = new Position();
 
-    private static final int RED_BITS = 5;
+    private static final int SAMSUNG_GALAXY_DEPTH_BITS = 16;
 
-    private static final int GREEN_BITS = 6;
+    private static final int REQUIRED_RED_BITS = 5;
 
-    private static final int BLUE_BITS = 5;
+    private static final int REQUIRED_GREEN_BITS = 6;
 
-    private static final int ALPHA_BITS = 5;
+    private static final int REQUIRED_BLUE_BITS = 5;
 
-    private static final int DEPTH_BITS = 16;
+    private static final int REQUIRED_ALPHA_BITS = 4;
 
-    private static final int STENCIL_BITS = 0;
+    private static final int REQUIRED_DEPTH_BITS = 0;
+
+    private static final int REQUIRED_STENCIL_BITS = 0;
     }
