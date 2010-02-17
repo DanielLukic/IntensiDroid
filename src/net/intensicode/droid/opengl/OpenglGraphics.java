@@ -142,10 +142,14 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
     // From DirectGraphics
 
-    public void clearRGB24( final int aRGB24 )
+    public final int getColorRGB24()
         {
-        setColorRGB24( aRGB24 );
-        fillRect( 0, 0, myWidth, myHeight );
+        return myColorARGB32 & 0x00FFFFFF;
+        }
+
+    public final int getColorARGB32()
+        {
+        return myColorARGB32;
         }
 
     public final void setColorRGB24( final int aRGB24 )
@@ -160,11 +164,20 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
         final float green = ( ( aARGB32 >> 8 ) & 255 ) / 255.0f;
         final float blue = ( aARGB32 & 255 ) / 255.0f;
         myGL.glColor4f( red, green, blue, alpha );
+        myColorARGB32 = aARGB32;
         }
+
+    private int myColorARGB32;
 
     public final void setFont( final FontResource aFont )
         {
         myFont = (AndroidFontResource) aFont;
+        }
+
+    public void clearRGB24( final int aRGB24 )
+        {
+        setColorRGB24( aRGB24 );
+        fillRect( 0, 0, myWidth, myHeight );
         }
 
     public final void drawLine( final int aX1, final int aY1, final int aX2, final int aY2 )
@@ -214,7 +227,14 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
     public final void blendImage( final ImageResource aImage, final int aX, final int aY, final int aAlpha256 )
         {
-        fillTexturedRect( aImage, aX, aY );
+        // TODO: How to apply alpha to texture? Create a new blended texture? OMG!?
+        drawImage( aImage, aX, aY );
+        }
+
+    public final void blendImage( final ImageResource aImage, final Rectangle aSourceRect, final int aX, final int aY, final int aAlpha256 )
+        {
+        // TODO: How to apply alpha to texture? Create a new blended texture? OMG!?
+        drawImage( aImage, aSourceRect, aX, aY );
         }
 
     private void fillTexturedRect( final ImageResource aImage, final int aX, final int aY )
