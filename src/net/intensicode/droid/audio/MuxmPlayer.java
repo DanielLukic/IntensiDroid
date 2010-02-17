@@ -10,8 +10,8 @@ public final class MuxmPlayer implements AudioTrack.OnPlaybackPositionUpdateList
         {
         myModuleEngine = aModuleEngine;
 
-        final int minBufferSize = AudioTrack.getMinBufferSize( DEFAULT_SAMPLE_RATE, 2, AudioFormat.ENCODING_PCM_16BIT );
-        final int frameCompatibleBuffer = minBufferSize * FRAME_SIZE_IN_BYTES;
+        final int minBufferSize = AudioTrack.getMinBufferSize( DEFAULT_SAMPLE_RATE, AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT );
+        final int frameCompatibleBuffer = minBufferSize / FRAME_SIZE_IN_BYTES * FRAME_SIZE_IN_BYTES;
 
         //#if DEBUG
         Log.debug( "AudioTrack Native Sample Rate: {}", AudioTrack.getNativeOutputSampleRate( AudioTrack.MODE_STREAM ) );
@@ -41,7 +41,7 @@ public final class MuxmPlayer implements AudioTrack.OnPlaybackPositionUpdateList
         fillAudioTrackBuffer();
         }
 
-    private final void fillAudioTrackBuffer()
+    private void fillAudioTrackBuffer()
         {
         myModuleEngine.getAudio( myAudioBuffer, 0, myBufferSizeInFrames, true );
         myAudioTrack.write( myAudioBuffer, 0, myBufferSizeInBytes );
@@ -78,6 +78,7 @@ public final class MuxmPlayer implements AudioTrack.OnPlaybackPositionUpdateList
         {
         if ( isStopped() ) return;
         myAudioTrack.stop();
+        myAudioTrack.flush();
         }
 
     private boolean isStopped()
@@ -116,5 +117,5 @@ public final class MuxmPlayer implements AudioTrack.OnPlaybackPositionUpdateList
 
     private static final int FRAME_SIZE_IN_BYTES = 4;
 
-    private static final int DEFAULT_SAMPLE_RATE = 44100;
+    private static final int DEFAULT_SAMPLE_RATE = 22050;
     }
