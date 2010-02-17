@@ -24,7 +24,9 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
         final String extensions = aGL10.glGetString( GL10.GL_EXTENSIONS );
 
         myHasDrawTextureExtension = extensions.indexOf( "GL_OES_draw_texture" ) >= 0;
-        myHasHardwareBuffersFlag = !isVersion1_0;
+
+        // TODO: Test this on a device. Then activate it.
+        myHasHardwareBuffersFlag = false; // !isVersion1_0;
 
         if ( myHasHardwareBuffersFlag )
             {
@@ -48,10 +50,14 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
             }
         }
 
-    public void onSurfaceChanged( final GL10 aGL10, final int aWidth, final int aHeight )
+    public void onSurfaceChanged( final GL10 aGL10, final int aWidth, final int aHeight, final int aDisplayWidth, final int aDisplayHeight )
         {
         myWidth = aWidth;
         myHeight = aHeight;
+        myDisplayWidth = aDisplayWidth;
+        myDisplayHeight = aDisplayHeight;
+        myScaleX = myDisplayWidth / (float) myWidth;
+        myScaleY = myDisplayHeight / (float) myHeight;
         }
 
     final void releaseGL()
@@ -183,9 +189,6 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
     public final void drawLine( final int aX1, final int aY1, final int aX2, final int aY2 )
         {
         if ( aX1 == aX2 && aY1 == aY2 ) fillColoredRect( aX1, aY1, 1, 1 );
-        //#if DEBUG
-        else Log.debug( "drawLine not implemented, yet" );
-        //#endif
         }
 
     private void fillColoredRect( final int aX, final int aY, final int aWidth, final int aHeight )
@@ -259,7 +262,8 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
         if ( myHasDrawTextureExtension )
             {
             if ( myIsCroppedFlag ) resetTextureCropping( imageResource.textureWidth, imageResource.textureHeight );
-            ( (GL11Ext) myGL ).glDrawTexfOES( aX, myHeight - aY - aHeight, 0, aWidth, aHeight );
+            final int y = myHeight - aY - aHeight;
+            ( (GL11Ext) myGL ).glDrawTexfOES( aX * myScaleX, y * myScaleY, 0, aWidth * myScaleX, aHeight * myScaleY );
             }
         else
             {
@@ -336,7 +340,11 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
         if ( myHasDrawTextureExtension )
             {
             cropTexture( aSourceRect, imageResource );
-            ( (GL11Ext) myGL ).glDrawTexfOES( aTargetX, myHeight - aTargetY - aSourceRect.height, 0, aSourceRect.width, aSourceRect.height );
+            final int x = aTargetX;
+            final int y = myHeight - aTargetY - aSourceRect.height;
+            final int width = aSourceRect.width;
+            final int height = aSourceRect.height;
+            ( (GL11Ext) myGL ).glDrawTexfOES( x * myScaleX, y * myScaleY, 0, width * myScaleX, height * myScaleY );
             }
         else
             {
@@ -372,12 +380,10 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
     public final void drawSubstring( final String aText, final int aStart, final int aEnd, final int aX, final int aY )
         {
-        throw new RuntimeException( "nyi" );
         }
 
     public void drawChar( final char aCharCode, final int aX, final int aY )
         {
-        throw new RuntimeException( "nyi" );
         }
 
     // Implementation
@@ -516,6 +522,14 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
     private int myWidth;
 
     private int myHeight;
+
+    private float myScaleX;
+
+    private float myScaleY;
+
+    private int myDisplayWidth;
+
+    private int myDisplayHeight;
 
     private AndroidFontResource myFont;
 
