@@ -88,26 +88,48 @@ public final class AndroidCanvasGraphics extends DirectGraphics
 
     public final void blendImage( final ImageResource aImage, final int aX, final int aY, final int aAlpha256 )
         {
-        final AndroidImageResource imageResource = (AndroidImageResource) aImage;
-        myImagePaint.setAlpha( aAlpha256 );
-        lockedCanvas.drawBitmap( imageResource.bitmap, aX, aY, myImagePaint );
-        myImagePaint.setAlpha( 255 );
+        if ( aAlpha256 == FULLY_TRANSPARENT )
+            {
+            // Nothing to do..
+            }
+        else if ( aAlpha256 == FULLY_OPAQUE )
+            {
+            drawImage( aImage, aX, aY );
+            }
+        else
+            {
+            final AndroidImageResource imageResource = (AndroidImageResource) aImage;
+            myImagePaint.setAlpha( aAlpha256 );
+            lockedCanvas.drawBitmap( imageResource.bitmap, aX, aY, myImagePaint );
+            myImagePaint.setAlpha( 255 );
+            }
         }
 
     public final void blendImage( final ImageResource aImage, final Rectangle aSourceRect, final int aX, final int aY, final int aAlpha256 )
         {
-        final AndroidImageResource imageResource = (AndroidImageResource) aImage;
-        myImagePaint.setAlpha( aAlpha256 );
-        mySourceRect.left = aSourceRect.x;
-        mySourceRect.top = aSourceRect.y;
-        mySourceRect.right = aSourceRect.x + aSourceRect.width;
-        mySourceRect.bottom = aSourceRect.y + aSourceRect.height;
-        myTargetRect.left = aX;
-        myTargetRect.top = aY;
-        myTargetRect.right = aX + aSourceRect.width;
-        myTargetRect.bottom = aY + aSourceRect.height;
-        lockedCanvas.drawBitmap( imageResource.bitmap, mySourceRect, myTargetRect, myImagePaint );
-        myImagePaint.setAlpha( 255 );
+        if ( aAlpha256 == FULLY_TRANSPARENT )
+            {
+            // Nothing to do..
+            }
+        else if ( aAlpha256 == FULLY_OPAQUE )
+            {
+            drawImage( aImage, aSourceRect, aX, aY );
+            }
+        else
+            {
+            final AndroidImageResource imageResource = (AndroidImageResource) aImage;
+            myImagePaint.setAlpha( aAlpha256 );
+            mySourceRect.left = aSourceRect.x;
+            mySourceRect.top = aSourceRect.y;
+            mySourceRect.right = aSourceRect.x + aSourceRect.width;
+            mySourceRect.bottom = aSourceRect.y + aSourceRect.height;
+            myTargetRect.left = aX;
+            myTargetRect.top = aY;
+            myTargetRect.right = aX + aSourceRect.width;
+            myTargetRect.bottom = aY + aSourceRect.height;
+            lockedCanvas.drawBitmap( imageResource.bitmap, mySourceRect, myTargetRect, myImagePaint );
+            myImagePaint.setAlpha( 255 );
+            }
         }
 
     public final void drawImage( final ImageResource aImage, final int aX, final int aY )
