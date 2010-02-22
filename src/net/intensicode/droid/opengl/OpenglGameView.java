@@ -162,14 +162,7 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
             // Samsung Galaxy needs this and other devices seem to be OK with it:
             return new int[]{ EGL10.EGL_DEPTH_SIZE, SAMSUNG_GALAXY_DEPTH_BITS, EGL10.EGL_NONE };
             }
-
-        return new int[]{ EGL10.EGL_RED_SIZE, REQUIRED_RED_BITS,
-                          EGL10.EGL_GREEN_SIZE, REQUIRED_GREEN_BITS,
-                          EGL10.EGL_BLUE_SIZE, REQUIRED_BLUE_BITS,
-                          EGL10.EGL_ALPHA_SIZE, REQUIRED_ALPHA_BITS,
-                          EGL10.EGL_DEPTH_SIZE, REQUIRED_DEPTH_BITS,
-                          EGL10.EGL_STENCIL_SIZE, REQUIRED_STENCIL_BITS,
-                          EGL10.EGL_NONE };
+        return new int[]{ EGL10.EGL_NONE };
         }
 
     private boolean isSamsungGalaxy()
@@ -217,16 +210,4 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
     private final Position myTransformedPosition = new Position();
 
     private static final int SAMSUNG_GALAXY_DEPTH_BITS = 16;
-
-    private static final int REQUIRED_RED_BITS = 5;
-
-    private static final int REQUIRED_GREEN_BITS = 6;
-
-    private static final int REQUIRED_BLUE_BITS = 5;
-
-    private static final int REQUIRED_ALPHA_BITS = 4;
-
-    private static final int REQUIRED_DEPTH_BITS = 0;
-
-    private static final int REQUIRED_STENCIL_BITS = 0;
     }
