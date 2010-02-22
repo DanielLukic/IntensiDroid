@@ -32,7 +32,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         myGameSystem.showError( "cannot keep minimum frame rate - system overloaded?", null );
         }
 
-    public final void terminateApplication()
+    public void terminateApplication()
         {
         finish();
         }
