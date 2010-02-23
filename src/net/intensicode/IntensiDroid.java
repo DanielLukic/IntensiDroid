@@ -17,6 +17,15 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     // From SystemContext
 
+    public final boolean useOpenglIfPossible()
+        {
+        //#if OPENGL
+        //# return true;
+        //#else
+        return false;
+        //#endif
+        }
+
     public final GameSystem getGameSystem()
         {
         return myGameSystem;
