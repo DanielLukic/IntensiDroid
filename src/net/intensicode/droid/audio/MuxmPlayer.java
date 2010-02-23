@@ -117,5 +117,5 @@ public final class MuxmPlayer implements AudioTrack.OnPlaybackPositionUpdateList
 
     private static final int FRAME_SIZE_IN_BYTES = 4;
 
-    private static final int DEFAULT_SAMPLE_RATE = 22050;
+    private static final int DEFAULT_SAMPLE_RATE = 11025;
     }
