@@ -120,38 +120,6 @@ class StaticSquare
             }
         }
 
-    private void original_draw( GL10 gl, boolean useTexture )
-        {
-        if ( mVertBufferIndex == 0 )
-            {
-            gl.glVertexPointer( 3, GL10.GL_FLOAT, 0, mVertexBuffer );
-
-            if ( useTexture ) gl.glTexCoordPointer( 2, GL10.GL_FLOAT, 0, mTexCoordBuffer );
-
-            gl.glDrawElements( GL10.GL_TRIANGLES, mIndexCount,
-                               GL10.GL_UNSIGNED_SHORT, mIndexBuffer );
-            }
-        else
-            {
-            final GL11 gl11 = (GL11) gl;
-
-            gl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, mVertBufferIndex );
-            gl11.glVertexPointer( 3, GL10.GL_FLOAT, 0, 0 );
-
-            if ( useTexture )
-                {
-                gl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, mTextureCoordBufferIndex );
-                gl11.glTexCoordPointer( 2, GL11.GL_FLOAT, 0, 0 );
-                }
-
-            gl11.glBindBuffer( GL11.GL_ELEMENT_ARRAY_BUFFER, mIndexBufferIndex );
-            gl11.glDrawElements( GL11.GL_TRIANGLES, mIndexCount, GL11.GL_UNSIGNED_SHORT, 0 );
-
-            gl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, 0 );
-            gl11.glBindBuffer( GL11.GL_ELEMENT_ARRAY_BUFFER, 0 );
-            }
-        }
-
     public void forgetHardwareBuffers()
         {
         mVertBufferIndex = 0;
