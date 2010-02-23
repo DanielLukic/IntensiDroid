@@ -105,7 +105,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         final DirectGraphics graphics = videoSystem.graphics;
 
         final AndroidResourcesManager resources = new AndroidResourcesManager( getAssets(), resourcesSubFolder );
-        //#ifdef TOUCH_SUPPORTED
+        //#ifdef TOUCH
         final AndroidTouchHandler touch = new AndroidTouchHandler( system, screen );
         //#endif
         final AndroidKeysHandler keys = new AndroidKeysHandler();
@@ -120,7 +120,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         system.storage = storage;
         system.engine = engine;
         system.screen = screen;
-        //#ifdef TOUCH_SUPPORTED
+        //#ifdef TOUCH
         system.touch = touch;
         //#endif
         system.audio = audio;
