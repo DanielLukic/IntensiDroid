@@ -11,6 +11,11 @@ public final class AndroidTouchHandler extends TouchHandler implements View.OnTo
         myTouchEventWrapper = new AndroidTouchEventWrapper( aDirectScreen );
         }
 
+    public final boolean supportsMultiTouch()
+        {
+        return false;
+        }
+
     // From OnTouchListener
 
     public final synchronized boolean onTouch( final View aView, final MotionEvent aMotionEvent )
