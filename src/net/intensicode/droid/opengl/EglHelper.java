@@ -1,12 +1,15 @@
 package net.intensicode.droid.opengl;
 
 import android.view.SurfaceHolder;
+import net.intensicode.util.Log;
 
 import javax.microedition.khronos.egl.*;
 import javax.microedition.khronos.opengles.GL;
 
 final class EglHelper
     {
+    public static final int[] CHOOSE_FIRST_AVAILABLE = null;
+
     public static final int CONTEXT_LOST = 0;
 
     public static final int CONTEXT_OK = 1;
@@ -28,11 +31,58 @@ final class EglHelper
         myDisplay = myEgl.eglGetDisplay( EGL10.EGL_DEFAULT_DISPLAY );
         myEgl.eglInitialize( myDisplay, version );
 
-        final EGLConfig[] configs = new EGLConfig[1];
-        final int[] num_config = new int[1];
-        myEgl.eglChooseConfig( myDisplay, aConfigurationSpec, configs, 1, num_config );
-        myConfiguration = configs[ 0 ];
+        final EGLConfig[] configurations = new EGLConfig[16];
+        final int[] numberOfConfigurations = new int[1];
+        myEgl.eglGetConfigs( myDisplay, configurations, configurations.length, numberOfConfigurations );
+
+        //#if DEBUG
+        Log.debug( "EGL configurations found: {}", numberOfConfigurations[ 0 ] );
+        for ( int idx = 0; idx < numberOfConfigurations[ 0 ]; idx++ )
+            {
+            Log.debug( "EGL available configuration:" );
+            dumpConfiguration( configurations[ idx ] );
+            }
+        //#endif
+
+        if ( aConfigurationSpec == CHOOSE_FIRST_AVAILABLE )
+            {
+            myConfiguration = configurations[0];
+            }
+        else
+            {
+            final EGLConfig[] configs = new EGLConfig[1];
+            final int[] num_config = new int[1];
+            myEgl.eglChooseConfig( myDisplay, aConfigurationSpec, configs, 1, num_config );
+            myConfiguration = configs[ 0 ];
+            }
+
+        Log.debug( "EGL choosen configuration:" );
+        dumpConfiguration( myConfiguration );
+
         myContext = myEgl.eglCreateContext( myDisplay, myConfiguration, EGL10.EGL_NO_CONTEXT, null );
+        }
+
+    private void dumpConfiguration( final EGLConfig aConfiguration )
+        {
+        dumpAttribute( aConfiguration, EGL10.EGL_BUFFER_SIZE, "EGL_BUFFER_SIZE" );
+        dumpAttribute( aConfiguration, EGL10.EGL_RED_SIZE, "EGL_RED_SIZE" );
+        dumpAttribute( aConfiguration, EGL10.EGL_GREEN_SIZE, "EGL_GREEN_SIZE" );
+        dumpAttribute( aConfiguration, EGL10.EGL_BLUE_SIZE, "EGL_BLUE_SIZE" );
+        dumpAttribute( aConfiguration, EGL10.EGL_ALPHA_SIZE, "EGL_ALPHA_SIZE" );
+        dumpAttribute( aConfiguration, EGL10.EGL_STENCIL_SIZE, "EGL_STENCIL_SIZE" );
+
+        dumpAttribute( aConfiguration, EGL10.EGL_CONFIG_CAVEAT, "EGL_CONFIG_CAVEAT" );
+        dumpAttribute( aConfiguration, EGL10.EGL_DEPTH_SIZE, "EGL_DEPTH_SIZE" );
+        dumpAttribute( aConfiguration, EGL10.EGL_NATIVE_RENDERABLE, "EGL_NATIVE_RENDERABLE" );
+        }
+
+    private void dumpAttribute( final EGLConfig aConfiguration, final int aId, final String aName )
+        {
+        //#if DEBUG
+        final int[] value = new int[1];
+        myEgl.eglGetConfigAttrib( myDisplay, aConfiguration, aId, value );
+        Log.debug( "{}: {}", aName, value[0] );
+        //#endif
         }
 
     final GL createOrUpdateSurface( final SurfaceHolder aSurfaceHolder )
