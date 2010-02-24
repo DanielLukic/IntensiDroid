@@ -71,16 +71,14 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     private void showDeviceSpecs()
         {
-        //#if DEBUG
-        Log.debug( "Board: {}", android.os.Build.BOARD );
-        Log.debug( "Brand: {}", android.os.Build.BRAND );
-        Log.debug( "Device: {}", android.os.Build.DEVICE );
-        Log.debug( "Display: {}", android.os.Build.DISPLAY );
-        Log.debug( "Model: {}", android.os.Build.MODEL );
-        Log.debug( "Product: {}", android.os.Build.PRODUCT );
-        Log.debug( "Tags: {}", android.os.Build.TAGS );
-        Log.debug( "Type: {}", android.os.Build.TYPE );
-        //#endif
+        System.out.println( "Board: " + android.os.Build.BOARD );
+        System.out.println( "Brand: " + android.os.Build.BRAND );
+        System.out.println( "Device: " + android.os.Build.DEVICE );
+        System.out.println( "Display: " + android.os.Build.DISPLAY );
+        System.out.println( "Model: " + android.os.Build.MODEL );
+        System.out.println( "Product: " + android.os.Build.PRODUCT );
+        System.out.println( "Tags: " + android.os.Build.TAGS );
+        System.out.println( "Type: " + android.os.Build.TYPE );
         }
 
     private void setWindowFeatures()
