@@ -242,14 +242,32 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
     public final void blendImage( final ImageResource aImage, final int aX, final int aY, final int aAlpha256 )
         {
-        // TODO: How to apply alpha to texture? Create a new blended texture? OMG!?
+        final boolean extensionState = hasDrawTextureExtension;
+
+        // Disable because it does not support blending color and texture..
+        hasDrawTextureExtension = false;
+
+        myGL.glColor4f( 1f, 1f, 1f, aAlpha256 / 255f );
         drawImage( aImage, aX, aY );
+
+        // Reset color and extension state..
+        setColorARGB32( myColorARGB32 );
+        hasDrawTextureExtension = extensionState;
         }
 
     public final void blendImage( final ImageResource aImage, final Rectangle aSourceRect, final int aX, final int aY, final int aAlpha256 )
         {
-        // TODO: How to apply alpha to texture? Create a new blended texture? OMG!?
+        final boolean extensionState = hasDrawTextureExtension;
+
+        // Disable because it does not support blending color and texture..
+        hasDrawTextureExtension = false;
+
+        myGL.glColor4f( 1f, 1f, 1f, aAlpha256 / 255f );
         drawImage( aImage, aSourceRect, aX, aY );
+
+        // Reset color and extension state..
+        setColorARGB32( myColorARGB32 );
+        hasDrawTextureExtension = extensionState;
         }
 
     private void fillTexturedRect( final ImageResource aImage, final int aX, final int aY )
