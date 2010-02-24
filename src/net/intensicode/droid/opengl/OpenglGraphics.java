@@ -13,34 +13,46 @@ import java.util.ArrayList;
 
 public final class OpenglGraphics extends DirectGraphics implements TexturePurger
     {
+    public String vendor;
+
+    public String renderer;
+
+    public String version;
+
+    public String extensions;
+
+    public boolean hasHardwareBuffers;
+
+    public boolean hasDrawTextureExtension;
+
+
     final void onSurfaceCreated( final GL10 aGL10 )
         {
         myGL = aGL10;
 
-        final String version = aGL10.glGetString( GL10.GL_VERSION );
+        vendor = aGL10.glGetString( GL10.GL_VENDOR );
+        renderer = aGL10.glGetString( GL10.GL_RENDERER );
+        version = aGL10.glGetString( GL10.GL_VERSION );
+        extensions = aGL10.glGetString( GL10.GL_EXTENSIONS );
 
         final boolean isVersion1_0 = version.indexOf( "1.0" ) >= 0;
+        hasHardwareBuffers = !isVersion1_0;
+        hasDrawTextureExtension = extensions.indexOf( "GL_OES_draw_texture" ) >= 0;
 
-        final String extensions = aGL10.glGetString( GL10.GL_EXTENSIONS );
-
-        myHasDrawTextureExtension = extensions.indexOf( "GL_OES_draw_texture" ) >= 0;
-
-        // TODO: Test this on a device. Then activate it.
-        myHasHardwareBuffersFlag = false; // !isVersion1_0;
-
-        if ( myHasHardwareBuffersFlag )
+        if ( hasHardwareBuffers )
             {
             myFillRectSquare.freeHardwareBuffers( aGL10 );
             myFillRectSquare.generateHardwareBuffers( aGL10 );
             }
 
+        System.out.println( "GL vendor: " + vendor );
+        System.out.println( "GL renderer: " + renderer );
+        System.out.println( "GL version: " + version );
+        System.out.println( "GL extensions: " + extensions );
+        System.out.println( "GL has draw texture extension? " + hasDrawTextureExtension );
+        System.out.println( "GL has hardware buffers? " + hasHardwareBuffers );
+
         //#if DEBUG
-        Log.debug( "GL vendor: {}", aGL10.glGetString( GL10.GL_VENDOR ) );
-        Log.debug( "GL rendered: {}", aGL10.glGetString( GL10.GL_RENDERER ) );
-        Log.debug( "GL version: {}", version );
-        Log.debug( "GL extensions: {}", extensions );
-        Log.debug( "has draw texture extension? " + myHasDrawTextureExtension );
-        Log.debug( "has hardware buffers? " + myHasHardwareBuffersFlag );
         Log.debug( "purging {} texturized image resources", myTexturizedImageResources.size() );
         //#endif
 
@@ -259,7 +271,7 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
         final int textureId = getOrLoadTexture( imageResource );
         if ( myTextureId != textureId ) bindTexture( textureId );
 
-        if ( myHasDrawTextureExtension )
+        if ( hasDrawTextureExtension )
             {
             if ( myIsCroppedFlag ) resetTextureCropping( imageResource.textureWidth, imageResource.textureHeight );
             final int y = myHeight - aY - aHeight;
@@ -337,7 +349,7 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
         final int textureId = getOrLoadTexture( imageResource );
         if ( myTextureId != textureId ) bindTexture( textureId );
 
-        if ( myHasDrawTextureExtension )
+        if ( hasDrawTextureExtension )
             {
             cropTexture( aSourceRect, imageResource );
             final int x = aTargetX;
@@ -460,7 +472,7 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
                                bitmap_data_buffer );
             }
 
-        if ( myHasDrawTextureExtension )
+        if ( hasDrawTextureExtension )
             {
             mCropWorkspace[ 0 ] = 0;
             mCropWorkspace[ 1 ] = bitmap.getHeight();
@@ -534,10 +546,6 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
     private AndroidFontResource myFont;
 
     private boolean myUseGlutilsFlag;
-
-    private boolean myHasHardwareBuffersFlag;
-
-    private boolean myHasDrawTextureExtension;
 
     private final int[] mCropWorkspace = new int[4];
 

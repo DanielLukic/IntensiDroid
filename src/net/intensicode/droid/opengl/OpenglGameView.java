@@ -35,6 +35,31 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         setWillNotDraw( false );
         }
 
+    public final String getArgbString()
+        {
+        final int alphaBits = getBitDepth( GL10.GL_ALPHA_BITS );
+        final int redBits = getBitDepth( GL10.GL_RED_BITS );
+        final int greenBits = getBitDepth( GL10.GL_GREEN_BITS );
+        final int blueBits = getBitDepth( GL10.GL_BLUE_BITS );
+        final StringBuffer buffer = new StringBuffer();
+        buffer.append( 'A' );
+        buffer.append( alphaBits );
+        buffer.append( 'R' );
+        buffer.append( redBits );
+        buffer.append( 'G' );
+        buffer.append( greenBits );
+        buffer.append( 'B' );
+        buffer.append( blueBits );
+        return buffer.toString();
+        }
+
+    private int getBitDepth( final int aIdentifier )
+        {
+        final int[] buffer = new int[1];
+        myGL.glGetIntegerv( aIdentifier, buffer, 0 );
+        return buffer[ 0 ];
+        }
+
     // From DirectScreen
 
     public final int width()
