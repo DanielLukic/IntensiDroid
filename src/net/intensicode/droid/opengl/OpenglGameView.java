@@ -194,11 +194,6 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
 
     private int[] getEglConfiguration()
         {
-        if ( isSamsungGalaxy() )
-            {
-            // Samsung Galaxy needs this and other devices seem to be OK with it:
-            return new int[]{ EGL10.EGL_DEPTH_SIZE, SAMSUNG_GALAXY_DEPTH_BITS, EGL10.EGL_NONE };
-            }
         return EglHelper.CHOOSE_FIRST_AVAILABLE;
         }
 
