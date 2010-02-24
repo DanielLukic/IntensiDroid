@@ -48,6 +48,13 @@ public class AndroidTouchEventWrapper implements TouchEvent
         return myEventPosition.y;
         }
 
+    // From Object
+
+    public final String toString()
+        {
+        return myMotionEvent.toString();
+        }
+
 
     private MotionEvent myMotionEvent;
 
