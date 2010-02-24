@@ -501,7 +501,7 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
     private int findClosestPowerOfTwo( final int aOriginalValue )
         {
-        final int nextPowerOfTwo = Math.min( 256, findNextPowerOfTwo( aOriginalValue ) );
+        final int nextPowerOfTwo = Math.min( MAX_TEXTURE_SIZE_IN_PIXELS, findNextPowerOfTwo( aOriginalValue ) );
         final int deltaToNext = Math.abs( nextPowerOfTwo - aOriginalValue );
         final int previousPowerOfTwo = nextPowerOfTwo / 2;
         if ( previousPowerOfTwo < 2 ) return nextPowerOfTwo;
@@ -574,4 +574,6 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
     private final Rect myTextureCloneTargetRect = new Rect();
 
     private final ArrayList<AndroidImageResource> myTexturizedImageResources = new ArrayList<AndroidImageResource>();
+
+    private static final int MAX_TEXTURE_SIZE_IN_PIXELS = 512;
     }
