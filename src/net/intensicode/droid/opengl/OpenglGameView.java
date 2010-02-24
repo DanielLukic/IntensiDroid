@@ -39,14 +39,14 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
 
     public final int width()
         {
-        if ( myTargetSize.width != 0 ) return myTargetSize.width;
-        return getWidth();
+        if ( myTargetSize.width == 0 ) return getWidth();
+        return myTargetSize.width;
         }
 
     public final int height()
         {
-        if ( myTargetSize.height != 0 ) return myTargetSize.height;
-        return getHeight();
+        if ( myTargetSize.width == 0 ) return getHeight();
+        return myTargetSize.height;
         }
 
     public final int getTargetWidth()
@@ -69,11 +69,16 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         //#endif
         }
 
-    public Position toTarget( final int aNativeX, final int aNativeY )
+    // Internal API
+
+    public final int getNativeWidth()
         {
-        myTransformedPosition.x = aNativeX * width() / getWidth();
-        myTransformedPosition.y = aNativeY * height() / getHeight();
-        return myTransformedPosition;
+        return getWidth();
+        }
+
+    public final int getNativeHeight()
+        {
+        return getHeight();
         }
 
     public final void beginFrame()
@@ -118,6 +123,13 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         graphics.releaseGL();
         myEglHelper.finish();
         myGL = null;
+        }
+
+    public Position toTarget( final int aNativeX, final int aNativeY )
+        {
+        myTransformedPosition.x = aNativeX * width() / getWidth();
+        myTransformedPosition.y = aNativeY * height() / getHeight();
+        return myTransformedPosition;
         }
 
     // From SurfaceHolder.Callback
