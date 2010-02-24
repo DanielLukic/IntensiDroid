@@ -131,10 +131,10 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
         myGL.glDisableClientState( GL10.GL_VERTEX_ARRAY );
 
-        //#if DEBUG
-        if ( myTextureStateChanges > 12 ) Log.debug( "gl texture state changes: {}", myTextureStateChanges );
-        if ( myTextureBindCalls > 20 ) Log.debug( "gl texture bind calls: {}", myTextureBindCalls );
-        if ( myTextureCropResets > 5 ) Log.debug( "gl texture crop resets: {}", myTextureCropResets );
+        //#if DEBUG && DEBUG_OPENGL
+        if ( myTextureStateChanges > 10 ) Log.debug( "gl texture state changes: {}", myTextureStateChanges );
+        if ( myTextureBindCalls > 10 ) Log.debug( "gl texture bind calls: {}", myTextureBindCalls );
+        if ( myTextureCropResets > 10 ) Log.debug( "gl texture crop resets: {}", myTextureCropResets );
         //#endif
         }
 
@@ -322,8 +322,6 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
         {
         if ( myTextureId == aTextureId ) return;
 
-//        Log.debug( "gl texture bind change: {} => {}", myTextureId, aTextureId );
-
         myGL.glBindTexture( GL10.GL_TEXTURE_2D, aTextureId );
         myTextureId = aTextureId;
 
@@ -423,8 +421,6 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
         myGL.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_CLAMP_TO_EDGE );
         myGL.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE );
-//        myGL.glTexParameterx( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_REPEAT );
-//        myGL.glTexParameterx( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_REPEAT );
 
         myGL.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE );
 
