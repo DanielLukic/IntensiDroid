@@ -35,14 +35,12 @@ final class EglHelper
         final int[] numberOfConfigurations = new int[1];
         myEgl.eglGetConfigs( myDisplay, configurations, configurations.length, numberOfConfigurations );
 
-        //#if DEBUG
-        Log.debug( "EGL configurations found: {}", numberOfConfigurations[ 0 ] );
+        System.out.println( "EGL configurations found: " + numberOfConfigurations[ 0 ] );
         for ( int idx = 0; idx < numberOfConfigurations[ 0 ]; idx++ )
             {
-            Log.debug( "EGL available configuration:" );
+            System.out.print( "EGL configuration: " );
             dumpConfiguration( configurations[ idx ] );
             }
-        //#endif
 
         if ( aConfigurationSpec == CHOOSE_FIRST_AVAILABLE )
             {
@@ -56,7 +54,7 @@ final class EglHelper
             myConfiguration = configs[ 0 ];
             }
 
-        Log.debug( "EGL choosen configuration:" );
+        System.out.print( "EGL configuration choosen: " );
         dumpConfiguration( myConfiguration );
 
         myContext = myEgl.eglCreateContext( myDisplay, myConfiguration, EGL10.EGL_NO_CONTEXT, null );
@@ -64,25 +62,22 @@ final class EglHelper
 
     private void dumpConfiguration( final EGLConfig aConfiguration )
         {
-        dumpAttribute( aConfiguration, EGL10.EGL_BUFFER_SIZE, "EGL_BUFFER_SIZE" );
-        dumpAttribute( aConfiguration, EGL10.EGL_RED_SIZE, "EGL_RED_SIZE" );
-        dumpAttribute( aConfiguration, EGL10.EGL_GREEN_SIZE, "EGL_GREEN_SIZE" );
-        dumpAttribute( aConfiguration, EGL10.EGL_BLUE_SIZE, "EGL_BLUE_SIZE" );
-        dumpAttribute( aConfiguration, EGL10.EGL_ALPHA_SIZE, "EGL_ALPHA_SIZE" );
-        dumpAttribute( aConfiguration, EGL10.EGL_STENCIL_SIZE, "EGL_STENCIL_SIZE" );
-
-        dumpAttribute( aConfiguration, EGL10.EGL_CONFIG_CAVEAT, "EGL_CONFIG_CAVEAT" );
-        dumpAttribute( aConfiguration, EGL10.EGL_DEPTH_SIZE, "EGL_DEPTH_SIZE" );
-        dumpAttribute( aConfiguration, EGL10.EGL_NATIVE_RENDERABLE, "EGL_NATIVE_RENDERABLE" );
+        dumpAttribute( aConfiguration, EGL10.EGL_RED_SIZE, "RED" );
+        dumpAttribute( aConfiguration, EGL10.EGL_GREEN_SIZE, "GREEN" );
+        dumpAttribute( aConfiguration, EGL10.EGL_BLUE_SIZE, "BLUE" );
+        dumpAttribute( aConfiguration, EGL10.EGL_ALPHA_SIZE, "ALPHA" );
+        dumpAttribute( aConfiguration, EGL10.EGL_DEPTH_SIZE, "DEPTH" );
+        dumpAttribute( aConfiguration, EGL10.EGL_STENCIL_SIZE, "STENCIL" );
+        dumpAttribute( aConfiguration, EGL10.EGL_CONFIG_CAVEAT, "CONFIG" );
+        dumpAttribute( aConfiguration, EGL10.EGL_NATIVE_RENDERABLE, "NATIVE" );
+        System.out.println();
         }
 
     private void dumpAttribute( final EGLConfig aConfiguration, final int aId, final String aName )
         {
-        //#if DEBUG
         final int[] value = new int[1];
         myEgl.eglGetConfigAttrib( myDisplay, aConfiguration, aId, value );
-        Log.debug( "{}: {}", aName, value[0] );
-        //#endif
+        System.out.print( aName + "=" + value[0] + " " );
         }
 
     final GL createOrUpdateSurface( final SurfaceHolder aSurfaceHolder )
