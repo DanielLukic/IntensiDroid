@@ -35,12 +35,14 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         setWillNotDraw( false );
         }
 
-    public final String getArgbString()
+    public final void addOpenglStrings( final DynamicArray aDynamicArray )
         {
         final int alphaBits = getBitDepth( GL10.GL_ALPHA_BITS );
         final int redBits = getBitDepth( GL10.GL_RED_BITS );
         final int greenBits = getBitDepth( GL10.GL_GREEN_BITS );
         final int blueBits = getBitDepth( GL10.GL_BLUE_BITS );
+
+        aDynamicArray.add( "EGL Display Mode:" );
         final StringBuffer buffer = new StringBuffer();
         buffer.append( 'A' );
         buffer.append( alphaBits );
@@ -50,7 +52,16 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         buffer.append( greenBits );
         buffer.append( 'B' );
         buffer.append( blueBits );
-        return buffer.toString();
+        aDynamicArray.add( buffer.toString() );
+
+        aDynamicArray.add( "EGL Configurations Available:" );
+        for ( int idx = 0; idx < myEglHelper.availableConfigurations.size; idx++ )
+            {
+            aDynamicArray.add( myEglHelper.availableConfigurations.get( idx ) );
+            }
+
+        aDynamicArray.add( "EGL Configuration Active:" );
+        aDynamicArray.add( myEglHelper.choosenConfiguration );
         }
 
     private int getBitDepth( final int aIdentifier )

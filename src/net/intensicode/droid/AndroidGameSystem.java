@@ -21,6 +21,7 @@ public final class AndroidGameSystem extends GameSystem
 
     protected final void fillInformationStrings()
         {
+        myInformationStrings.add( "Android Device Info:" );
         myInformationStrings.add( Build.BRAND );
         myInformationStrings.add( Build.MODEL );
         myInformationStrings.add( Build.DEVICE );
@@ -30,16 +31,20 @@ public final class AndroidGameSystem extends GameSystem
         if ( screen instanceof OpenglGameView )
             {
             final OpenglGameView view = (OpenglGameView) screen;
-            myInformationStrings.add( view.getArgbString() );
+            view.addOpenglStrings( myInformationStrings );
             }
 
         if ( graphics instanceof OpenglGraphics )
             {
             final OpenglGraphics opengl = (OpenglGraphics) graphics;
+            myInformationStrings.add( "OpenGL Vendor:" );
             myInformationStrings.add( opengl.vendor );
+            myInformationStrings.add( "OpenGL Renderer:" );
             myInformationStrings.add( opengl.renderer );
+            myInformationStrings.add( "OpenGL Version:" );
             myInformationStrings.add( opengl.version );
 
+            myInformationStrings.add( "OpenGL Extensions:" );
             final DynamicArray extensions = StringUtils.splitString( opengl.extensions, " ", true );
             for ( int idx = 0; idx < extensions.size; idx++ )
                 {
