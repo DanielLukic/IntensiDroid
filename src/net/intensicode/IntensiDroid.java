@@ -141,10 +141,16 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         {
         if ( useOpenglIfPossible() )
             {
+            //#if DEBUG
+            Log.debug( "creating OPENGL video system" );
+            //#endif
             return createOpenglVideoSystem( aGameSystem );
             }
         else
             {
+            //#if DEBUG
+            Log.debug( "creating CANVAS video system" );
+            //#endif
             return createCanvasVideoSystem( aGameSystem );
             }
         }
