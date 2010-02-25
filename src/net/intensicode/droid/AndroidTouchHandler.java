@@ -1,5 +1,6 @@
 package net.intensicode.droid;
 
+import android.os.Build;
 import android.view.*;
 import net.intensicode.core.*;
 
@@ -13,7 +14,18 @@ public final class AndroidTouchHandler extends TouchHandler implements View.OnTo
 
     public final boolean supportsMultiTouch()
         {
-        return false;
+        try
+            {
+            final int version = Integer.parseInt( Build.VERSION.SDK );
+            if ( version <= SDK_VERSION_DONUT ) return false;
+            }
+        catch ( final Throwable t )
+            {
+            // Let's be safe in this case..
+            return false;
+            }
+        // Let's assume we can..
+        return true;
         }
 
     // From OnTouchListener
@@ -29,4 +41,6 @@ public final class AndroidTouchHandler extends TouchHandler implements View.OnTo
         }
 
     private final AndroidTouchEventWrapper myTouchEventWrapper;
+
+    private static final int SDK_VERSION_DONUT = 4;
     }
