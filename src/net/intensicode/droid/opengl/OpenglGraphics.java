@@ -36,7 +36,7 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
         extensions = aGL10.glGetString( GL10.GL_EXTENSIONS );
 
         final boolean isVersion1_0 = version.indexOf( "1.0" ) >= 0;
-        hasHardwareBuffers = !isVersion1_0;
+        hasHardwareBuffers = false; // NOT TESTED YET ON REAL DEVICE - !isVersion1_0;
         hasDrawTextureExtension = extensions.indexOf( "GL_OES_draw_texture" ) >= 0;
 
         if ( hasHardwareBuffers )
