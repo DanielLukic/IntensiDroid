@@ -210,6 +210,10 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
             // Samsung Galaxy needs this and other devices seem to be OK with it:
             return new int[]{ EGL10.EGL_DEPTH_SIZE, SAMSUNG_GALAXY_DEPTH_BITS, EGL10.EGL_NONE };
             }
+        if ( isDroidOrMilestone() )
+            {
+            return new int[]{ EGL10.EGL_DEPTH_SIZE, 24, EGL10.EGL_NONE };
+            }
         return new int[]{ EGL10.EGL_NONE };
         }
 
@@ -218,6 +222,14 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         final boolean isSamsung = Build.BRAND.toLowerCase().indexOf( "samsung" ) != -1;
         final boolean isGalaxy = Build.MODEL.toLowerCase().indexOf( "galaxy" ) != -1;
         return isSamsung && isGalaxy;
+        }
+
+    private boolean isDroidOrMilestone()
+        {
+        final boolean isSamsung = Build.BRAND.toLowerCase().indexOf( "moto" ) != -1;
+        final boolean isDroid = Build.MODEL.toLowerCase().indexOf( "droid" ) != -1;
+        final boolean isMilestone = Build.MODEL.toLowerCase().indexOf( "milestone" ) != -1;
+        return isSamsung && ( isDroid || isMilestone );
         }
 
     private void onSurfaceCreated( final GL10 aGL10 )
