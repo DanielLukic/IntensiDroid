@@ -60,6 +60,8 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
             {
             purge( myTexturizedImageResources.get( myTexturizedImageResources.size() - 1 ) );
             }
+
+        myGL.glEnableClientState( GL10.GL_VERTEX_ARRAY );
         }
 
     public void onSurfaceChanged( final GL10 aGL10, final int aWidth, final int aHeight, final int aDisplayWidth, final int aDisplayHeight )
@@ -79,8 +81,6 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
     final void onBeginFrame()
         {
-        myGL.glEnableClientState( GL10.GL_VERTEX_ARRAY );
-
         mMatrix4x4[ 1 ] = mMatrix4x4[ 2 ] = mMatrix4x4[ 4 ] = mMatrix4x4[ 6 ] = mMatrix4x4[ 8 ] = mMatrix4x4[ 9 ] = 0.0f;
         mMatrix4x4[ 0 ] = 1.0f;
         mMatrix4x4[ 5 ] = -1.0f;
@@ -128,8 +128,6 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
     final void onEndFrame()
         {
         disableTexturing();
-
-        myGL.glDisableClientState( GL10.GL_VERTEX_ARRAY );
 
         //#if DEBUG && DEBUG_OPENGL
         if ( myTextureStateChanges > 10 ) Log.debug( "gl texture state changes: {}", myTextureStateChanges );
