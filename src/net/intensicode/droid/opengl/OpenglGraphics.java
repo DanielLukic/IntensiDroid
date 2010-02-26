@@ -158,7 +158,6 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void setFont( final FontResource aFont )
         {
-        myFont = (AndroidFontResource) aFont;
         }
 
     public void clearRGB24( final int aRGB24 )
@@ -366,8 +365,6 @@ public final class OpenglGraphics extends DirectGraphics
     private int myDisplayWidth;
 
     private int myDisplayHeight;
-
-    private AndroidFontResource myFont;
 
     private final TextureManager myTextureManager = new TextureManager();
 
