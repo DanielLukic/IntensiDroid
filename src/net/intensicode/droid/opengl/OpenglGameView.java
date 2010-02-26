@@ -240,7 +240,7 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         aGL10.glEnable( GL10.GL_BLEND );
         aGL10.glBlendFunc( GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA );
         aGL10.glHint( GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST );
-        aGL10.glClear( GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT );
+        aGL10.glClear( GL10.GL_COLOR_BUFFER_BIT );
 
         graphics.onSurfaceCreated( aGL10 );
         }
