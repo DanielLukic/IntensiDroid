@@ -240,17 +240,32 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
 
     public final void blendImage( final ImageResource aImage, final int aX, final int aY, final int aAlpha256 )
         {
+        if ( aAlpha256 == FULLY_TRANSPARENT ) return;
+        if ( aAlpha256 == FULLY_OPAQUE ) drawImage( aImage, aX, aY );
+
         final boolean extensionState = hasDrawTextureExtension;
 
         // Disable because it does not support blending color and texture..
         hasDrawTextureExtension = false;
 
-        myGL.glColor4f( 1f, 1f, 1f, aAlpha256 / 255f );
+        enableImageAlpha( aAlpha256 );
         drawImage( aImage, aX, aY );
+        disableImageAlpha();
 
-        // Reset color and extension state..
-        setColorARGB32( myColorARGB32 );
+        // Reset extension state..
         hasDrawTextureExtension = extensionState;
+        }
+
+    private void enableImageAlpha( final int aAlpha256 )
+        {
+        myGL.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE );
+        myGL.glColor4f( 1f, 1f, 1f, aAlpha256 / 255f );
+        }
+
+    private void disableImageAlpha()
+        {
+        setColorARGB32( myColorARGB32 );
+        myGL.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE );
         }
 
     public final void blendImage( final ImageResource aImage, final Rectangle aSourceRect, final int aX, final int aY, final int aAlpha256 )
@@ -260,11 +275,11 @@ public final class OpenglGraphics extends DirectGraphics implements TexturePurge
         // Disable because it does not support blending color and texture..
         hasDrawTextureExtension = false;
 
-        myGL.glColor4f( 1f, 1f, 1f, aAlpha256 / 255f );
+        enableImageAlpha( aAlpha256 );
         drawImage( aImage, aSourceRect, aX, aY );
+        disableImageAlpha();
 
-        // Reset color and extension state..
-        setColorARGB32( myColorARGB32 );
+        // Reset extension state..
         hasDrawTextureExtension = extensionState;
         }
 
