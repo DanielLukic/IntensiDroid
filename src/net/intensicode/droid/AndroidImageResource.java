@@ -1,9 +1,10 @@
 package net.intensicode.droid;
 
-import android.graphics.*;
+import android.graphics.Bitmap;
 import net.intensicode.core.*;
-import net.intensicode.util.Assert;
 import net.intensicode.droid.canvas.AndroidCanvasGraphics;
+import net.intensicode.droid.opengl.Texture;
+import net.intensicode.util.Assert;
 
 public final class AndroidImageResource implements ImageResource
     {
@@ -15,11 +16,7 @@ public final class AndroidImageResource implements ImageResource
 
     public TexturePurger texturePurger;
 
-    public int textureId;
-
-    public int textureWidth;
-
-    public int textureHeight;
+    public Texture texture;
 
 
     public AndroidImageResource( final Bitmap aBitmap )
@@ -62,7 +59,7 @@ public final class AndroidImageResource implements ImageResource
     public final void purge()
         {
         bitmap.recycle();
-        if ( textureId != 0 ) texturePurger.purge( this );
+        if ( texture != null ) texturePurger.purge( this );
         }
 
     private AndroidCanvasGraphics myGraphics;

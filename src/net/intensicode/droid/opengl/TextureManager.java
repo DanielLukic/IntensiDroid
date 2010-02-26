@@ -29,7 +29,11 @@ public class TextureManager implements TexturePurger
         mTextureNameWorkspace[ 0 ] = 0;
         gl.glGenTextures( 1, mTextureNameWorkspace, 0 );
 
-        final int textureName = aImageResource.textureId = mTextureNameWorkspace[ 0 ];
+        aImageResource.texturePurger = this;
+
+        final Texture texture = aImageResource.texture = new Texture();
+
+        final int textureName = aImageResource.texture.id = mTextureNameWorkspace[ 0 ];
         //#if DEBUG
         Log.debug( "new texture id: {}", textureName );
         //#endif
@@ -56,10 +60,10 @@ public class TextureManager implements TexturePurger
 
         final Bitmap bitmap = makeProperBitmap( originalBitmap, properWidth, properHeight );
 
-        aImageResource.textureWidth = bitmap.getWidth();
-        aImageResource.textureHeight = bitmap.getHeight();
-
-        aImageResource.texturePurger = this;
+        texture.width = bitmap.getWidth();
+        texture.height = bitmap.getHeight();
+        texture.originalWidth = originalWidth;
+        texture.originalHeight = originalHeight;
 
         if ( useGlUtils )
             {
@@ -120,13 +124,13 @@ public class TextureManager implements TexturePurger
     public final void purge( final AndroidImageResource aImageResource )
         {
         //#if DEBUG
-        Log.debug( "purging texture {} ({})", aImageResource.textureId, aImageResource.resourcePath );
+        Log.debug( "purging texture {} ({})", aImageResource.texture.id, aImageResource.resourcePath );
         //#endif
 
-        mTextureNameWorkspace[ 0 ] = aImageResource.textureId;
+        mTextureNameWorkspace[ 0 ] = aImageResource.texture.id;
         gl.glDeleteTextures( 1, mTextureNameWorkspace, 0 );
 
-        aImageResource.textureId = aImageResource.textureWidth = aImageResource.textureHeight = 0;
+        aImageResource.texture.id = aImageResource.texture.width = aImageResource.texture.height = 0;
         aImageResource.texturePurger = null;
 
         final boolean removed = myTexturizedImageResources.remove( aImageResource );

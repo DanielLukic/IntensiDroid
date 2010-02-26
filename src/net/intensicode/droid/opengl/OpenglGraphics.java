@@ -1,7 +1,7 @@
 package net.intensicode.droid.opengl;
 
 import net.intensicode.core.*;
-import net.intensicode.droid.*;
+import net.intensicode.droid.AndroidImageResource;
 import net.intensicode.util.*;
 
 import javax.microedition.khronos.opengles.*;
@@ -86,24 +86,22 @@ public final class OpenglGraphics extends DirectGraphics
 
         enableTexturing();
 
-        myTextureStateChanges = myTextureBindCalls = myTextureCropResets = 0;
+        myTextureStateChanges = myTextureBindCalls = Texture.theTextureCropResets = 0;
         }
 
     private int myTextureStateChanges;
 
     private int myTextureBindCalls;
 
-    private int myTextureCropResets;
+    private boolean myTextureEnabled;
 
-    private boolean myTextureActive;
-
-    private int myTextureId;
+    private Texture myActiveTexture;
 
     private void enableTexturing()
         {
         myGL.glEnable( GL10.GL_TEXTURE_2D );
         myGL.glEnableClientState( GL10.GL_TEXTURE_COORD_ARRAY );
-        myTextureActive = true;
+        myTextureEnabled = true;
 
         myTextureStateChanges++;
         }
@@ -112,7 +110,7 @@ public final class OpenglGraphics extends DirectGraphics
         {
         myGL.glDisable( GL10.GL_TEXTURE_2D );
         myGL.glDisableClientState( GL10.GL_TEXTURE_COORD_ARRAY );
-        myTextureActive = false;
+        myTextureEnabled = false;
 
         myTextureStateChanges++;
         }
@@ -124,7 +122,8 @@ public final class OpenglGraphics extends DirectGraphics
         //#if DEBUG && DEBUG_OPENGL
         if ( myTextureStateChanges > 10 ) Log.debug( "gl texture state changes: {}", myTextureStateChanges );
         if ( myTextureBindCalls > 10 ) Log.debug( "gl texture bind calls: {}", myTextureBindCalls );
-        if ( myTextureCropResets > 10 ) Log.debug( "gl texture crop resets: {}", myTextureCropResets );
+        if ( Texture.theTextureCropResets > 10 )
+            Log.debug( "gl texture crop resets: {}", Texture.theTextureCropResets );
         //#endif
         }
 
@@ -175,7 +174,7 @@ public final class OpenglGraphics extends DirectGraphics
 
     private void fillColoredRect( final int aX, final int aY, final int aWidth, final int aHeight )
         {
-        if ( myTextureActive ) disableTexturing();
+        if ( myTextureEnabled ) disableTexturing();
         if ( myBuffersDirty ) updateBuffers();
         myFillRectSquare.draw( myGL, aX, aY, aWidth, aHeight, false );
         }
@@ -247,23 +246,22 @@ public final class OpenglGraphics extends DirectGraphics
         fillTexturedRect( aImage, aX, aY, aImage.getWidth(), aImage.getHeight() );
         }
 
-    private int getOrLoadTexture( final AndroidImageResource aImage )
+    private Texture getOrLoadTexture( final AndroidImageResource aImage )
         {
-        if ( aImage.textureId == 0 ) myTextureManager.makeTexture( aImage );
-        return aImage.textureId;
+        if ( aImage.texture == null ) myTextureManager.makeTexture( aImage );
+        return aImage.texture;
         }
 
     private void fillTexturedRect( final ImageResource aImage, final int aX, final int aY, final int aWidth, final int aHeight )
         {
-        if ( !myTextureActive ) enableTexturing();
+        if ( !myTextureEnabled ) enableTexturing();
 
-        final AndroidImageResource imageResource = (AndroidImageResource) aImage;
-        final int textureId = getOrLoadTexture( imageResource );
-        if ( myTextureId != textureId ) bindTexture( textureId );
+        final Texture texture = getOrLoadTexture( (AndroidImageResource) aImage );
+        if ( myActiveTexture != texture ) bindTexture( texture );
 
         if ( hasDrawTextureExtension )
             {
-            if ( myIsCroppedFlag ) resetTextureCropping( imageResource.textureWidth, imageResource.textureHeight );
+            if ( texture.isCropped ) texture.resetCropRect( (GL11) myGL );
             final int y = myHeight - aY - aHeight;
             ( (GL11Ext) myGL ).glDrawTexfOES( aX * myScaleX, y * myScaleY, 0, aWidth * myScaleX, aHeight * myScaleY );
             }
@@ -274,48 +272,12 @@ public final class OpenglGraphics extends DirectGraphics
             }
         }
 
-    private boolean myIsCroppedFlag;
-
-    private void resetTextureCropping( final int aWidth, final int aHeight )
+    private void bindTexture( final Texture aTexture )
         {
-        mCropWorkspace[ 0 ] = 0;
-        mCropWorkspace[ 1 ] = aHeight;
-        mCropWorkspace[ 2 ] = aWidth;
-        mCropWorkspace[ 3 ] = -aHeight;
+        if ( myActiveTexture == aTexture ) throw new IllegalStateException();
 
-        ( (GL11) myGL ).glTexParameteriv( GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, mCropWorkspace, 0 );
-
-        myIsCroppedFlag = false;
-
-        myTextureCropResets++;
-        }
-
-    private final int[] mCropWorkspace = new int[4];
-
-    private void cropTexture( final Rectangle aRect, final AndroidImageResource aImageResource )
-        {
-        final float xFactor = aImageResource.textureWidth / (float) aImageResource.getWidth();
-        final float yFactor = aImageResource.textureHeight / (float) aImageResource.getHeight();
-        final float x = aRect.x * xFactor;
-        final float y = aRect.y * yFactor;
-        final float width = aRect.width * xFactor;
-        final float height = aRect.height * yFactor;
-        mCropWorkspace[ 0 ] = (int) x;
-        mCropWorkspace[ 1 ] = (int) ( y + height );
-        mCropWorkspace[ 2 ] = (int) width;
-        mCropWorkspace[ 3 ] = (int) -height;
-
-        ( (GL11) myGL ).glTexParameteriv( GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, mCropWorkspace, 0 );
-
-        myIsCroppedFlag = true;
-        }
-
-    private void bindTexture( final int aTextureId )
-        {
-        if ( myTextureId == aTextureId ) return;
-
-        myGL.glBindTexture( GL10.GL_TEXTURE_2D, aTextureId );
-        myTextureId = aTextureId;
+        myGL.glBindTexture( GL10.GL_TEXTURE_2D, aTexture.id );
+        myActiveTexture = aTexture;
 
         myTextureBindCalls++;
         }
@@ -333,15 +295,15 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void drawImage( final ImageResource aImage, final Rectangle aSourceRect, final int aTargetX, final int aTargetY )
         {
-        if ( !myTextureActive ) enableTexturing();
+        if ( !myTextureEnabled ) enableTexturing();
 
         final AndroidImageResource imageResource = (AndroidImageResource) aImage;
-        final int textureId = getOrLoadTexture( imageResource );
-        if ( myTextureId != textureId ) bindTexture( textureId );
+        final Texture texture = getOrLoadTexture( imageResource );
+        if ( myActiveTexture != texture ) bindTexture( texture );
 
         if ( hasDrawTextureExtension )
             {
-            cropTexture( aSourceRect, imageResource );
+            texture.cropTexture( (GL11) myGL, aSourceRect );
             final int x = aTargetX;
             final int y = myHeight - aTargetY - aSourceRect.height;
             final int width = aSourceRect.width;
