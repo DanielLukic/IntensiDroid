@@ -255,7 +255,7 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         aGL10.glScalef( 1.0f, -1.0f, 1.0f );
         aGL10.glMatrixMode( GL10.GL_MODELVIEW );
 
-        graphics.onSurfaceChanged( aGL10, width(), height(), aWidth, aHeight );
+        graphics.onSurfaceChanged( width(), height(), aWidth, aHeight );
         }
 
 

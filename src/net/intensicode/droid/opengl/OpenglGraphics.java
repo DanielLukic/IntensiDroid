@@ -56,7 +56,7 @@ public final class OpenglGraphics extends DirectGraphics
         myTextureManager.useDrawTextureExtension = hasDrawTextureExtension;
         }
 
-    public void onSurfaceChanged( final GL10 aGL10, final int aWidth, final int aHeight, final int aDisplayWidth, final int aDisplayHeight )
+    public void onSurfaceChanged( final int aWidth, final int aHeight, final int aDisplayWidth, final int aDisplayHeight )
         {
         myWidth = aWidth;
         myHeight = aHeight;
