@@ -73,10 +73,10 @@ public class TextureManager implements TexturePurger
             for ( int n = 0; n < bitmap.getWidth() * bitmap.getHeight(); ++n )
                 {
                 int pixel = bitmap_data[ n ];
-                bitmap_data[ n ] = ( ( ( 0xFF000000 & pixel ) ) |        // Alpha.
-                                     ( ( 0x00FF0000 & pixel ) >> 16 ) |  // Red.
-                                     ( ( 0x0000FF00 & pixel ) ) |        // Green.
-                                     ( ( 0x000000FF & pixel ) << 16 ) );  // Blue.
+                bitmap_data[ n ] = ( ( ( MASK_ALPHA_32 & pixel ) ) |        // Alpha.
+                                     ( ( MASK_RED_32 & pixel ) >> SHIFT_SWITCH_RGB_BGR ) |  // Red.
+                                     ( ( MASK_GREEN_32 & pixel ) ) |        // Green.
+                                     ( ( MASK_BLUE_32 & pixel ) << SHIFT_SWITCH_RGB_BGR ) );  // Blue.
                 }
             IntBuffer bitmap_data_buffer = IntBuffer.wrap( bitmap_data );
             gl.glBindTexture( GL10.GL_TEXTURE_2D, textureName );
@@ -137,15 +137,15 @@ public class TextureManager implements TexturePurger
 
     // Implementation
 
-    private int findNextPowerOfTwo( int aPositiveInteger )
+    private int findNextPowerOfTwo( final int aPositiveInteger )
         {
         if ( aPositiveInteger == 0 ) return 1;
-        aPositiveInteger--;
-        for ( int i = 1; i < 30; i <<= 1 )
+        int value = aPositiveInteger - 1;
+        for ( int i = 1; i < MAX_INTEGER_SHIFT_BITS; i <<= 1 )
             {
-            aPositiveInteger = aPositiveInteger | aPositiveInteger >> i;
+            value |= value >> i;
             }
-        return aPositiveInteger + 1;
+        return value + 1;
         }
 
     private Bitmap makeProperBitmap( final Bitmap aBitmap, final int aWidth, final int aHeight )
@@ -185,4 +185,16 @@ public class TextureManager implements TexturePurger
     private final ArrayList<AndroidImageResource> myTexturizedImageResources = new ArrayList<AndroidImageResource>();
 
     private static final int MAX_TEXTURE_SIZE_IN_PIXELS = 512;
+
+    private static final int MASK_ALPHA_32 = 0xFF000000;
+
+    private static final int MASK_RED_32 = 0x00FF0000;
+
+    private static final int MASK_GREEN_32 = 0x0000FF00;
+
+    private static final int MASK_BLUE_32 = 0x000000FF;
+
+    private static final int SHIFT_SWITCH_RGB_BGR = 16;
+
+    private static final int MAX_INTEGER_SHIFT_BITS = 30;
     }
