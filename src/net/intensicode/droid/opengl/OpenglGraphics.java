@@ -215,17 +215,9 @@ public final class OpenglGraphics extends DirectGraphics
         if ( aAlpha256 == FULLY_TRANSPARENT ) return;
         if ( aAlpha256 == FULLY_OPAQUE ) drawImage( aImage, aX, aY );
 
-        final boolean extensionState = hasDrawTextureExtension;
-
-        // Disable because it does not support blending color and texture..
-        hasDrawTextureExtension = false;
-
         enableImageAlpha( aAlpha256 );
         drawImage( aImage, aX, aY );
         disableImageAlpha();
-
-        // Reset extension state..
-        hasDrawTextureExtension = extensionState;
         }
 
     private void enableImageAlpha( final int aAlpha256 )
@@ -242,17 +234,12 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void blendImage( final ImageResource aImage, final Rectangle aSourceRect, final int aX, final int aY, final int aAlpha256 )
         {
-        final boolean extensionState = hasDrawTextureExtension;
-
-        // Disable because it does not support blending color and texture..
-        hasDrawTextureExtension = false;
+        if ( aAlpha256 == FULLY_TRANSPARENT ) return;
+        if ( aAlpha256 == FULLY_OPAQUE ) drawImage( aImage, aSourceRect, aX, aY );
 
         enableImageAlpha( aAlpha256 );
         drawImage( aImage, aSourceRect, aX, aY );
         disableImageAlpha();
-
-        // Reset extension state..
-        hasDrawTextureExtension = extensionState;
         }
 
     private void fillTexturedRect( final ImageResource aImage, final int aX, final int aY )
