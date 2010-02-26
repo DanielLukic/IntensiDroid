@@ -1,4 +1,4 @@
-package net.intensicode.droid;
+package net.intensicode.droid.canvas;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -84,7 +84,7 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         Assert.isNotNull( "surface holder should be initialized", mySurfaceHolder );
         //#endif
 
-        final Canvas canvas = graphics.lockedCanvas = mySurfaceHolder.lockCanvas();
+        final Canvas canvas = graphics.canvas = mySurfaceHolder.lockCanvas();
         if ( canvas != null ) canvas.scale( getWidth() * 1.0f / width(), getHeight() * 1.0f / height() );
         else Log.error( "lockCanvas failed with null object", null );
         }
@@ -95,7 +95,7 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         Assert.isNotNull( "surface holder should be initialized", mySurfaceHolder );
         //#endif
 
-        mySurfaceHolder.unlockCanvasAndPost( graphics.lockedCanvas );
+        mySurfaceHolder.unlockCanvasAndPost( graphics.canvas );
         }
 
     public final void initialize()

@@ -3,6 +3,7 @@ package net.intensicode.droid;
 import android.graphics.*;
 import net.intensicode.core.*;
 import net.intensicode.util.Assert;
+import net.intensicode.droid.canvas.AndroidCanvasGraphics;
 
 public final class AndroidImageResource implements ImageResource
     {
@@ -49,11 +50,7 @@ public final class AndroidImageResource implements ImageResource
 
     public final DirectGraphics getGraphics()
         {
-        if ( myGraphics == null )
-            {
-            myGraphics = new AndroidCanvasGraphics();
-            myGraphics.lockedCanvas = new Canvas( bitmap );
-            }
+        if ( myGraphics == null ) myGraphics = new AndroidCanvasGraphics( bitmap );
         return myGraphics;
         }
 

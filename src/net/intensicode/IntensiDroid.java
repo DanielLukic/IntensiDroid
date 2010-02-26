@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
+import net.intensicode.droid.canvas.*;
 import net.intensicode.droid.opengl.*;
 import net.intensicode.util.*;
 
