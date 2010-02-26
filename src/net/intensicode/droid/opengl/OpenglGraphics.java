@@ -73,7 +73,7 @@ public final class OpenglGraphics extends DirectGraphics
 
     final void onBeginFrame()
         {
-        mMatrix4x4[ 1 ] = mMatrix4x4[ 2 ] = mMatrix4x4[ 4 ] = mMatrix4x4[ 6 ] = mMatrix4x4[ 8 ] = mMatrix4x4[ 9 ] = 0.0f;
+        mMatrix4x4[ 1 ] = mMatrix4x4[ 2 ] = mMatrix4x4[ 4 ] = mMatrix4x4[ 6 ] = mMatrix4x4[ SHIFT_BLUE ] = mMatrix4x4[ 9 ] = 0.0f;
         mMatrix4x4[ 0 ] = 1.0f;
         mMatrix4x4[ 5 ] = -1.0f;
         mMatrix4x4[ 12 ] = 0.0f;
@@ -132,7 +132,7 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final int getColorRGB24()
         {
-        return myColorARGB32 & 0x00FFFFFF;
+        return myColorARGB32 & MASK_RGB24;
         }
 
     public final int getColorARGB32()
@@ -142,15 +142,15 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void setColorRGB24( final int aRGB24 )
         {
-        setColorARGB32( 0xFF000000 | aRGB24 );
+        setColorARGB32( MASK_ALPHA32 | aRGB24 );
         }
 
     public final void setColorARGB32( final int aARGB32 )
         {
-        final float alpha = ( ( aARGB32 >> 24 ) & 255 ) / 255.0f;
-        final float red = ( ( aARGB32 >> 16 ) & 255 ) / 255.0f;
-        final float green = ( ( aARGB32 >> 8 ) & 255 ) / 255.0f;
-        final float blue = ( aARGB32 & 255 ) / 255.0f;
+        final float alpha = ( ( aARGB32 >> SHIFT_ALPHA ) & MASK_COLOR_CHANNEL_8BITS ) / MASK_COLOR_CHANNEL_AS_FLOAT_VALUE;
+        final float red = ( ( aARGB32 >> SHIFT_RED ) & MASK_COLOR_CHANNEL_8BITS ) / MASK_COLOR_CHANNEL_AS_FLOAT_VALUE;
+        final float green = ( ( aARGB32 >> SHIFT_BLUE ) & MASK_COLOR_CHANNEL_8BITS ) / MASK_COLOR_CHANNEL_AS_FLOAT_VALUE;
+        final float blue = ( aARGB32 & MASK_COLOR_CHANNEL_8BITS ) / MASK_COLOR_CHANNEL_AS_FLOAT_VALUE;
         myGL.glColor4f( red, green, blue, alpha );
         myColorARGB32 = aARGB32;
         }
@@ -223,7 +223,7 @@ public final class OpenglGraphics extends DirectGraphics
     private void enableImageAlpha( final int aAlpha256 )
         {
         myGL.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE );
-        myGL.glColor4f( 1f, 1f, 1f, aAlpha256 / 255f );
+        myGL.glColor4f( 1f, 1f, 1f, aAlpha256 / MASK_COLOR_CHANNEL_AS_FLOAT_VALUE );
         }
 
     private void disableImageAlpha()
@@ -350,7 +350,7 @@ public final class OpenglGraphics extends DirectGraphics
             }
         else
             {
-            mMatrix4x4[ 1 ] = mMatrix4x4[ 2 ] = mMatrix4x4[ 4 ] = mMatrix4x4[ 6 ] = mMatrix4x4[ 8 ] = mMatrix4x4[ 9 ] = 0.0f;
+            mMatrix4x4[ 1 ] = mMatrix4x4[ 2 ] = mMatrix4x4[ 4 ] = mMatrix4x4[ 6 ] = mMatrix4x4[ SHIFT_BLUE ] = mMatrix4x4[ 9 ] = 0.0f;
             mMatrix4x4[ 0 ] = aSourceRect.width / (float) aImage.getWidth();
             mMatrix4x4[ 5 ] = -aSourceRect.height / (float) aImage.getHeight();
             mMatrix4x4[ 12 ] = aSourceRect.x / (float) aImage.getWidth();
@@ -408,4 +408,18 @@ public final class OpenglGraphics extends DirectGraphics
     private AndroidFontResource myFont;
 
     private final TextureManager myTextureManager = new TextureManager();
+
+    private static final int MASK_RGB24 = 0x00FFFFFF;
+
+    private static final int MASK_ALPHA32 = 0xFF000000;
+
+    private static final int SHIFT_ALPHA = 24;
+
+    private static final int SHIFT_RED = 16;
+
+    private static final int SHIFT_BLUE = 8;
+
+    private static final int MASK_COLOR_CHANNEL_8BITS = 255;
+
+    private static final float MASK_COLOR_CHANNEL_AS_FLOAT_VALUE = 255.0f;
     }
