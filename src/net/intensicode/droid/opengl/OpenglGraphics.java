@@ -32,14 +32,11 @@ public final class OpenglGraphics extends DirectGraphics
         extensions = aGL10.glGetString( GL10.GL_EXTENSIONS );
 
         final boolean isVersion1_0 = version.indexOf( "1.0" ) >= 0;
-        hasHardwareBuffers = false; // NOT TESTED YET ON REAL DEVICE - !isVersion1_0;
+        hasHardwareBuffers = false; // NOT TESTED YET - !isVersion1_0;
         hasDrawTextureExtension = extensions.indexOf( "GL_OES_draw_texture" ) >= 0;
 
-        if ( hasHardwareBuffers )
-            {
-            myFillRectSquare.freeHardwareBuffers( aGL10 );
-            myFillRectSquare.generateHardwareBuffers( aGL10 );
-            }
+        myGeometryDrawer.gl = aGL10;
+        if ( hasHardwareBuffers ) myGeometryDrawer.updateHardwareBuffers();
 
         System.out.println( "GL vendor: " + vendor );
         System.out.println( "GL renderer: " + renderer );
@@ -56,7 +53,7 @@ public final class OpenglGraphics extends DirectGraphics
         myTextureManager.useDrawTextureExtension = hasDrawTextureExtension;
         }
 
-    public void onSurfaceChanged( final int aWidth, final int aHeight, final int aDisplayWidth, final int aDisplayHeight )
+    void onSurfaceChanged( final int aWidth, final int aHeight, final int aDisplayWidth, final int aDisplayHeight )
         {
         myWidth = aWidth;
         myHeight = aHeight;
@@ -73,7 +70,6 @@ public final class OpenglGraphics extends DirectGraphics
 
     final void onBeginFrame()
         {
-        mMatrix4x4[ 1 ] = mMatrix4x4[ 2 ] = mMatrix4x4[ 4 ] = mMatrix4x4[ 6 ] = mMatrix4x4[ SHIFT_BLUE ] = mMatrix4x4[ 9 ] = 0.0f;
         mMatrix4x4[ 0 ] = 1.0f;
         mMatrix4x4[ 5 ] = -1.0f;
         mMatrix4x4[ 12 ] = 0.0f;
@@ -89,41 +85,25 @@ public final class OpenglGraphics extends DirectGraphics
         myTextureStateChanges = myTextureBindCalls = Texture.theTextureCropResets = 0;
         }
 
-    private int myTextureStateChanges;
-
-    private int myTextureBindCalls;
-
-    private boolean myTextureEnabled;
-
-    private Texture myActiveTexture;
-
-    private void enableTexturing()
-        {
-        myGL.glEnable( GL10.GL_TEXTURE_2D );
-        myGL.glEnableClientState( GL10.GL_TEXTURE_COORD_ARRAY );
-        myTextureEnabled = true;
-
-        myTextureStateChanges++;
-        }
-
-    private void disableTexturing()
-        {
-        myGL.glDisable( GL10.GL_TEXTURE_2D );
-        myGL.glDisableClientState( GL10.GL_TEXTURE_COORD_ARRAY );
-        myTextureEnabled = false;
-
-        myTextureStateChanges++;
-        }
-
     final void onEndFrame()
         {
         disableTexturing();
 
+        if ( myTextureMatrixPushedFlag ) popTextureMatrix();
+
         //#if DEBUG && DEBUG_OPENGL
-        if ( myTextureStateChanges > 10 ) Log.debug( "gl texture state changes: {}", myTextureStateChanges );
-        if ( myTextureBindCalls > 10 ) Log.debug( "gl texture bind calls: {}", myTextureBindCalls );
+        if ( myTextureStateChanges > 10 )
+            {
+            Log.debug( "gl texture state changes: {}", myTextureStateChanges );
+            }
+        if ( myTextureBindCalls > 10 )
+            {
+            Log.debug( "gl texture bind calls: {}", myTextureBindCalls );
+            }
         if ( Texture.theTextureCropResets > 10 )
+            {
             Log.debug( "gl texture crop resets: {}", Texture.theTextureCropResets );
+            }
         //#endif
         }
 
@@ -154,8 +134,6 @@ public final class OpenglGraphics extends DirectGraphics
         myColorARGB32 = aARGB32;
         }
 
-    private int myColorARGB32;
-
     public final void setFont( final FontResource aFont )
         {
         }
@@ -168,17 +146,9 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void drawLine( final int aX1, final int aY1, final int aX2, final int aY2 )
         {
-        if ( aX1 == aX2 && aY1 == aY2 ) fillColoredRect( aX1, aY1, 1, 1 );
+        if ( aX1 == aX2 && aY1 == aY2 ) myGeometryDrawer.drawPoint( aX1, aY1 );
+        else myGeometryDrawer.drawLine( aX1, aY1, aX2, aY2 );
         }
-
-    private void fillColoredRect( final int aX, final int aY, final int aWidth, final int aHeight )
-        {
-        if ( myTextureEnabled ) disableTexturing();
-        if ( myBuffersDirty ) updateBuffers();
-        myFillRectSquare.draw( myGL, aX, aY, aWidth, aHeight, false );
-        }
-
-    private final StaticSquare myFillRectSquare = new StaticSquare();
 
     public final void drawRect( final int aX, final int aY, final int aWidth, final int aHeight )
         {
@@ -197,37 +167,14 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void fillTriangle( final int aX1, final int aY1, final int aX2, final int aY2, final int aX3, final int aY3 )
         {
-        myTriangle.set( 0, aX1, aY1 );
-        myTriangle.set( 1, aX2, aY2 );
-        myTriangle.set( 2, aX3, aY3 );
-        myTriangle.draw( myGL );
-        myBuffersDirty = true;
+        myGeometryDrawer.drawTriangle( aX1, aY1, aX2, aY2, aX3, aY3 );
         }
-
-    private final MutableTriangle myTriangle = new MutableTriangle();
-
-    private boolean myBuffersDirty = true;
 
     public final void blendImage( final ImageResource aImage, final int aX, final int aY, final int aAlpha256 )
         {
-        if ( aAlpha256 == FULLY_TRANSPARENT ) return;
-        if ( aAlpha256 == FULLY_OPAQUE ) drawImage( aImage, aX, aY );
-
-        enableImageAlpha( aAlpha256 );
-        drawImage( aImage, aX, aY );
-        disableImageAlpha();
-        }
-
-    private void enableImageAlpha( final int aAlpha256 )
-        {
-        myGL.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE );
-        myGL.glColor4f( 1f, 1f, 1f, aAlpha256 / MASK_COLOR_CHANNEL_AS_FLOAT_VALUE );
-        }
-
-    private void disableImageAlpha()
-        {
-        setColorARGB32( myColorARGB32 );
-        myGL.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE );
+        myFullRect.width = aImage.getWidth();
+        myFullRect.height = aImage.getHeight();
+        blendImage( aImage, myFullRect, aX, aY, aAlpha256 );
         }
 
     public final void blendImage( final ImageResource aImage, final Rectangle aSourceRect, final int aX, final int aY, final int aAlpha256 )
@@ -240,50 +187,11 @@ public final class OpenglGraphics extends DirectGraphics
         disableImageAlpha();
         }
 
-    private void fillTexturedRect( final ImageResource aImage, final int aX, final int aY )
-        {
-        fillTexturedRect( aImage, aX, aY, aImage.getWidth(), aImage.getHeight() );
-        }
-
-    private Texture getOrLoadTexture( final AndroidImageResource aImage )
-        {
-        if ( aImage.texture == null ) myTextureManager.makeTexture( aImage );
-        return aImage.texture;
-        }
-
-    private void fillTexturedRect( final ImageResource aImage, final int aX, final int aY, final int aWidth, final int aHeight )
-        {
-        if ( !myTextureEnabled ) enableTexturing();
-
-        final Texture texture = getOrLoadTexture( (AndroidImageResource) aImage );
-        if ( myActiveTexture != texture ) bindTexture( texture );
-
-        if ( hasDrawTextureExtension )
-            {
-            if ( texture.isCropped ) texture.resetCropRect( (GL11) myGL );
-            final int y = myHeight - aY - aHeight;
-            ( (GL11Ext) myGL ).glDrawTexfOES( aX * myScaleX, y * myScaleY, 0, aWidth * myScaleX, aHeight * myScaleY );
-            }
-        else
-            {
-            if ( myBuffersDirty ) updateBuffers();
-            myFillRectSquare.draw( myGL, aX, aY, aWidth, aHeight, true );
-            }
-        }
-
-    private void bindTexture( final Texture aTexture )
-        {
-        if ( myActiveTexture == aTexture ) throw new IllegalStateException();
-
-        myGL.glBindTexture( GL10.GL_TEXTURE_2D, aTexture.id );
-        myActiveTexture = aTexture;
-
-        myTextureBindCalls++;
-        }
-
     public final void drawImage( final ImageResource aImage, final int aX, final int aY )
         {
-        fillTexturedRect( aImage, aX, aY );
+        myFullRect.width = aImage.getWidth();
+        myFullRect.height = aImage.getHeight();
+        drawImage( aImage, myFullRect, aX, aY );
         }
 
     public final void drawImage( final ImageResource aImage, final int aX, final int aY, final int aAlignment )
@@ -311,35 +219,17 @@ public final class OpenglGraphics extends DirectGraphics
             }
         else
             {
-            mMatrix4x4[ 1 ] = mMatrix4x4[ 2 ] = mMatrix4x4[ 4 ] = mMatrix4x4[ 6 ] = mMatrix4x4[ SHIFT_BLUE ] = mMatrix4x4[ 9 ] = 0.0f;
-            mMatrix4x4[ 0 ] = aSourceRect.width / (float) aImage.getWidth();
-            mMatrix4x4[ 5 ] = -aSourceRect.height / (float) aImage.getHeight();
-            mMatrix4x4[ 12 ] = aSourceRect.x / (float) aImage.getWidth();
-            mMatrix4x4[ 13 ] = aSourceRect.y / (float) aImage.getHeight() - mMatrix4x4[ 5 ];
+            final boolean textureMatrixChanged = !isTextureMatrixUpToDate( texture, aSourceRect );
+            if ( textureMatrixChanged )
+                {
+                if ( isTextureMatrixPushed() ) popTextureMatrix();
+                pushTextureMatrix( texture, aSourceRect );
+                }
 
-            myGL.glMatrixMode( GL10.GL_TEXTURE );
-            myGL.glPushMatrix();
-            myGL.glLoadMatrixf( mMatrix4x4, 0 );
-
-            myGL.glMatrixMode( GL10.GL_MODELVIEW );
-
-            if ( myBuffersDirty ) updateBuffers();
-            myFillRectSquare.draw( myGL, aTargetX, aTargetY, aSourceRect.width, aSourceRect.height, true );
-
-            myGL.glMatrixMode( GL10.GL_TEXTURE );
-            myGL.glPopMatrix();
-
-            myGL.glMatrixMode( GL10.GL_MODELVIEW );
+            myGeometryDrawer.enableTextureCoordinates = true;
+            myGeometryDrawer.drawSquare( aTargetX, aTargetY, aSourceRect.width, aSourceRect.height );
             }
         }
-
-    private void updateBuffers()
-        {
-        myFillRectSquare.updateBuffers( myGL, true );
-        myBuffersDirty = false;
-        }
-
-    private float[] mMatrix4x4 = new float[]{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 
     public final void drawSubstring( final String aText, final int aStart, final int aEnd, final int aX, final int aY )
         {
@@ -350,6 +240,94 @@ public final class OpenglGraphics extends DirectGraphics
         }
 
     // Implementation
+
+    private void fillColoredRect( final int aX, final int aY, final int aWidth, final int aHeight )
+        {
+        if ( myTextureEnabled ) disableTexturing();
+
+        myGeometryDrawer.enableTextureCoordinates = false;
+        myGeometryDrawer.drawSquare( aX, aY, aWidth, aHeight );
+        }
+
+    private void enableImageAlpha( final int aAlpha256 )
+        {
+        myGL.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE );
+        myGL.glColor4f( 1f, 1f, 1f, aAlpha256 / MASK_COLOR_CHANNEL_AS_FLOAT_VALUE );
+        }
+
+    private void disableImageAlpha()
+        {
+        setColorARGB32( myColorARGB32 );
+        myGL.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE );
+        }
+
+    private Texture getOrLoadTexture( final AndroidImageResource aImage )
+        {
+        if ( aImage.texture == null ) myTextureManager.makeTexture( aImage );
+        return aImage.texture;
+        }
+
+    private void bindTexture( final Texture aTexture )
+        {
+        if ( myActiveTexture == aTexture ) throw new IllegalStateException();
+
+        myGL.glBindTexture( GL10.GL_TEXTURE_2D, aTexture.id );
+        myActiveTexture = aTexture;
+
+        myTextureBindCalls++;
+        }
+
+    private void enableTexturing()
+        {
+        myGL.glEnable( GL10.GL_TEXTURE_2D );
+        myGL.glEnableClientState( GL10.GL_TEXTURE_COORD_ARRAY );
+        myTextureEnabled = true;
+
+        myTextureStateChanges++;
+        }
+
+    private void disableTexturing()
+        {
+        myGL.glDisable( GL10.GL_TEXTURE_2D );
+        myGL.glDisableClientState( GL10.GL_TEXTURE_COORD_ARRAY );
+        myTextureEnabled = false;
+
+        myTextureStateChanges++;
+        }
+
+    private boolean isTextureMatrixUpToDate( final Texture aTexture, final Rectangle aRectangle )
+        {
+        if ( myActiveTexture != aTexture ) return false;
+        return myTextureMatrixRect.equals( aRectangle );
+        }
+
+    private boolean isTextureMatrixPushed()
+        {
+        return myTextureMatrixPushedFlag;
+        }
+
+    private void pushTextureMatrix( final Texture aTexture, final Rectangle aRectangle )
+        {
+        if ( myTextureMatrixPushedFlag ) throw new IllegalStateException();
+
+        aTexture.setMatrix( mMatrix4x4, aRectangle );
+
+        myGL.glMatrixMode( GL10.GL_TEXTURE );
+        myGL.glPushMatrix();
+        myGL.glLoadMatrixf( mMatrix4x4, 0 );
+
+        myGL.glMatrixMode( GL10.GL_MODELVIEW );
+
+        myTextureMatrixPushedFlag = true;
+        }
+
+    private void popTextureMatrix()
+        {
+        myGL.glMatrixMode( GL10.GL_TEXTURE );
+        myGL.glPopMatrix();
+
+        myGL.glMatrixMode( GL10.GL_MODELVIEW );
+        }
 
 
     private GL10 myGL;
@@ -362,11 +340,31 @@ public final class OpenglGraphics extends DirectGraphics
 
     private float myScaleY;
 
+    private int myColorARGB32;
+
     private int myDisplayWidth;
 
     private int myDisplayHeight;
 
+    private int myTextureBindCalls;
+
+    private int myTextureStateChanges;
+
+    private boolean myTextureEnabled;
+
+    private Texture myActiveTexture;
+
+    private boolean myTextureMatrixPushedFlag;
+
+    private final Rectangle myFullRect = new Rectangle();
+
+    private final Rectangle myTextureMatrixRect = new Rectangle();
+
     private final TextureManager myTextureManager = new TextureManager();
+
+    private final GeometryDrawer myGeometryDrawer = new GeometryDrawer();
+
+    private final float[] mMatrix4x4 = new float[]{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 
     private static final int MASK_RGB24 = 0x00FFFFFF;
 
