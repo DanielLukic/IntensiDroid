@@ -88,8 +88,6 @@ class StaticSquare
                 }
 
             gl11.glBindBuffer( GL11.GL_ELEMENT_ARRAY_BUFFER, mIndexBufferIndex );
-
-            throw new RuntimeException("nyi"); 
             }
         }
 
