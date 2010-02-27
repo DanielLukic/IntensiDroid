@@ -25,7 +25,7 @@ public final class Texture
         aMatrix4x4[ 13 ] = aSourceRect.y / (float) originalHeight - aMatrix4x4[ 5 ];
         }
 
-    public final boolean cropTexture( final GL11 aGL, final Rectangle aRect )
+    public final boolean cropTextureIfNecessary( final GL11 aGL, final Rectangle aRect )
         {
         if ( myActiveCropRect.equals( aRect ) ) return false;
 

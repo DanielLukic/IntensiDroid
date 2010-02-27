@@ -51,6 +51,8 @@ public final class OpenglGraphics extends DirectGraphics
 
         myTextureManager.gl = aGL10;
         myTextureManager.useDrawTextureExtension = hasDrawTextureExtension;
+
+        myTextureStateManager.gl = aGL10;
         }
 
     void onSurfaceChanged( final int aWidth, final int aHeight, final int aDisplayWidth, final int aDisplayHeight )
@@ -68,33 +70,15 @@ public final class OpenglGraphics extends DirectGraphics
 
     final void onBeginFrame()
         {
-        mMatrix4x4[ 0 ] = 1.0f;
-        mMatrix4x4[ 5 ] = -1.0f;
-        mMatrix4x4[ 12 ] = 0.0f;
-        mMatrix4x4[ 13 ] = 1.0f;
-
-        myGL.glMatrixMode( GL10.GL_TEXTURE );
-        myGL.glLoadMatrixf( mMatrix4x4, 0 );
-
-        myGL.glMatrixMode( GL10.GL_MODELVIEW );
-
-        enableTexturing();
-
-        myTextureStateChanges = myTextureBindCalls = myTextureMatrixPops = myTextureMatrixPushes = myTextureCropChanges = 0;
+        //#if DEBUG && DEBUG_OPENGL
+        myTextureStateManager.resetDebugCounters();
+        //#endif
         }
 
     final void onEndFrame()
         {
-        disableTexturing();
-
-        if ( myTextureMatrixPushedFlag ) popTextureMatrix();
-
         //#if DEBUG && DEBUG_OPENGL
-        if ( myTextureBindCalls > 10 ) Log.debug( "gl texture bind calls: {}", myTextureBindCalls );
-        if ( myTextureMatrixPops > 10 ) Log.debug( "gl texture matrix pops: {}", myTextureMatrixPops );
-        if ( myTextureMatrixPushes > 10 ) Log.debug( "gl texture matrix pushes: {}", myTextureMatrixPushes );
-        if ( myTextureCropChanges > 10 ) Log.debug( "gl texture crop resets: {}", myTextureCropChanges );
-        if ( myTextureStateChanges > 10 ) Log.debug( "gl texture state changes: {}", myTextureStateChanges );
+        myTextureStateManager.dumpDebugCounters();
         //#endif
         }
 
@@ -173,9 +157,9 @@ public final class OpenglGraphics extends DirectGraphics
         if ( aAlpha256 == FULLY_TRANSPARENT ) return;
         if ( aAlpha256 == FULLY_OPAQUE ) drawImage( aImage, aSourceRect, aX, aY );
 
-        enableImageAlpha( aAlpha256 );
+        myTextureStateManager.enableAlpha( aAlpha256 );
         drawImage( aImage, aSourceRect, aX, aY );
-        disableImageAlpha();
+        myTextureStateManager.disableAlpha();
         }
 
     public final void drawImage( final ImageResource aImage, final int aX, final int aY )
@@ -193,11 +177,11 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void drawImage( final ImageResource aImage, final Rectangle aSourceRect, final int aTargetX, final int aTargetY )
         {
-        if ( !myTextureEnabled ) enableTexturing();
+        myTextureStateManager.enableTexturingIfNecessary();
 
         final AndroidImageResource imageResource = (AndroidImageResource) aImage;
         final Texture texture = getOrLoadTexture( imageResource );
-        if ( myActiveTexture != texture ) bindTexture( texture );
+        myTextureStateManager.bindTextureIfNecessary( texture );
 
         //#if DEBUG_OPENGL
         if ( hasDrawTextureExtension && Random.INSTANCE.nextInt( 16 ) > 10 )
@@ -205,8 +189,8 @@ public final class OpenglGraphics extends DirectGraphics
             //# if ( hasDrawTextureExtension )
             //#endif
             {
-            final boolean cropChanged = texture.cropTexture( (GL11) myGL, aSourceRect );
-            if ( cropChanged ) myTextureCropChanges++;
+            myTextureStateManager.updateCropIfNecessary( aSourceRect );
+
             final int x = aTargetX;
             final int y = myHeight - aTargetY - aSourceRect.height;
             final int width = aSourceRect.width;
@@ -215,16 +199,7 @@ public final class OpenglGraphics extends DirectGraphics
             }
         else
             {
-            final boolean textureMatrixChanged = !isTextureMatrixUpToDate( texture, aSourceRect );
-            //#if DEBUG_OPENGL
-            if ( textureMatrixChanged || Random.INSTANCE.nextInt( 16 ) < 10 )
-                //#else
-                //# if ( textureMatrixChanged )
-                //#endif
-                {
-                if ( isTextureMatrixPushed() ) popTextureMatrix();
-                pushTextureMatrix( texture, aSourceRect );
-                }
+            myTextureStateManager.updateMatrixIfNecessary( aSourceRect );
 
             myGeometryDrawer.enableTextureCoordinates = true;
             myGeometryDrawer.drawSquare( aTargetX, aTargetY, aSourceRect.width, aSourceRect.height );
@@ -243,101 +218,16 @@ public final class OpenglGraphics extends DirectGraphics
 
     private void fillColoredRect( final int aX, final int aY, final int aWidth, final int aHeight )
         {
-        if ( myTextureEnabled ) disableTexturing();
+        myTextureStateManager.disableTexturingIfNecessary();
 
         myGeometryDrawer.enableTextureCoordinates = false;
         myGeometryDrawer.drawSquare( aX, aY, aWidth, aHeight );
-        }
-
-    private void enableImageAlpha( final int aAlpha256 )
-        {
-        myGL.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE );
-        myGL.glColor4f( 1f, 1f, 1f, aAlpha256 / MASK_COLOR_CHANNEL_AS_FLOAT_VALUE );
-        }
-
-    private void disableImageAlpha()
-        {
-        setColorARGB32( myColorARGB32 );
-        myGL.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE );
         }
 
     private Texture getOrLoadTexture( final AndroidImageResource aImage )
         {
         if ( aImage.texture == null ) myTextureManager.makeTexture( aImage );
         return aImage.texture;
-        }
-
-    private void bindTexture( final Texture aTexture )
-        {
-        //#if DEBUG
-        Assert.notSame( "texture already bound", myActiveTexture, aTexture );
-        //#endif
-
-        myGL.glBindTexture( GL10.GL_TEXTURE_2D, aTexture.id );
-        myActiveTexture = aTexture;
-
-        myTextureBindCalls++;
-        }
-
-    private void enableTexturing()
-        {
-        myGL.glEnable( GL10.GL_TEXTURE_2D );
-        myGL.glEnableClientState( GL10.GL_TEXTURE_COORD_ARRAY );
-        myTextureEnabled = true;
-
-        myTextureStateChanges++;
-        }
-
-    private void disableTexturing()
-        {
-        myGL.glDisable( GL10.GL_TEXTURE_2D );
-        myGL.glDisableClientState( GL10.GL_TEXTURE_COORD_ARRAY );
-        myTextureEnabled = false;
-
-        myTextureStateChanges++;
-        }
-
-    private boolean isTextureMatrixUpToDate( final Texture aTexture, final Rectangle aRectangle )
-        {
-        return myActiveTexture == aTexture && myTextureMatrixRect.equals( aRectangle );
-        }
-
-    private boolean isTextureMatrixPushed()
-        {
-        return myTextureMatrixPushedFlag;
-        }
-
-    private void pushTextureMatrix( final Texture aTexture, final Rectangle aRectangle )
-        {
-        //#if DEBUG
-        Assert.isFalse( "already pushed", myTextureMatrixPushedFlag );
-        //#endif
-
-        aTexture.setMatrix( mMatrix4x4, aRectangle );
-
-        myGL.glMatrixMode( GL10.GL_TEXTURE );
-        myGL.glPushMatrix();
-        myGL.glLoadMatrixf( mMatrix4x4, 0 );
-
-        myGL.glMatrixMode( GL10.GL_MODELVIEW );
-
-        myTextureMatrixPushes++;
-        myTextureMatrixPushedFlag = true;
-        }
-
-    private void popTextureMatrix()
-        {
-        //#if DEBUG
-        Assert.isTrue( "nothing pushed", myTextureMatrixPushedFlag );
-        //#endif
-
-        myGL.glMatrixMode( GL10.GL_TEXTURE );
-        myGL.glPopMatrix();
-
-        myGL.glMatrixMode( GL10.GL_MODELVIEW );
-
-        myTextureMatrixPops++;
-        myTextureMatrixPushedFlag = false;
         }
 
 
@@ -354,32 +244,13 @@ public final class OpenglGraphics extends DirectGraphics
     private int myColorARGB32;
 
 
-    private int myTextureBindCalls;
-
-    private int myTextureMatrixPops;
-
-    private int myTextureMatrixPushes;
-
-    private int myTextureStateChanges;
-
-    private int myTextureCropChanges;
-
-
-    private Texture myActiveTexture;
-
-    private boolean myTextureEnabled;
-
-    private boolean myTextureMatrixPushedFlag;
-
     private final Rectangle myFullRect = new Rectangle();
-
-    private final Rectangle myTextureMatrixRect = new Rectangle();
-
-    private final TextureManager myTextureManager = new TextureManager();
 
     private final GeometryDrawer myGeometryDrawer = new GeometryDrawer();
 
-    private final float[] mMatrix4x4 = new float[]{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+    private final TextureManager myTextureManager = new TextureManager();
+
+    private final TextureStateManager myTextureStateManager = new TextureStateManager();
 
     private static final int MASK_RGB24 = 0x00FFFFFF;
 
