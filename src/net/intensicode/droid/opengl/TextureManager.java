@@ -72,9 +72,9 @@ public class TextureManager implements TexturePurger
 
         if ( originalWidth == properWidth && originalHeight == properHeight )
             {
-            final DirectTexture directTexture = new DirectTexture( gl );
-            directTexture.makeUsing( aOriginalBitmap );
-            return directTexture;
+            final Texture texture = new Texture( gl );
+            texture.makeUsing( aOriginalBitmap );
+            return texture;
             }
         else
             {

@@ -7,16 +7,25 @@ import net.intensicode.util.*;
 import javax.microedition.khronos.opengles.*;
 import java.nio.IntBuffer;
 
-public abstract class Texture
+public class Texture
     {
     public boolean allowUseOfGlUtils;
 
     public int id;
 
-    public int width;
 
-    public int height;
+    public Texture( final GL10 aGL )
+        {
+        myGL = aGL;
+        }
 
+    public void makeUsing( final Bitmap aBitmap )
+        {
+        myWidth = aBitmap.getWidth();
+        myHeight = aBitmap.getHeight();
+        setScaledSize( myWidth, myHeight );
+        makeOpenglTexture( aBitmap );
+        }
 
     public final void purge()
         {
@@ -25,23 +34,54 @@ public abstract class Texture
         id = 0;
         }
 
-    // Abstract Interface
+    public final boolean isFullRect( final Rectangle aRectangle )
+        {
+        return aRectangle.x == 0 && aRectangle.y == 0 && aRectangle.width == myScaledWidth && aRectangle.height == myScaledHeight;
+        }
 
-    public abstract boolean isFullRect( final Rectangle aRectangle );
+    public final void setMatrix( final float[] aMatrix4x4, final Rectangle aSourceRect )
+        {
+        aMatrix4x4[ 0 ] = aSourceRect.width / myScaledWidth;
+        aMatrix4x4[ 5 ] = -aSourceRect.height / myScaledHeight;
+        aMatrix4x4[ 12 ] = aSourceRect.x / myScaledWidth;
+        aMatrix4x4[ 13 ] = aSourceRect.y / myScaledHeight - aMatrix4x4[ 5 ];
+        }
 
-    public abstract void setMatrix( final float[] aMatrix4x4, final Rectangle aSourceRect );
+    public final boolean cropTextureIfNecessary( final GL11 aGL, final Rectangle aRect )
+        {
+        if ( myActiveCropRect.equals( aRect ) ) return false;
 
-    public abstract boolean cropTextureIfNecessary( final GL11 aGL, final Rectangle aRect );
+        final float x = aRect.x * myScaleFactorX;
+        final float y = aRect.y * myScaleFactorY;
+        final float scaledWidth = aRect.width * myScaleFactorX;
+        final float scaledHeight = aRect.height * myScaleFactorY;
+        theCropWorkspace[ 0 ] = (int) x;
+        theCropWorkspace[ 1 ] = (int) ( y + scaledHeight );
+        theCropWorkspace[ 2 ] = (int) scaledWidth;
+        theCropWorkspace[ 3 ] = (int) -scaledHeight;
+
+        aGL.glTexParameteriv( GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, theCropWorkspace, 0 );
+
+        myActiveCropRect.setTo( aRect );
+
+        return true;
+        }
 
     // Protected API
 
-    protected Texture( final GL10 aGL )
+    protected final void setScaledSize( final float aWidth, final float aHeight )
         {
-        myGL = aGL;
+        myScaledWidth = aWidth;
+        myScaledHeight = aHeight;
+        myScaleFactorX = myWidth / myScaledWidth;
+        myScaleFactorY = myHeight / myScaledHeight;
         }
 
     protected final void makeOpenglTexture( final Bitmap aBitmapARGB32 )
         {
+        myWidth = aBitmapARGB32.getWidth();
+        myHeight = aBitmapARGB32.getHeight();
+
         if ( id == 0 ) makeNewOpenglTexture();
 
         if ( allowUseOfGlUtils )
@@ -59,13 +99,13 @@ public abstract class Texture
     private void makeTexImageFromBitmapARGB32( final Bitmap aBitmap )
         {
         //#if DEBUG
-        Assert.equals( "texture width matches", width, aBitmap.getWidth() );
-        Assert.equals( "texture height matches", height, aBitmap.getHeight() );
+        Assert.equals( "texture width matches", myWidth, aBitmap.getWidth() );
+        Assert.equals( "texture height matches", myHeight, aBitmap.getHeight() );
         //#endif
 
-        final int numberOfPixels = width * height;
+        final int numberOfPixels = myWidth * myHeight;
         final int[] data = new int[numberOfPixels];
-        aBitmap.getPixels( data, 0, width, 0, 0, width, height );
+        aBitmap.getPixels( data, 0, myWidth, 0, 0, myWidth, myHeight );
 
         for ( int idx = 0; idx < numberOfPixels; ++idx )
             {
@@ -79,7 +119,7 @@ public abstract class Texture
 
         final IntBuffer dataBuffer = IntBuffer.wrap( data );
         myGL.glTexImage2D( GL10.GL_TEXTURE_2D, MIPMAP_LEVEL_ZERO, INTERNAL_TEXTURE_FORMAT_RGBA,
-                           width, height, BORDER_SIZE_ZERO,
+                           myWidth, myHeight, BORDER_SIZE_ZERO,
                            BITMAP_FORMAT_RGBA, BITMAP_DATA_FORMAT, dataBuffer );
         }
 
@@ -108,7 +148,23 @@ public abstract class Texture
 
     private GL10 myGL;
 
+    private int myWidth;
+
+    private int myHeight;
+
+    private float myScaledWidth;
+
+    private float myScaledHeight;
+
+    private float myScaleFactorX = 1;
+
+    private float myScaleFactorY = 1;
+
     private final int[] mTextureNameWorkspace = new int[1];
+
+    private final Rectangle myActiveCropRect = new Rectangle();
+
+    private static final int[] theCropWorkspace = new int[4];
 
     private static final int SHIFT_SWITCH_RGB_BGR = 16;
 
