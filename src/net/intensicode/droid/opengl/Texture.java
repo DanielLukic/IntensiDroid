@@ -6,10 +6,6 @@ import javax.microedition.khronos.opengles.*;
 
 public final class Texture
     {
-    //#if DEBUG_OPENGL
-    public static int theTextureCropResets;
-    //#endif
-
     public int id;
 
     public int width;
@@ -29,8 +25,10 @@ public final class Texture
         aMatrix4x4[ 13 ] = aSourceRect.y / (float) height - aMatrix4x4[ 5 ];
         }
 
-    public final void cropTexture( final GL11 aGL, final Rectangle aRect )
+    public final boolean cropTexture( final GL11 aGL, final Rectangle aRect )
         {
+        if ( myActiveCropRect.equals( aRect ) ) return false;
+
         final float xFactor = width / (float) originalWidth;
         final float yFactor = height / (float) originalHeight;
         final float x = aRect.x * xFactor;
@@ -43,8 +41,14 @@ public final class Texture
         theCropWorkspace[ 3 ] = (int) -scaledHeight;
 
         aGL.glTexParameteriv( GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, theCropWorkspace, 0 );
+
+        myActiveCropRect.setTo( aRect );
+
+        return true;
         }
 
+
+    private final Rectangle myActiveCropRect = new Rectangle();
 
     private static final int[] theCropWorkspace = new int[4];
     }

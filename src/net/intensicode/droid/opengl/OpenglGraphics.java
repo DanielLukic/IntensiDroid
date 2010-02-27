@@ -82,7 +82,7 @@ public final class OpenglGraphics extends DirectGraphics
 
         enableTexturing();
 
-        myTextureStateChanges = myTextureBindCalls = Texture.theTextureCropResets = 0;
+        myTextureStateChanges = myTextureBindCalls = myTextureMatrixPops = myTextureMatrixPushes = myTextureCropChanges = 0;
         }
 
     final void onEndFrame()
@@ -92,18 +92,11 @@ public final class OpenglGraphics extends DirectGraphics
         if ( myTextureMatrixPushedFlag ) popTextureMatrix();
 
         //#if DEBUG && DEBUG_OPENGL
-        if ( myTextureStateChanges > 10 )
-            {
-            Log.debug( "gl texture state changes: {}", myTextureStateChanges );
-            }
-        if ( myTextureBindCalls > 10 )
-            {
-            Log.debug( "gl texture bind calls: {}", myTextureBindCalls );
-            }
-        if ( Texture.theTextureCropResets > 10 )
-            {
-            Log.debug( "gl texture crop resets: {}", Texture.theTextureCropResets );
-            }
+        if ( myTextureBindCalls > 10 ) Log.debug( "gl texture bind calls: {}", myTextureBindCalls );
+        if ( myTextureMatrixPops > 10 ) Log.debug( "gl texture matrix pops: {}", myTextureMatrixPops );
+        if ( myTextureMatrixPushes > 10 ) Log.debug( "gl texture matrix pushes: {}", myTextureMatrixPushes );
+        if ( myTextureCropChanges > 10 ) Log.debug( "gl texture crop resets: {}", myTextureCropChanges );
+        if ( myTextureStateChanges > 10 ) Log.debug( "gl texture state changes: {}", myTextureStateChanges );
         //#endif
         }
 
@@ -210,7 +203,8 @@ public final class OpenglGraphics extends DirectGraphics
 
         if ( hasDrawTextureExtension )
             {
-            texture.cropTexture( (GL11) myGL, aSourceRect );
+            final boolean cropChanged = texture.cropTexture( (GL11) myGL, aSourceRect );
+            if ( cropChanged ) myTextureCropChanges++;
             final int x = aTargetX;
             final int y = myHeight - aTargetY - aSourceRect.height;
             final int width = aSourceRect.width;
@@ -269,7 +263,9 @@ public final class OpenglGraphics extends DirectGraphics
 
     private void bindTexture( final Texture aTexture )
         {
-        if ( myActiveTexture == aTexture ) throw new IllegalStateException();
+        //#if DEBUG
+        Assert.notSame( "texture already bound", myActiveTexture, aTexture );
+        //#endif
 
         myGL.glBindTexture( GL10.GL_TEXTURE_2D, aTexture.id );
         myActiveTexture = aTexture;
@@ -297,8 +293,7 @@ public final class OpenglGraphics extends DirectGraphics
 
     private boolean isTextureMatrixUpToDate( final Texture aTexture, final Rectangle aRectangle )
         {
-        if ( myActiveTexture != aTexture ) return false;
-        return myTextureMatrixRect.equals( aRectangle );
+        return myActiveTexture == aTexture && myTextureMatrixRect.equals( aRectangle );
         }
 
     private boolean isTextureMatrixPushed()
@@ -308,7 +303,9 @@ public final class OpenglGraphics extends DirectGraphics
 
     private void pushTextureMatrix( final Texture aTexture, final Rectangle aRectangle )
         {
-        if ( myTextureMatrixPushedFlag ) throw new IllegalStateException();
+        //#if DEBUG
+        Assert.isFalse( "already pushed", myTextureMatrixPushedFlag );
+        //#endif
 
         aTexture.setMatrix( mMatrix4x4, aRectangle );
 
@@ -318,15 +315,23 @@ public final class OpenglGraphics extends DirectGraphics
 
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
 
+        myTextureMatrixPushes++;
         myTextureMatrixPushedFlag = true;
         }
 
     private void popTextureMatrix()
         {
+        //#if DEBUG
+        Assert.isTrue( "nothing pushed", myTextureMatrixPushedFlag );
+        //#endif
+
         myGL.glMatrixMode( GL10.GL_TEXTURE );
         myGL.glPopMatrix();
 
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
+
+        myTextureMatrixPops++;
+        myTextureMatrixPushedFlag = false;
         }
 
 
@@ -346,13 +351,21 @@ public final class OpenglGraphics extends DirectGraphics
 
     private int myDisplayHeight;
 
+
     private int myTextureBindCalls;
+
+    private int myTextureMatrixPops;
+
+    private int myTextureMatrixPushes;
 
     private int myTextureStateChanges;
 
-    private boolean myTextureEnabled;
+    private int myTextureCropChanges;
+
 
     private Texture myActiveTexture;
+
+    private boolean myTextureEnabled;
 
     private boolean myTextureMatrixPushedFlag;
 
