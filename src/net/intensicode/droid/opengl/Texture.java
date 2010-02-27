@@ -17,6 +17,11 @@ public final class Texture
     public int originalHeight;
 
 
+    public final boolean isFullRect( final Rectangle aRectangle )
+        {
+        return aRectangle.x == 0 && aRectangle.y == 0 && aRectangle.width == originalWidth && aRectangle.height == originalHeight;
+        }
+
     public final void setMatrix( final float[] aMatrix4x4, final Rectangle aSourceRect )
         {
         aMatrix4x4[ 0 ] = aSourceRect.width / (float) originalWidth;

@@ -93,7 +93,18 @@ public final class TextureStateManager
 
     private boolean isTextureMatrixUpToDate( final Texture aTexture, final Rectangle aRectangle )
         {
-        return myActiveTexture == aTexture && myTextureMatrixRect.equals( aRectangle );
+        if ( myActiveTexture != aTexture ) return false;
+        if ( isIdentityMatrix() && aTexture.isFullRect( aRectangle ) ) return false;
+        return myTextureMatrixRect.equals( aRectangle );
+        }
+
+    private boolean isIdentityMatrix()
+        {
+        if ( mMatrix4x4[ 0 ] != 1.0f ) return false;
+        if ( mMatrix4x4[ 5 ] == -1.0f ) return false;
+        if ( mMatrix4x4[ 12 ] == 0.0f ) return false;
+        if ( mMatrix4x4[ 13 ] == 1.0f ) return false;
+        return true;
         }
 
     private boolean isTextureMatrixPushed()
