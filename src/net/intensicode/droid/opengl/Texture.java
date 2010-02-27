@@ -4,7 +4,7 @@ import net.intensicode.util.Rectangle;
 
 import javax.microedition.khronos.opengles.*;
 
-public class Texture
+public final class Texture
     {
     //#if DEBUG_OPENGL
     public static int theTextureCropResets;
@@ -29,22 +29,6 @@ public class Texture
         aMatrix4x4[ 5 ] = -aSourceRect.height / (float) height;
         aMatrix4x4[ 12 ] = aSourceRect.x / (float) width;
         aMatrix4x4[ 13 ] = aSourceRect.y / (float) height - aMatrix4x4[ 5 ];
-        }
-
-    public final void resetCropRect( final GL11 aGL )
-        {
-        if ( !isCropped ) throw new IllegalStateException();
-
-        theCropWorkspace[ 0 ] = 0;
-        theCropWorkspace[ 1 ] = height;
-        theCropWorkspace[ 2 ] = width;
-        theCropWorkspace[ 3 ] = -height;
-
-        aGL.glTexParameteriv( GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, theCropWorkspace, 0 );
-
-        isCropped = false;
-
-        theTextureCropResets++;
         }
 
     public final void cropTexture( final GL11 aGL, final Rectangle aRect )
