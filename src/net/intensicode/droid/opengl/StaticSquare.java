@@ -66,26 +66,31 @@ class StaticSquare
         mTexCoordBuffer.put( texIndex + 1, v );
         }
 
-    public final void updateBuffers( final GL10 gl, boolean useTexture )
+    public final void updateTextureBuffer( final GL10 aGL )
         {
         if ( !hasHardwareBuffers() )
             {
-            gl.glVertexPointer( BYTES_PER_VERTEX_COORD, GL10.GL_FLOAT, 0, mVertexBuffer );
-
-            if ( useTexture ) gl.glTexCoordPointer( BYTES_PER_TEX_COORD, GL10.GL_FLOAT, 0, mTexCoordBuffer );
+            aGL.glTexCoordPointer( BYTES_PER_TEX_COORD, GL10.GL_FLOAT, 0, mTexCoordBuffer );
             }
         else
             {
-            final GL11 gl11 = (GL11) gl;
+            final GL11 gl11 = (GL11) aGL;
+            gl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, mTextureCoordBufferIndex );
+            gl11.glTexCoordPointer( BYTES_PER_TEX_COORD, GL11.GL_FLOAT, 0, 0 );
+            }
+        }
 
+    public final void updateVertexBuffer( final GL10 aGL )
+        {
+        if ( !hasHardwareBuffers() )
+            {
+            aGL.glVertexPointer( BYTES_PER_VERTEX_COORD, GL10.GL_FLOAT, 0, mVertexBuffer );
+            }
+        else
+            {
+            final GL11 gl11 = (GL11) aGL;
             gl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, mVertBufferIndex );
             gl11.glVertexPointer( BYTES_PER_VERTEX_COORD, GL10.GL_FLOAT, 0, 0 );
-
-            if ( useTexture )
-                {
-                gl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, mTextureCoordBufferIndex );
-                gl11.glTexCoordPointer( BYTES_PER_TEX_COORD, GL11.GL_FLOAT, 0, 0 );
-                }
 
             gl11.glBindBuffer( GL11.GL_ELEMENT_ARRAY_BUFFER, mIndexBufferIndex );
             }
