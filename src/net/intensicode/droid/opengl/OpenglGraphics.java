@@ -50,7 +50,6 @@ public final class OpenglGraphics extends DirectGraphics
         myGL.glEnableClientState( GL10.GL_VERTEX_ARRAY );
 
         myTextureManager.gl = aGL10;
-        myTextureManager.useDrawTextureExtension = hasDrawTextureExtension;
 
         myTextureStateManager.gl = aGL10;
         }

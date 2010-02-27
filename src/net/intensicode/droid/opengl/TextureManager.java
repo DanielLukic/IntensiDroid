@@ -13,9 +13,7 @@ public class TextureManager implements TexturePurger
 
     public boolean useGlUtils;
 
-    public boolean useDrawTextureExtension;
-
-    public boolean needPowerOfTwo = true;
+    public boolean useScaledProperTextures;
 
 
     public void addTexture( final AndroidImageResource aImageResource )
@@ -76,11 +74,17 @@ public class TextureManager implements TexturePurger
             texture.makeUsing( aOriginalBitmap );
             return texture;
             }
-        else
+        else if ( useScaledProperTextures )
             {
             final ProperTexture properTexture = new ProperTexture( gl );
             properTexture.makeUsing( aOriginalBitmap, properWidth, properHeight );
             return properTexture;
+            }
+        else
+            {
+            final CroppedTexture texture = new CroppedTexture( gl );
+            texture.makeUsing( aOriginalBitmap, properWidth, properHeight );
+            return texture;
             }
         }
 

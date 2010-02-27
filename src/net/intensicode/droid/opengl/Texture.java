@@ -23,8 +23,9 @@ public class Texture
         {
         myWidth = aBitmap.getWidth();
         myHeight = aBitmap.getHeight();
-        setScaledSize( myWidth, myHeight );
         makeOpenglTexture( aBitmap );
+
+        setScaledSize( myWidth, myHeight );
         }
 
     public final void purge()
@@ -34,12 +35,12 @@ public class Texture
         id = 0;
         }
 
-    public final boolean isFullRect( final Rectangle aRectangle )
+    public boolean isFullRect( final Rectangle aRectangle )
         {
         return aRectangle.x == 0 && aRectangle.y == 0 && aRectangle.width == myScaledWidth && aRectangle.height == myScaledHeight;
         }
 
-    public final void setMatrix( final float[] aMatrix4x4, final Rectangle aSourceRect )
+    public void setMatrix( final float[] aMatrix4x4, final Rectangle aSourceRect )
         {
         aMatrix4x4[ 0 ] = aSourceRect.width / myScaledWidth;
         aMatrix4x4[ 5 ] = -aSourceRect.height / myScaledHeight;
@@ -47,7 +48,7 @@ public class Texture
         aMatrix4x4[ 13 ] = aSourceRect.y / myScaledHeight - aMatrix4x4[ 5 ];
         }
 
-    public final boolean cropTextureIfNecessary( final GL11 aGL, final Rectangle aRect )
+    public boolean cropTextureIfNecessary( final GL11 aGL, final Rectangle aRect )
         {
         if ( myActiveCropRect.equals( aRect ) ) return false;
 
@@ -148,13 +149,13 @@ public class Texture
 
     private GL10 myGL;
 
-    private int myWidth;
+    protected int myWidth;
 
-    private int myHeight;
+    protected int myHeight;
 
-    private float myScaledWidth;
+    protected float myScaledWidth;
 
-    private float myScaledHeight;
+    protected float myScaledHeight;
 
     private float myScaleFactorX = 1;
 
@@ -162,9 +163,9 @@ public class Texture
 
     private final int[] mTextureNameWorkspace = new int[1];
 
-    private final Rectangle myActiveCropRect = new Rectangle();
+    protected final Rectangle myActiveCropRect = new Rectangle();
 
-    private static final int[] theCropWorkspace = new int[4];
+    protected static final int[] theCropWorkspace = new int[4];
 
     private static final int SHIFT_SWITCH_RGB_BGR = 16;
 
