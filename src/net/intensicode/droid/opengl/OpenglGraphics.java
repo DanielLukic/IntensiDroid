@@ -57,10 +57,8 @@ public final class OpenglGraphics extends DirectGraphics
         {
         myWidth = aWidth;
         myHeight = aHeight;
-        myDisplayWidth = aDisplayWidth;
-        myDisplayHeight = aDisplayHeight;
-        myScaleX = myDisplayWidth / (float) myWidth;
-        myScaleY = myDisplayHeight / (float) myHeight;
+        myScaleX = aDisplayWidth / (float) myWidth;
+        myScaleY = aDisplayHeight / (float) myHeight;
         }
 
     final void releaseGL()
@@ -346,10 +344,6 @@ public final class OpenglGraphics extends DirectGraphics
     private float myScaleY;
 
     private int myColorARGB32;
-
-    private int myDisplayWidth;
-
-    private int myDisplayHeight;
 
 
     private int myTextureBindCalls;
