@@ -20,8 +20,6 @@ public final class Texture
 
     public int originalHeight;
 
-    public boolean isCropped;
-
 
     public final void setMatrix( final float[] aMatrix4x4, final Rectangle aSourceRect )
         {
@@ -45,8 +43,6 @@ public final class Texture
         theCropWorkspace[ 3 ] = (int) -scaledHeight;
 
         aGL.glTexParameteriv( GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, theCropWorkspace, 0 );
-
-        isCropped = true;
         }
 
 
