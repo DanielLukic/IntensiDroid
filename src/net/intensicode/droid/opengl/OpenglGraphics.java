@@ -199,7 +199,11 @@ public final class OpenglGraphics extends DirectGraphics
         final Texture texture = getOrLoadTexture( imageResource );
         if ( myActiveTexture != texture ) bindTexture( texture );
 
-        if ( hasDrawTextureExtension )
+        //#if DEBUG_OPENGL
+        if ( hasDrawTextureExtension && Random.INSTANCE.nextInt( 16 ) > 10 )
+            //#else
+            //# if ( hasDrawTextureExtension )
+            //#endif
             {
             final boolean cropChanged = texture.cropTexture( (GL11) myGL, aSourceRect );
             if ( cropChanged ) myTextureCropChanges++;
@@ -212,7 +216,11 @@ public final class OpenglGraphics extends DirectGraphics
         else
             {
             final boolean textureMatrixChanged = !isTextureMatrixUpToDate( texture, aSourceRect );
-            if ( textureMatrixChanged )
+            //#if DEBUG_OPENGL
+            if ( textureMatrixChanged || Random.INSTANCE.nextInt( 16 ) < 10 )
+                //#else
+                //# if ( textureMatrixChanged )
+                //#endif
                 {
                 if ( isTextureMatrixPushed() ) popTextureMatrix();
                 pushTextureMatrix( texture, aSourceRect );
