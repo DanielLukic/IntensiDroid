@@ -1,59 +1,132 @@
 package net.intensicode.droid.opengl;
 
-import net.intensicode.util.Rectangle;
+import android.graphics.Bitmap;
+import android.opengl.GLUtils;
+import net.intensicode.util.*;
 
 import javax.microedition.khronos.opengles.*;
+import java.nio.IntBuffer;
 
-public final class Texture
+public abstract class Texture
     {
+    public boolean allowUseOfGlUtils;
+
     public int id;
 
     public int width;
 
     public int height;
 
-    public int originalWidth;
 
-    public int originalHeight;
-
-
-    public final boolean isFullRect( final Rectangle aRectangle )
+    public final void purge()
         {
-        return aRectangle.x == 0 && aRectangle.y == 0 && aRectangle.width == originalWidth && aRectangle.height == originalHeight;
+        mTextureNameWorkspace[ 0 ] = id;
+        myGL.glDeleteTextures( 1, mTextureNameWorkspace, 0 );
+        id = 0;
         }
 
-    public final void setMatrix( final float[] aMatrix4x4, final Rectangle aSourceRect )
+    // Abstract Interface
+
+    public abstract boolean isFullRect( final Rectangle aRectangle );
+
+    public abstract void setMatrix( final float[] aMatrix4x4, final Rectangle aSourceRect );
+
+    public abstract boolean cropTextureIfNecessary( final GL11 aGL, final Rectangle aRect );
+
+    // Protected API
+
+    protected Texture( final GL10 aGL )
         {
-        aMatrix4x4[ 0 ] = aSourceRect.width / (float) originalWidth;
-        aMatrix4x4[ 5 ] = -aSourceRect.height / (float) originalHeight;
-        aMatrix4x4[ 12 ] = aSourceRect.x / (float) originalWidth;
-        aMatrix4x4[ 13 ] = aSourceRect.y / (float) originalHeight - aMatrix4x4[ 5 ];
+        myGL = aGL;
         }
 
-    public final boolean cropTextureIfNecessary( final GL11 aGL, final Rectangle aRect )
+    protected final void makeOpenglTexture( final Bitmap aBitmapARGB32 )
         {
-        if ( myActiveCropRect.equals( aRect ) ) return false;
+        if ( id == 0 ) makeNewOpenglTexture();
 
-        final float xFactor = width / (float) originalWidth;
-        final float yFactor = height / (float) originalHeight;
-        final float x = aRect.x * xFactor;
-        final float y = aRect.y * yFactor;
-        final float scaledWidth = aRect.width * xFactor;
-        final float scaledHeight = aRect.height * yFactor;
-        theCropWorkspace[ 0 ] = (int) x;
-        theCropWorkspace[ 1 ] = (int) ( y + scaledHeight );
-        theCropWorkspace[ 2 ] = (int) scaledWidth;
-        theCropWorkspace[ 3 ] = (int) -scaledHeight;
+        if ( allowUseOfGlUtils )
+            {
+            GLUtils.texImage2D( GL10.GL_TEXTURE_2D, 0, aBitmapARGB32, 0 );
+            }
+        else
+            {
+            makeTexImageFromBitmapARGB32( aBitmapARGB32 );
+            }
+        }
 
-        aGL.glTexParameteriv( GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, theCropWorkspace, 0 );
+    // Implementation
 
-        myActiveCropRect.setTo( aRect );
+    private void makeTexImageFromBitmapARGB32( final Bitmap aBitmap )
+        {
+        //#if DEBUG
+        Assert.equals( "texture width matches", width, aBitmap.getWidth() );
+        Assert.equals( "texture height matches", height, aBitmap.getHeight() );
+        //#endif
 
-        return true;
+        final int numberOfPixels = width * height;
+        final int[] data = new int[numberOfPixels];
+        aBitmap.getPixels( data, 0, width, 0, 0, width, height );
+
+        for ( int idx = 0; idx < numberOfPixels; ++idx )
+            {
+            final int pixel = data[ idx ];
+            final int alpha = pixel & MASK_ALPHA_32;
+            final int red = ( pixel & MASK_RED_32 ) >> SHIFT_SWITCH_RGB_BGR;
+            final int green = pixel & MASK_GREEN_32;
+            final int blue = ( pixel & MASK_BLUE_32 ) << SHIFT_SWITCH_RGB_BGR;
+            data[ idx ] = alpha | red | green | blue;
+            }
+
+        final IntBuffer dataBuffer = IntBuffer.wrap( data );
+        myGL.glTexImage2D( GL10.GL_TEXTURE_2D, MIPMAP_LEVEL_ZERO, INTERNAL_TEXTURE_FORMAT_RGBA,
+                           width, height, BORDER_SIZE_ZERO,
+                           BITMAP_FORMAT_RGBA, BITMAP_DATA_FORMAT, dataBuffer );
+        }
+
+    private void makeNewOpenglTexture()
+        {
+        //#if DEBUG
+        Assert.isTrue( "no opengl set", id == 0 );
+        //#endif
+
+        mTextureNameWorkspace[ 0 ] = 0;
+        myGL.glGenTextures( 1, mTextureNameWorkspace, 0 );
+        id = mTextureNameWorkspace[ 0 ];
+
+        //#if DEBUG
+        Log.debug( "new texture id: {}", id );
+        //#endif
+
+        myGL.glBindTexture( GL10.GL_TEXTURE_2D, id );
+        myGL.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE );
+        myGL.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST );
+        myGL.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR );
+        myGL.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_CLAMP_TO_EDGE );
+        myGL.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE );
         }
 
 
-    private final Rectangle myActiveCropRect = new Rectangle();
+    private GL10 myGL;
 
-    private static final int[] theCropWorkspace = new int[4];
+    private final int[] mTextureNameWorkspace = new int[1];
+
+    private static final int SHIFT_SWITCH_RGB_BGR = 16;
+
+    private static final int MASK_ALPHA_32 = 0xFF000000;
+
+    private static final int MASK_RED_32 = 0x00FF0000;
+
+    private static final int MASK_GREEN_32 = 0x0000FF00;
+
+    private static final int MASK_BLUE_32 = 0x000000FF;
+
+    private static final int BORDER_SIZE_ZERO = 0;
+
+    private static final int MIPMAP_LEVEL_ZERO = 0;
+
+    private static final int BITMAP_FORMAT_RGBA = GL10.GL_RGBA;
+
+    private static final int INTERNAL_TEXTURE_FORMAT_RGBA = GL10.GL_RGBA;
+
+    private static final int BITMAP_DATA_FORMAT = GL10.GL_UNSIGNED_BYTE;
     }

@@ -226,7 +226,7 @@ public final class OpenglGraphics extends DirectGraphics
 
     private Texture getOrLoadTexture( final AndroidImageResource aImage )
         {
-        if ( aImage.texture == null ) myTextureManager.makeTexture( aImage );
+        if ( aImage.texture == null ) myTextureManager.addTexture( aImage );
         return aImage.texture;
         }
 
