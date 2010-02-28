@@ -1,20 +1,34 @@
 package net.intensicode.droid.opengl;
 
+import net.intensicode.core.Configuration;
 import net.intensicode.droid.AndroidImageResource;
 
 public final class TextureManager
     {
+    public final void setConfiguration( final Configuration aConfiguration )
+        {
+        myConfiguration = aConfiguration;
+        }
+
     public final void addTexture( final AndroidImageResource aImageResource )
         {
-        final String imageId = aImageResource.resourcePath;
-        if ( configuredForAtlas( imageId ) )
-            {
-            myAtlasTextureManager.addTexture( aImageResource );
-            }
-        else
+        final String imageId = getImageOrDefaultId( aImageResource.resourcePath );
+        if ( configuredAsDirectTexture( imageId ) )
             {
             myDirectTextureManager.addTexture( aImageResource );
             }
+        else
+            {
+            myAtlasTextureManager.addTexture( aImageResource );
+            }
+        }
+
+    private String getImageOrDefaultId( final String aResourcePath )
+        {
+        if ( aResourcePath == null || aResourcePath.length() == 0 ) return AndroidImageResource.RUNTIME_IMAGE;
+        final int lastDotPos = aResourcePath.lastIndexOf( '.' );
+        if ( lastDotPos == -1 ) return aResourcePath;
+        return aResourcePath.substring( 0, lastDotPos );
         }
 
     public final void purgeAllTextures()
@@ -25,17 +39,20 @@ public final class TextureManager
 
     // Implementation
 
-    private boolean configuredForAtlas( final String aImageId )
+    private boolean configuredAsDirectTexture( final String aImageId )
         {
-        // TODO: Get this from a configuration..
-        if ( "logo_anim.png".equals( aImageId ) ) return false;
-        if ( "title_logo.png".equals( aImageId ) ) return false;
-        if ( "title_background.png".equals( aImageId ) ) return false;
-        return true;
+        //#if DEBUG
+        net.intensicode.util.Log.debug( "TextureManager looking up configuration for {}", aImageId );
+        //#endif
+        return myConfiguration.readBoolean( aImageId, "direct", DEFAULT_DIRECT_TEXTURE_CONFIGURATION );
         }
 
+
+    private Configuration myConfiguration = Configuration.NULL_CONFIGURATION;
 
     private final AtlasTextureManager myAtlasTextureManager = new AtlasTextureManager();
 
     private final DirectTextureManager myDirectTextureManager = new DirectTextureManager();
+
+    private static final boolean DEFAULT_DIRECT_TEXTURE_CONFIGURATION = false;
     }
