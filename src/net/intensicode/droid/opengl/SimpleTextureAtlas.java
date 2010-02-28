@@ -57,15 +57,15 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
 
     private boolean enoughRoomAtCurrentPosition( final AndroidImageResource aImageResource )
         {
-        if ( myCurrentX + aImageResource.getWidth() >= myWidth ) return false;
-        if ( myCurrentY + aImageResource.getHeight() >= myHeight ) return false;
+        if ( myCurrentX + aImageResource.getWidth() > myWidth ) return false;
+        if ( myCurrentY + aImageResource.getHeight() > myHeight ) return false;
         return true;
         }
 
     private boolean enoughRoomInNextColumn( final AndroidImageResource aImageResource )
         {
-        if ( myNextX + aImageResource.getWidth() >= myWidth ) return false;
-        if ( myNextY + aImageResource.getHeight() >= myHeight ) return false;
+        if ( myNextX + aImageResource.getWidth() > myWidth ) return false;
+        if ( myNextY + aImageResource.getHeight() > myHeight ) return false;
         return true;
         }
 
@@ -78,7 +78,17 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
 
     private void moveToNextColumn( final AndroidImageResource aImageResource )
         {
-        if ( !enoughRoomInNextColumn( aImageResource ) ) throw new IllegalStateException( "texture atlas exhausted" );
+        if ( !enoughRoomInNextColumn( aImageResource ) )
+            {
+            //#if DEBUG
+            Log.debug( "failed adding {} into {}", aImageResource, this );
+            Log.debug( "image size: {}x{}", aImageResource.getWidth(), aImageResource.getHeight() );
+            Log.debug( "atlas size: {}x{}", myWidth, myHeight );
+            Log.debug( "current pos: {}x{}", myCurrentX, myCurrentY );
+            Log.debug( "next pos: {}x{}", myNextX, myNextY );
+            //#endif
+            throw new IllegalStateException( "texture atlas exhausted" );
+            }
 
         myCurrentX = myNextX;
         myCurrentY = myNextY;
