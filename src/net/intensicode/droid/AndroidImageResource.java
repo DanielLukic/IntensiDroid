@@ -8,7 +8,7 @@ import net.intensicode.util.Assert;
 
 public final class AndroidImageResource implements ImageResource
     {
-    public static final String NO_RESOURCE_PATH = "";
+    public static final String RUNTIME_IMAGE = "[runtime_image]";
 
     public final String resourcePath;
 
@@ -21,7 +21,7 @@ public final class AndroidImageResource implements ImageResource
 
     public AndroidImageResource( final Bitmap aBitmap )
         {
-        this( NO_RESOURCE_PATH, aBitmap );
+        this( RUNTIME_IMAGE, aBitmap );
         }
 
     public AndroidImageResource( final String aResourcePath, final Bitmap aBitmap )
