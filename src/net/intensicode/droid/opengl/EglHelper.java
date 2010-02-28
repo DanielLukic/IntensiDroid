@@ -18,8 +18,6 @@ final class EglHelper
 
     public String choosenConfiguration;
 
-    final int[] version = new int[2];
-
 
     final boolean isStarted()
         {
@@ -33,9 +31,11 @@ final class EglHelper
         myEgl = (EGL10) EGLContext.getEGL();
 
         myDisplay = myEgl.eglGetDisplay( EGL10.EGL_DEFAULT_DISPLAY );
+
+        final int[] version = new int[2];
         myEgl.eglInitialize( myDisplay, version );
 
-        final EGLConfig[] configurations = new EGLConfig[16];
+        final EGLConfig[] configurations = new EGLConfig[MAX_NUMBER_OF_CONFIGURATIONS];
         final int[] numberOfConfigurations = new int[1];
         myEgl.eglGetConfigs( myDisplay, configurations, configurations.length, numberOfConfigurations );
 
@@ -145,4 +145,6 @@ final class EglHelper
     private EGLDisplay myDisplay;
 
     private EGLConfig myConfiguration;
+
+    private static final int MAX_NUMBER_OF_CONFIGURATIONS = 32;
     }
