@@ -39,7 +39,7 @@ public final class AndroidResourcesManager extends ResourcesManager
         return image;
         }
 
-    public final ImageResource loadImageResource( final String aResourcePath ) throws IOException
+    public final ImageResource loadImageResource( final String aResourcePath )
         {
         final InputStream resourceStream = openStream( aResourcePath );
         if ( resourceStream == null ) throw new NullPointerException( aResourcePath );
