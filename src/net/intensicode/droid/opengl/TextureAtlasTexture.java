@@ -1,11 +1,9 @@
 package net.intensicode.droid.opengl;
 
-import net.intensicode.droid.*;
+import android.graphics.Bitmap;
 import net.intensicode.util.*;
 
-import java.util.ArrayList;
-
-public final class TextureAtlasTexture implements TexturePurger
+public final class TextureAtlasTexture
     {
     public final void make( final int aWidth, final int aHeight )
         {
@@ -21,7 +19,7 @@ public final class TextureAtlasTexture implements TexturePurger
         TextureUtilities.makeEmptyTexture( aWidth, aHeight );
         }
 
-    public final void add( final AndroidImageResource aImageResource, final int aX, final int aY )
+    public final void add( final Bitmap aBitmap, final int aX, final int aY )
         {
         //#if DEBUG
         Assert.isTrue( "made", myHasTextureIdFlag );
@@ -29,18 +27,8 @@ public final class TextureAtlasTexture implements TexturePurger
 
         TextureUtilities.setAtlasTextureUnit();
         TextureUtilities.bindTexture( myOglTextureId );
-        TextureUtilities.setTextureSubPixels( aImageResource.bitmap, aX, aY );
+        TextureUtilities.setTextureSubPixels( aBitmap, aX, aY );
         TextureUtilities.setRenderTextureUnit();
-
-        myAtlasRectangleWorkspace.x = aX;
-        myAtlasRectangleWorkspace.y = aY;
-        myAtlasRectangleWorkspace.width = aImageResource.getWidth();
-        myAtlasRectangleWorkspace.height = aImageResource.getHeight();
-
-        aImageResource.texture = new AtlasTexture( this, myAtlasRectangleWorkspace );
-        aImageResource.texturePurger = this;
-
-        myTexturizedImageResources.add( aImageResource );
         }
 
     public final void bind()
@@ -64,8 +52,6 @@ public final class TextureAtlasTexture implements TexturePurger
         aMatrix4x4[ Texture.TEXTURE_MATRIX_INDEX_OF_Y ] = ( aAtlasRectangle.y + aSourceRect.y ) / (float) myHeight - aMatrix4x4[ 5 ];
         }
 
-    private final Rectangle myCropCheckRectangle = new Rectangle();
-
     public void cropTextureIfNecessary( final Rectangle aSourceRect, final Rectangle aAtlasRectangle )
         {
         //#if DEBUG
@@ -87,24 +73,8 @@ public final class TextureAtlasTexture implements TexturePurger
         Assert.isTrue( "made", myHasTextureIdFlag );
         //#endif
 
-        //#if DEBUG
-        Log.debug( "purging {} texturized image resources", myTexturizedImageResources.size() );
-        //#endif
-        while ( myTexturizedImageResources.size() > 0 )
-            {
-            purge( myTexturizedImageResources.remove( myTexturizedImageResources.size() - 1 ) );
-            }
-
         TextureUtilities.purge( myOglTextureId );
         myHasTextureIdFlag = false;
-        }
-
-    // From TexturePurger
-
-    public final void purge( final AndroidImageResource aImageResource )
-        {
-        aImageResource.texture = null;
-        aImageResource.texturePurger = null;
         }
 
 
@@ -118,7 +88,5 @@ public final class TextureAtlasTexture implements TexturePurger
 
     private final Rectangle myActiveCropRect = new Rectangle();
 
-    private final Rectangle myAtlasRectangleWorkspace = new Rectangle();
-
-    private final ArrayList<AndroidImageResource> myTexturizedImageResources = new ArrayList<AndroidImageResource>();
+    private final Rectangle myCropCheckRectangle = new Rectangle();
     }

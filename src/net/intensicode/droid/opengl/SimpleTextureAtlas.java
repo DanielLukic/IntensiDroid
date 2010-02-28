@@ -1,7 +1,9 @@
 package net.intensicode.droid.opengl;
 
 import net.intensicode.droid.*;
-import net.intensicode.util.Log;
+import net.intensicode.util.*;
+
+import java.util.ArrayList;
 
 public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
     {
@@ -36,21 +38,59 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
         Log.debug( "texture atlas insert position: {}x{}", myCurrentX, myCurrentY );
         //#endif
 
-        myAtlasTexture.add( aImageResource, myCurrentX, myCurrentY );
+        myAtlasTexture.add( aImageResource.bitmap, myCurrentX, myCurrentY );
+
+        myAtlasRectangleWorkspace.x = myCurrentX;
+        myAtlasRectangleWorkspace.y = myCurrentY;
+        myAtlasRectangleWorkspace.width = aImageResource.getWidth();
+        myAtlasRectangleWorkspace.height = aImageResource.getHeight();
+
+        aImageResource.texture = new AtlasTexture( myAtlasTexture, myAtlasRectangleWorkspace );
+        aImageResource.texturePurger = this;
+
+        myTexturizedImageResources.add( aImageResource );
+
         myCurrentY += aImageResource.getHeight();
         myNextX = Math.max( myNextX, myCurrentX + aImageResource.getWidth() );
         }
 
     public final void purge()
         {
-        throw new UnsupportedOperationException();
+        //#if DEBUG
+        Log.debug( "purging {} texturized image resources", myTexturizedImageResources.size() );
+        //#endif
+        while ( myTexturizedImageResources.size() > 0 )
+            {
+            final int lastIndex = myTexturizedImageResources.size() - 1;
+            final AndroidImageResource lastImageResource = myTexturizedImageResources.remove( lastIndex );
+            purge( lastImageResource );
+            }
+
+        if ( myAtlasTexture != null ) myAtlasTexture.purge();
+        myAtlasTexture = null;
         }
 
     // From TexturePurger
 
     public final void purge( final AndroidImageResource aImageResource )
         {
-        throw new UnsupportedOperationException();
+        //#if DEBUG
+        Assert.isTrue( "known image", myTexturizedImageResources.contains( aImageResource ) );
+        //#endif
+
+        myTexturizedImageResources.remove( aImageResource );
+
+        aImageResource.texture = null;
+        aImageResource.texturePurger = null;
+
+        if ( myTexturizedImageResources.size() == 0 )
+            {
+            //#if DEBUG
+            Log.debug( "all textures purged from atlas {} - purging atlas texture", this );
+            //#endif
+            purge();
+            myCurrentX = myCurrentY = myNextX = myNextY = 0;
+            }
         }
 
     // Implementation
@@ -97,7 +137,7 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
 
     private int myNextX;
 
-    private int myNextY = 0;
+    private int myNextY;
 
     private int myCurrentX;
 
@@ -108,4 +148,8 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
     private final int myWidth;
 
     private final int myHeight;
+
+    private final Rectangle myAtlasRectangleWorkspace = new Rectangle();
+
+    private final ArrayList<AndroidImageResource> myTexturizedImageResources = new ArrayList<AndroidImageResource>();
     }
