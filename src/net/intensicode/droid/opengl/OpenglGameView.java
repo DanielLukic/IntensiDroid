@@ -123,8 +123,6 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         Assert.notNull( "opengl handle", myGL );
         //#endif
 
-        graphics.onBeginFrame();
-
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
         myGL.glLoadIdentity();
 
@@ -136,8 +134,6 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         //#if DEBUG
         Assert.notNull( "opengl handle", myGL );
         //#endif
-
-        graphics.onEndFrame();
 
         final int state = myEglHelper.swapAndReturnContextState();
         if ( state == EglHelper.CONTEXT_LOST )
@@ -199,8 +195,8 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         {
         myEglHelper.start( getEglConfiguration() );
         myGL = (GL10) myEglHelper.createOrUpdateSurface( mySurfaceHolder );
-        onSurfaceCreated( myGL );
-        onSurfaceChanged( myGL, getWidth(), getHeight() );
+        onSurfaceCreated();
+        onSurfaceChanged( getWidth(), getHeight() );
         }
 
     private int[] getEglConfiguration()
@@ -212,7 +208,10 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
             }
         if ( isDroidOrMilestone() )
             {
-            return new int[]{ EGL10.EGL_DEPTH_SIZE, 24, EGL10.EGL_NONE };
+            // Let's assume it can handle this:
+            TextureUtilities.maximumTextureSize = DROID_MAX_TEXTURE_SIZE;
+
+            return new int[]{ EGL10.EGL_DEPTH_SIZE, DROID_RECOMMENDED_DEPTH_BITS, EGL10.EGL_NONE };
             }
         return new int[]{ EGL10.EGL_NONE };
         }
@@ -232,28 +231,28 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         return isSamsung && ( isDroid || isMilestone );
         }
 
-    private void onSurfaceCreated( final GL10 aGL10 )
+    private void onSurfaceCreated()
         {
-        aGL10.glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-        aGL10.glShadeModel( GL10.GL_SMOOTH );
-        aGL10.glDisable( GL10.GL_DITHER );
-        aGL10.glEnable( GL10.GL_BLEND );
-        aGL10.glBlendFunc( GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA );
-        aGL10.glHint( GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST );
-        aGL10.glClear( GL10.GL_COLOR_BUFFER_BIT );
+        myGL.glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+        myGL.glShadeModel( GL10.GL_SMOOTH );
+        myGL.glDisable( GL10.GL_DITHER );
+        myGL.glEnable( GL10.GL_BLEND );
+        myGL.glBlendFunc( GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA );
+        myGL.glHint( GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST );
+        myGL.glClear( GL10.GL_COLOR_BUFFER_BIT );
 
-        graphics.onSurfaceCreated( aGL10 );
+        graphics.onSurfaceCreated( myGL );
         }
 
-    private void onSurfaceChanged( final GL10 aGL10, final int aWidth, final int aHeight )
+    private void onSurfaceChanged( final int aWidth, final int aHeight )
         {
-        aGL10.glViewport( 0, 0, aWidth, aHeight );
-        aGL10.glMatrixMode( GL10.GL_PROJECTION );
-        aGL10.glLoadIdentity();
-        aGL10.glOrthof( 0, width(), 0, height(), -1, 1 );
-        aGL10.glTranslatef( 0, height(), 0 );
-        aGL10.glScalef( 1.0f, -1.0f, 1.0f );
-        aGL10.glMatrixMode( GL10.GL_MODELVIEW );
+        myGL.glViewport( 0, 0, aWidth, aHeight );
+        myGL.glMatrixMode( GL10.GL_PROJECTION );
+        myGL.glLoadIdentity();
+        myGL.glOrthof( 0, width(), 0, height(), -1, 1 );
+        myGL.glTranslatef( 0, height(), 0 );
+        myGL.glScalef( 1.0f, -1.0f, 1.0f );
+        myGL.glMatrixMode( GL10.GL_MODELVIEW );
 
         graphics.onSurfaceChanged( width(), height(), aWidth, aHeight );
         }
@@ -270,4 +269,8 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
     private final Position myTransformedPosition = new Position();
 
     private static final int SAMSUNG_GALAXY_DEPTH_BITS = 16;
+
+    private static final int DROID_RECOMMENDED_DEPTH_BITS = 24;
+
+    private static final int DROID_MAX_TEXTURE_SIZE = TextureUtilities.MAX_TEXTURE_SIZE;
     }

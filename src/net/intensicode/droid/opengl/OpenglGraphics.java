@@ -24,6 +24,8 @@ public final class OpenglGraphics extends DirectGraphics
 
     final void onSurfaceCreated( final GL10 aGL10 )
         {
+        TextureUtilities.gl = aGL10;
+
         myGL = aGL10;
 
         vendor = aGL10.glGetString( GL10.GL_VENDOR );
@@ -49,8 +51,6 @@ public final class OpenglGraphics extends DirectGraphics
 
         myGL.glEnableClientState( GL10.GL_VERTEX_ARRAY );
 
-        myTextureManager.gl = aGL10;
-
         myTextureStateManager.gl = aGL10;
         }
 
@@ -65,20 +65,6 @@ public final class OpenglGraphics extends DirectGraphics
     final void releaseGL()
         {
         myGL = null;
-        }
-
-    final void onBeginFrame()
-        {
-        //#if DEBUG && DEBUG_OPENGL
-        myTextureStateManager.resetDebugCounters();
-        //#endif
-        }
-
-    final void onEndFrame()
-        {
-        //#if DEBUG && DEBUG_OPENGL
-        myTextureStateManager.dumpDebugCounters();
-        //#endif
         }
 
     // From DirectGraphics
@@ -180,7 +166,7 @@ public final class OpenglGraphics extends DirectGraphics
 
         final AndroidImageResource imageResource = (AndroidImageResource) aImage;
         final Texture texture = getOrLoadTexture( imageResource );
-        myTextureStateManager.bindTextureIfNecessary( texture );
+        myTextureStateManager.bindTexture( texture );
 
         //#if DEBUG_OPENGL
         if ( hasDrawTextureExtension && Random.INSTANCE.nextInt( 16 ) > 10 )
@@ -188,7 +174,7 @@ public final class OpenglGraphics extends DirectGraphics
             //# if ( hasDrawTextureExtension )
             //#endif
             {
-            myTextureStateManager.updateCropIfNecessary( aSourceRect );
+            myTextureStateManager.updateCrop( aSourceRect );
 
             final int x = aTargetX;
             final int y = myHeight - aTargetY - aSourceRect.height;
@@ -198,7 +184,7 @@ public final class OpenglGraphics extends DirectGraphics
             }
         else
             {
-            myTextureStateManager.updateMatrixIfNecessary( aSourceRect );
+            myTextureStateManager.updateMatrix( aSourceRect );
 
             myGeometryDrawer.enableTextureCoordinates = true;
             myGeometryDrawer.drawSquare( aTargetX, aTargetY, aSourceRect.width, aSourceRect.height );
