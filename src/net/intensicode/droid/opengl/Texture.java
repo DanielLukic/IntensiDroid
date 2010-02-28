@@ -1,13 +1,13 @@
 package net.intensicode.droid.opengl;
 
-import android.graphics.Bitmap;
+import android.graphics.*;
 import android.opengl.GLUtils;
 import net.intensicode.util.*;
 
 import javax.microedition.khronos.opengles.*;
 import java.nio.IntBuffer;
 
-public class Texture
+public final class Texture
     {
     public boolean allowUseOfGlUtils;
 
@@ -19,13 +19,22 @@ public class Texture
         myGL = aGL;
         }
 
-    public void makeUsing( final Bitmap aBitmap )
+    public final void makeUsing( final Bitmap aOriginalBitmap, final int aProperWidth, final int aProperHeight )
+        {
+        final Bitmap bitmap = makeProperBitmap( aOriginalBitmap, aProperWidth, aProperHeight );
+        makeUsing( bitmap );
+        bitmap.recycle();
+
+        setFullSize( aOriginalBitmap.getWidth(), aOriginalBitmap.getHeight() );
+        }
+
+    public final void makeUsing( final Bitmap aBitmap )
         {
         myWidth = aBitmap.getWidth();
         myHeight = aBitmap.getHeight();
         makeOpenglTexture( aBitmap );
 
-        setScaledSize( myWidth, myHeight );
+        setFullSize( myWidth, myHeight );
         }
 
     public final void purge()
@@ -35,31 +44,29 @@ public class Texture
         id = 0;
         }
 
+    // From Texture
+
     public boolean isFullRect( final Rectangle aRectangle )
         {
-        return aRectangle.x == 0 && aRectangle.y == 0 && aRectangle.width == myScaledWidth && aRectangle.height == myScaledHeight;
+        return aRectangle.x == 0 && aRectangle.y == 0 && aRectangle.width == myFullWidth && aRectangle.height == myFullHeight;
         }
 
     public void setMatrix( final float[] aMatrix4x4, final Rectangle aSourceRect )
         {
-        aMatrix4x4[ 0 ] = aSourceRect.width / myScaledWidth;
-        aMatrix4x4[ 5 ] = -aSourceRect.height / myScaledHeight;
-        aMatrix4x4[ 12 ] = aSourceRect.x / myScaledWidth;
-        aMatrix4x4[ 13 ] = aSourceRect.y / myScaledHeight - aMatrix4x4[ 5 ];
+        aMatrix4x4[ 0 ] = aSourceRect.width / (float) myWidth;
+        aMatrix4x4[ 5 ] = -aSourceRect.height / (float) myHeight;
+        aMatrix4x4[ 12 ] = aSourceRect.x / (float) myWidth;
+        aMatrix4x4[ 13 ] = aSourceRect.y / (float) myHeight - aMatrix4x4[ 5 ];
         }
 
-    public boolean cropTextureIfNecessary( final GL11 aGL, final Rectangle aRect )
+    public final boolean cropTextureIfNecessary( final GL11 aGL, final Rectangle aRect )
         {
         if ( myActiveCropRect.equals( aRect ) ) return false;
 
-        final float x = aRect.x * myScaleFactorX;
-        final float y = aRect.y * myScaleFactorY;
-        final float scaledWidth = aRect.width * myScaleFactorX;
-        final float scaledHeight = aRect.height * myScaleFactorY;
-        theCropWorkspace[ 0 ] = (int) x;
-        theCropWorkspace[ 1 ] = (int) ( y + scaledHeight );
-        theCropWorkspace[ 2 ] = (int) scaledWidth;
-        theCropWorkspace[ 3 ] = (int) -scaledHeight;
+        theCropWorkspace[ 0 ] = aRect.x;
+        theCropWorkspace[ 1 ] = aRect.y + aRect.height;
+        theCropWorkspace[ 2 ] = aRect.width;
+        theCropWorkspace[ 3 ] = -aRect.height;
 
         aGL.glTexParameteriv( GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, theCropWorkspace, 0 );
 
@@ -68,17 +75,15 @@ public class Texture
         return true;
         }
 
-    // Protected API
+    // Implementation
 
-    protected final void setScaledSize( final float aWidth, final float aHeight )
+    private void setFullSize( final float aWidth, final float aHeight )
         {
-        myScaledWidth = aWidth;
-        myScaledHeight = aHeight;
-        myScaleFactorX = myWidth / myScaledWidth;
-        myScaleFactorY = myHeight / myScaledHeight;
+        myFullWidth = aWidth;
+        myFullHeight = aHeight;
         }
 
-    protected final void makeOpenglTexture( final Bitmap aBitmapARGB32 )
+    private void makeOpenglTexture( final Bitmap aBitmapARGB32 )
         {
         myWidth = aBitmapARGB32.getWidth();
         myHeight = aBitmapARGB32.getHeight();
@@ -95,7 +100,20 @@ public class Texture
             }
         }
 
-    // Implementation
+    private Bitmap makeProperBitmap( final Bitmap aBitmap, final int aWidth, final int aHeight )
+        {
+        final Bitmap bitmap = Bitmap.createBitmap( aWidth, aHeight, Bitmap.Config.ARGB_8888 );
+        myTextureCloneCanvas.setBitmap( bitmap );
+        myTextureCloneCanvas.drawBitmap( aBitmap, 0, 0, myTextureClonePaint );
+
+        //#if DEBUG
+        Log.debug( "created proper texture bitmap" );
+        Log.debug( "bitmap size: {}x{}", aBitmap.getWidth(), aBitmap.getHeight() );
+        Log.debug( "proper size: {}x{}", aWidth, aHeight );
+        //#endif
+
+        return bitmap;
+        }
 
     private void makeTexImageFromBitmapARGB32( final Bitmap aBitmap )
         {
@@ -149,23 +167,23 @@ public class Texture
 
     private GL10 myGL;
 
-    protected int myWidth;
+    private int myWidth;
 
-    protected int myHeight;
+    private int myHeight;
 
-    protected float myScaledWidth;
+    private float myFullWidth;
 
-    protected float myScaledHeight;
-
-    private float myScaleFactorX = 1;
-
-    private float myScaleFactorY = 1;
+    private float myFullHeight;
 
     private final int[] mTextureNameWorkspace = new int[1];
 
-    protected final Rectangle myActiveCropRect = new Rectangle();
+    private final Paint myTextureClonePaint = new Paint();
 
-    protected static final int[] theCropWorkspace = new int[4];
+    private final Canvas myTextureCloneCanvas = new Canvas();
+
+    private final Rectangle myActiveCropRect = new Rectangle();
+
+    private static final int[] theCropWorkspace = new int[4];
 
     private static final int SHIFT_SWITCH_RGB_BGR = 16;
 
