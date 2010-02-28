@@ -147,7 +147,11 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
 
     public final void initialize()
         {
-        initializeGraphics();
+        myEglHelper.start( getEglConfiguration() );
+        myGL = (GL10) myEglHelper.createOrUpdateSurface( mySurfaceHolder );
+        onSurfaceCreated();
+        onSurfaceChanged( getWidth(), getHeight() );
+        graphics.lateInitialize();
         }
 
     public final void cleanup()
@@ -190,14 +194,6 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         }
 
     // Implementation
-
-    private void initializeGraphics()
-        {
-        myEglHelper.start( getEglConfiguration() );
-        myGL = (GL10) myEglHelper.createOrUpdateSurface( mySurfaceHolder );
-        onSurfaceCreated();
-        onSurfaceChanged( getWidth(), getHeight() );
-        }
 
     private int[] getEglConfiguration()
         {

@@ -22,6 +22,17 @@ public final class OpenglGraphics extends DirectGraphics
     public boolean hasDrawTextureExtension;
 
 
+    public OpenglGraphics( final GameSystem aGameSystem )
+        {
+        myGameSystem = aGameSystem;
+        }
+
+    public final void lateInitialize()
+        {
+        final Configuration configuration = myGameSystem.resources.loadConfigurationOrUseDefaults( "opengl.properties" );
+        myTextureManager.setConfiguration( configuration );
+        }
+
     final void onSurfaceCreated( final GL10 aGL10 )
         {
         TextureUtilities.gl = aGL10;
@@ -228,6 +239,8 @@ public final class OpenglGraphics extends DirectGraphics
 
     private int myColorARGB32;
 
+
+    private final GameSystem myGameSystem;
 
     private final Rectangle myFullRect = new Rectangle();
 

@@ -159,7 +159,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
     private VideoSystem createOpenglVideoSystem( final GameSystem aGameSystem )
         {
         final OpenglGameView screen = new OpenglGameView( this );
-        final OpenglGraphics graphics = new OpenglGraphics();
+        final OpenglGraphics graphics = new OpenglGraphics( aGameSystem );
 
         screen.graphics = graphics;
         screen.system = aGameSystem;
