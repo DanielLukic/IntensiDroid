@@ -9,16 +9,28 @@ public final class AtlasTextureManager
     {
     public final void addTexture( final AndroidImageResource aImageResource )
         {
-        //#if DEBUG
+        //#if DEBUG_OPENGL
         Log.debug( "inserting texture for {} into atlas", aImageResource.resourcePath );
         //#endif
-        if ( !myActiveAtlas.enoughRoomFor( aImageResource ) ) createNewAtlas();
-        myActiveAtlas.add( aImageResource );
+
+        final TextureAtlas atlas = getAtlasWithEnoughRoomFor( aImageResource );
+        atlas.add( aImageResource );
+        }
+
+    private TextureAtlas getAtlasWithEnoughRoomFor( final AndroidImageResource aImageResource )
+        {
+        final int numberOfAtlases = myTextureAtlases.size();
+        for ( int idx = 0; idx < numberOfAtlases; idx++ )
+            {
+            final TextureAtlas atlas = myTextureAtlases.get( idx );
+            if ( atlas.enoughRoomFor( aImageResource ) ) return atlas;
+            }
+        return createNewAtlas();
         }
 
     public final void purgeAllTextures()
         {
-        //#if DEBUG
+        //#if DEBUG_OPENGL
         Log.debug( "purging {} texture atlases", myTextureAtlases.size() );
         //#endif
         while ( myTextureAtlases.size() > 0 )
@@ -30,18 +42,19 @@ public final class AtlasTextureManager
 
     // Implementation
 
-    private void createNewAtlas()
+    private TextureAtlas createNewAtlas()
         {
-        final int id = myTextureAtlases.size() + 1;
-        //#if DEBUG
-        Log.debug( "creating new texture atlas - id {}", id );
+        final int newAtlasId = myTextureAtlases.size() + 1;
+        final FreeAreaTrackingTextureAtlas newAtlas = new FreeAreaTrackingTextureAtlas( newAtlasId );
+        myTextureAtlases.add( newAtlas );
+
+        //#if DEBUG_OPENGL
+        Log.debug( "new texture atlas created: {}", newAtlas );
         //#endif
-        myActiveAtlas = new FreeAreaTrackingTextureAtlas( id );
-        myTextureAtlases.add( myActiveAtlas );
+
+        return newAtlas;
         }
 
 
-    private TextureAtlas myActiveAtlas = new NullTextureAtlas();
-
-    private final ArrayList<TextureAtlas> myTextureAtlases = new ArrayList<TextureAtlas>();
+    private final ArrayList<FreeAreaTrackingTextureAtlas> myTextureAtlases = new ArrayList<FreeAreaTrackingTextureAtlas>();
     }
