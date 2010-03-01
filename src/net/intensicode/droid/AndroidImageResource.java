@@ -33,6 +33,12 @@ public final class AndroidImageResource implements ImageResource
         bitmap = aBitmap;
         }
 
+    public final void dropTexture()
+        {
+        texture = null;
+        texturePurger = null;
+        }
+
     // From ImageResource
 
     public final int getWidth()
@@ -61,6 +67,24 @@ public final class AndroidImageResource implements ImageResource
         bitmap.recycle();
         if ( texture != null ) texturePurger.purge( this );
         }
+
+    // From Object
+
+    //#if DEBUG
+
+    public String toString()
+        {
+        final StringBuilder builder = new StringBuilder( resourcePath );
+        builder.append( '[' );
+        builder.append( getWidth() );
+        builder.append( 'x' );
+        builder.append( getHeight() );
+        builder.append( ']' );
+        return builder.toString();
+        }
+
+    //#endif
+
 
     private AndroidCanvasGraphics myGraphics;
     }
