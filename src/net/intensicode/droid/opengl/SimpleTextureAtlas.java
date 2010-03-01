@@ -1,5 +1,6 @@
 package net.intensicode.droid.opengl;
 
+import net.intensicode.core.ImageResource;
 import net.intensicode.droid.*;
 import net.intensicode.util.*;
 
@@ -18,12 +19,49 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
         myHeight = aHeight;
         }
 
+    public final void setVerticalStrategy()
+        {
+        myStrategy = VERTICAL;
+        }
+
+    public final void setHorizontalStrategy()
+        {
+        myStrategy = HORIZONTAL;
+        }
+
+    private interface LayoutStrategy
+        {
+        void moveCursor( ImageResource aImageResource );
+        }
+
+    private final class VerticalStrategy implements LayoutStrategy
+        {
+        public final void moveCursor( final ImageResource aImageResource )
+            {
+            myCurrentY += aImageResource.getHeight();
+            myNextX = Math.max( myNextX, myCurrentX + aImageResource.getWidth() );
+            }
+        }
+
+    private final class HorizontalStrategy implements LayoutStrategy
+        {
+        public final void moveCursor( final ImageResource aImageResource )
+            {
+            myCurrentX += aImageResource.getWidth();
+            myNextY = Math.max( myNextY, myCurrentY + aImageResource.getHeight() );
+            }
+        }
+
+    private final LayoutStrategy VERTICAL = new VerticalStrategy();
+
+    private final LayoutStrategy HORIZONTAL = new HorizontalStrategy();
+
     // From TextureAtlas
 
     public final boolean enoughRoomFor( final AndroidImageResource aImageResource )
         {
         if ( enoughRoomAtCurrentPosition( aImageResource ) ) return true;
-        if ( enoughRoomInNextColumn( aImageResource ) ) return true;
+        if ( enoughRoomInNextPosition( aImageResource ) ) return true;
         return false;
         }
 
@@ -31,7 +69,7 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
         {
         createAtlasTextureIfNecessary();
 
-        if ( !enoughRoomAtCurrentPosition( aImageResource ) ) moveToNextColumn( aImageResource );
+        if ( !enoughRoomAtCurrentPosition( aImageResource ) ) moveToNextLane( aImageResource );
 
         //#if DEBUG
         Log.debug( "adding {} to texture atlas", aImageResource.resourcePath );
@@ -50,8 +88,11 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
 
         myTexturizedImageResources.add( aImageResource );
 
-        myCurrentY += aImageResource.getHeight();
-        myNextX = Math.max( myNextX, myCurrentX + aImageResource.getWidth() );
+        myStrategy.moveCursor( aImageResource );
+
+        //#if DEBUG
+        Log.debug( "texture atlas {} has {} textures now", this, myTexturizedImageResources.size() );
+        //#endif
         }
 
     public final void purge()
@@ -102,7 +143,7 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
         return true;
         }
 
-    private boolean enoughRoomInNextColumn( final AndroidImageResource aImageResource )
+    private boolean enoughRoomInNextPosition( final AndroidImageResource aImageResource )
         {
         if ( myNextX + aImageResource.getWidth() > myWidth ) return false;
         if ( myNextY + aImageResource.getHeight() > myHeight ) return false;
@@ -116,9 +157,9 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
         myAtlasTexture.make( myWidth, myHeight );
         }
 
-    private void moveToNextColumn( final AndroidImageResource aImageResource )
+    private void moveToNextLane( final AndroidImageResource aImageResource )
         {
-        if ( !enoughRoomInNextColumn( aImageResource ) )
+        if ( !enoughRoomInNextPosition( aImageResource ) )
             {
             //#if DEBUG
             Log.debug( "failed adding {} into {}", aImageResource, this );
@@ -142,6 +183,8 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
     private int myCurrentX;
 
     private int myCurrentY;
+
+    private LayoutStrategy myStrategy = HORIZONTAL;
 
     private TextureAtlasTexture myAtlasTexture;
 
