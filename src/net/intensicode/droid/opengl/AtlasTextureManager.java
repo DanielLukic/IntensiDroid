@@ -32,10 +32,11 @@ public final class AtlasTextureManager
 
     private void createNewAtlas()
         {
+        final int id = myTextureAtlases.size() + 1;
         //#if DEBUG
-        Log.debug( "creating new texture atlas - id {}", myTextureAtlases.size() );
+        Log.debug( "creating new texture atlas - id {}", id );
         //#endif
-        myActiveAtlas = new SimpleTextureAtlas();
+        myActiveAtlas = new FreeAreaTrackingTextureAtlas( id );
         myTextureAtlases.add( myActiveAtlas );
         }
 
