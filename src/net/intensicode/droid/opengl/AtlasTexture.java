@@ -10,6 +10,11 @@ public class AtlasTexture implements Texture
         myAtlasRectangle.setTo( aAtlasRectangle );
         }
 
+    public final void copyAtlasRectTo( final Rectangle aRectangle )
+        {
+        aRectangle.setTo( myAtlasRectangle );
+        }
+
     // From Texture
 
     public final void bind()
