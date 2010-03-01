@@ -32,43 +32,43 @@ public final class FreeAreas
         {
         if ( aWidth == aRectangle.width )
             {
-            createFreeAreaWithFullWidthBelow( aRectangle, aWidth, aHeight );
+            createFreeAreaBelow( aRectangle, aWidth, aHeight );
             }
         else if ( aHeight == aRectangle.height )
             {
-            createFreeAreaToTheLeft( aRectangle, aWidth, aHeight );
+            createFreeAreaWithFullHeightToTheLeft( aRectangle, aWidth );
             }
         else
             {
-            createFreeAreaToTheLeft( aRectangle, aWidth, aHeight );
-            createFreeAreaWithFullWidthBelow( aRectangle, aWidth, aHeight );
+            createFreeAreaWithFullHeightToTheLeft( aRectangle, aWidth );
+            createFreeAreaBelow( aRectangle, aWidth, aHeight );
             }
         }
 
-    private void createFreeAreaWithFullWidthBelow( final Rectangle aRectangle, final int aWidth, final int aHeight )
+    private void createFreeAreaBelow( final Rectangle aRectangle, final int aWidth, final int aHeight )
         {
         final Rectangle below = new Rectangle();
         below.x = aRectangle.x;
         below.y = aRectangle.y + aHeight;
-        below.width = aRectangle.width;
+        below.width = aWidth;
         below.height = aRectangle.height - aHeight;
         add( below );
         }
 
-    private void createFreeAreaToTheLeft( final Rectangle aRectangle, final int aWidth, final int aHeight )
+    private void createFreeAreaWithFullHeightToTheLeft( final Rectangle aRectangle, final int aWidth )
         {
         final Rectangle toTheLeft = new Rectangle();
         toTheLeft.x = aRectangle.x + aWidth;
         toTheLeft.y = aRectangle.y;
         toTheLeft.width = aRectangle.width - aWidth;
-        toTheLeft.height = aHeight;
+        toTheLeft.height = aRectangle.height;
         add( toTheLeft );
         }
 
     public final void remove( final Rectangle aRectangle )
         {
         final boolean removed = myFreeList.remove( aRectangle );
-        //#if DEBUG
+        //#if DEBUG_OPENGL
         Assert.isTrue( "known free area", removed );
         //#endif
         }
