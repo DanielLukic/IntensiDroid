@@ -26,7 +26,7 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
         {
         if ( enoughRoomAtCurrentPosition( aImageResource ) ) return true;
         if ( enoughRoomInNextLane( aImageResource ) ) return true;
-        return false;
+        return freeAreaAvailableFor( aImageResource );
         }
 
     private boolean enoughRoomInNextLane( final ImageResource aImageResource )
@@ -43,11 +43,18 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
         return true;
         }
 
+    private boolean freeAreaAvailableFor( final AndroidImageResource aImageResource )
+        {
+        final Rectangle rectangle = myFreeAreas.findFreeAreaBigEnoughFor( aImageResource.getWidth(), aImageResource.getHeight() );
+        return rectangle != null;
+        }
+
     public final void add( final AndroidImageResource aImageResource )
         {
         createAtlasTextureIfNecessary();
 
         // TODO: Object chain or helper class?
+
         if ( freeAreaReplaced( aImageResource ) ) return;
 
         if ( mergedFreeAreaReplaced( aImageResource ) ) return;
@@ -55,10 +62,12 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
 
         if ( placeAtCurrentPosition( aImageResource ) ) return;
         if ( placedInNextLane( aImageResource ) ) return;
+
+        // Let's try again. Moving to next lane creates new areas below potentially purged old areas!
         if ( mergedFreeAreaReplaced( aImageResource ) ) return;
         if ( biggerFreeAreaUsedPartially( aImageResource ) ) return;
 
-        //#if DEBUG
+        //#if DEBUG_OPENGL
         Log.debug( "failed adding {} into {}", aImageResource, this );
         Log.debug( "image size: {}x{}", aImageResource.getWidth(), aImageResource.getHeight() );
         Log.debug( "atlas size: {}x{}", myWidth, myHeight );
@@ -72,13 +81,13 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
     private boolean biggerFreeAreaUsedPartially( final AndroidImageResource aImageResource )
         {
         final Rectangle freeArea = findFreeArea( aImageResource );
-        if ( freeArea != null )
-            {
-            Log.debug( "using bigger free area {} for {}", freeArea, aImageResource );
-            useFreeArea( freeArea, aImageResource );
-            return true;
-            }
-        return false;
+        if ( freeArea == null ) return false;
+
+        //#if DEBUG_OPENGL
+        Log.debug( "using bigger free area {} for {}", freeArea, aImageResource );
+        //#endif
+        useFreeArea( freeArea, aImageResource );
+        return true;
         }
 
     private void createAtlasTextureIfNecessary()
@@ -93,7 +102,9 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
         final Rectangle matchedFreeArea = findMatchingFreeArea( aImageResource );
         if ( matchedFreeArea == null ) return false;
 
+        //#if DEBUG_OPENGL
         Log.debug( "using matched free area {} for {}", matchedFreeArea, aImageResource );
+        //#endif
         useFreeArea( matchedFreeArea, aImageResource );
         return true;
         }
@@ -103,7 +114,7 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
         final int x = aRectangle.x;
         final int y = aRectangle.y;
 
-        //#if DEBUG
+        //#if DEBUG_OPENGL
         Log.debug( "adding {} to texture atlas", aImageResource.resourcePath );
         Log.debug( "texture atlas insert position: free area {}", aRectangle );
         //#endif
@@ -117,13 +128,13 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
 
     private boolean placeAtCurrentPosition( final AndroidImageResource aImageResource )
         {
-        if ( enoughRoomAtCurrentPosition( aImageResource ) )
-            {
-            Log.debug( "using current position {} for {}", new Position( myCurrentX, myCurrentY ), aImageResource );
-            useCurrentPosition( aImageResource );
-            return true;
-            }
-        return false;
+        if ( !enoughRoomAtCurrentPosition( aImageResource ) ) return false;
+
+        //#if DEBUG_OPENGL
+        Log.debug( "using current position {} for {}", new Position( myCurrentX, myCurrentY ), aImageResource );
+        //#endif
+        useCurrentPosition( aImageResource );
+        return true;
         }
 
     private void useCurrentPosition( final AndroidImageResource aImageResource )
@@ -131,7 +142,7 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
         final int x = myCurrentX;
         final int y = myCurrentY;
 
-        //#if DEBUG
+        //#if DEBUG_OPENGL
         Log.debug( "adding {} to texture atlas", aImageResource.resourcePath );
         Log.debug( "texture atlas insert position: current position {}", new Position( x, y ) );
         //#endif
@@ -142,29 +153,31 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
 
     private boolean placedInNextLane( final AndroidImageResource aImageResource )
         {
-        if ( enoughRoomInNextLane( aImageResource ) )
-            {
-            Log.debug( "using next position {} for {}", new Position( myNextX, myNextY ), aImageResource );
-            moveToNextLane();
-            useCurrentPosition( aImageResource );
-            return true;
-            }
-        return false;
+        if ( !enoughRoomInNextLane( aImageResource ) ) return false;
+
+        //#if DEBUG_OPENGL
+        Log.debug( "using next position {} for {}", new Position( myNextX, myNextY ), aImageResource );
+        //#endif
+        moveToNextLane();
+        useCurrentPosition( aImageResource );
+        return true;
         }
 
     private boolean mergedFreeAreaReplaced( final AndroidImageResource aImageResource )
         {
+        //#if DEBUG_OPENGL
         Log.debug( "merging free areas for {}", this );
+        //#endif
         myFreeAreas.mergeFreeAreas();
 
         final Rectangle mergedFreeArea = findMatchingFreeArea( aImageResource );
-        if ( mergedFreeArea != null )
-            {
-            Log.debug( "using matching merged free area {} for {}", mergedFreeArea, aImageResource );
-            useFreeArea( mergedFreeArea, aImageResource );
-            return true;
-            }
-        return false;
+        if ( mergedFreeArea == null ) return false;
+
+        //#if DEBUG_OPENGL
+        Log.debug( "using matching merged free area {} for {}", mergedFreeArea, aImageResource );
+        //#endif
+        useFreeArea( mergedFreeArea, aImageResource );
+        return true;
         }
 
     private Rectangle findMatchingFreeArea( final ImageResource aImageResource )
@@ -198,20 +211,13 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
 
     private void moveCursor( final int aWidth, final int aHeight )
         {
-        // create free area*s* for skipped vertical area:
-        // new next y = max( next y, current y + aIR.getHeight )
-        // delta height = new next y - next y
-        // done if delta height == 0
-        // for every rect in the current lane:
-        //   create free area below, same width, delta height
-
         myCurrentX += aWidth;
         myNextY = Math.max( myNextY, myCurrentY + aHeight );
         }
 
     public final void purge()
         {
-        //#if DEBUG
+        //#if DEBUG_OPENGL
         Log.debug( "purging {} texturized image resources", myTexturizedImageResources.size() );
         //#endif
 
@@ -222,7 +228,7 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
             lastImageResource.dropTexture();
             }
 
-        //#if DEBUG
+        //#if DEBUG_OPENGL
         Log.debug( "all textures purged from atlas {} - purging atlas texture", this );
         //#endif
 
@@ -238,11 +244,11 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
 
     public final void purge( final AndroidImageResource aImageResource )
         {
-        //#if DEBUG
+        //#if DEBUG_OPENGL
         Assert.isTrue( "known image", myTexturizedImageResources.contains( aImageResource ) );
         //#endif
 
-        //#if DEBUG
+        //#if DEBUG_OPENGL
         Log.debug( "purging {} from {}", aImageResource, this );
         //#endif
 
@@ -259,8 +265,6 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
         final Rectangle freeRectangle = new Rectangle();
         aTexture.copyAtlasRectTo( freeRectangle );
         myFreeAreas.add( freeRectangle );
-
-        // merging free areas should be done only if nothing is found in 'add'.. here it would be overkill..
         }
 
     // From Object
@@ -286,20 +290,43 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
 
     private void moveToNextLane()
         {
+        addFreeAreasBelowUsedAreasOfThisLane();
         addFreeAreaForRemainingSpaceInLane();
         myCurrentX = myNextX;
         myCurrentY = myNextY;
         }
 
+    private void addFreeAreasBelowUsedAreasOfThisLane()
+        {
+        final Rectangle checkRectangle = new Rectangle();
+        for ( int idx = 0; idx < myTexturizedImageResources.size(); idx++ )
+            {
+            final AndroidImageResource imageResource = myTexturizedImageResources.get( idx );
+            final AtlasTexture texture = (AtlasTexture) imageResource.texture;
+            texture.copyAtlasRectTo( checkRectangle );
+            if ( checkRectangle.y != myCurrentY ) continue;
+            if ( checkRectangle.height >= myNextY ) continue;
+            addFreeAreaBelow( checkRectangle );
+            }
+        }
+
+    private void addFreeAreaBelow( final Rectangle aRectangle )
+        {
+        final Rectangle freeBelow = new Rectangle();
+        freeBelow.x = aRectangle.x;
+        freeBelow.y = aRectangle.y + aRectangle.height;
+        freeBelow.width = aRectangle.width;
+        freeBelow.height = myNextY - myCurrentY - aRectangle.height;
+        myFreeAreas.add( freeBelow );
+        }
+
     private void addFreeAreaForRemainingSpaceInLane()
         {
-        if ( myCurrentX < myWidth )
-            {
-            final int width = myWidth - myCurrentX;
-            final int height = myNextY - myCurrentY;
-            final Rectangle remaining = new Rectangle( myCurrentX, myCurrentY, width, height );
-            myFreeAreas.add( remaining );
-            }
+        if ( myCurrentX >= myWidth ) return;
+        final int width = myWidth - myCurrentX;
+        final int height = myNextY - myCurrentY;
+        final Rectangle remaining = new Rectangle( myCurrentX, myCurrentY, width, height );
+        myFreeAreas.add( remaining );
         }
 
 
