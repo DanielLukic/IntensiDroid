@@ -4,7 +4,7 @@ import android.view.MotionEvent;
 import net.intensicode.core.*;
 import net.intensicode.util.Position;
 
-public class AndroidTouchEventWrapper implements TouchEvent
+public class AndroidTouchEventWrapper extends TouchEvent
     {
     public AndroidTouchEventWrapper( final DirectScreen aDirectScreen )
         {
