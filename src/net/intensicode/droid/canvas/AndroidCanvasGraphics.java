@@ -181,7 +181,7 @@ public final class AndroidCanvasGraphics extends DirectGraphics
 
     public void drawChar( final char aCharCode, final int aX, final int aY )
         {
-        myCharSequence.setLength( 0 );
+        myCharSequence.delete( 0, myCharSequence.length() );
         myCharSequence.append( aCharCode );
         canvas.drawText( myCharSequence, 0, 1, aX, aY - myFontMetrics.ascent, myActivePaint );
         }
