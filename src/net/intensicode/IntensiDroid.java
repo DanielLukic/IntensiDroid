@@ -18,6 +18,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     // From SystemContext
 
+    public final GameSystem system()
+        {
+        return myGameSystem;
+        }
+
     public final boolean useOpenglIfPossible()
         {
         //#if OPENGL
@@ -25,11 +30,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         //#else
         return false;
         //#endif
-        }
-
-    public final GameSystem getGameSystem()
-        {
-        return myGameSystem;
         }
 
     public void onApplicationShouldPause( final GameSystem aGameSystem )
