@@ -57,6 +57,11 @@ public final class AndroidCanvasGraphics extends DirectGraphics
         canvas.drawColor( 0xFF000000 | ( aRGB24 & 0x00FFFFFF ) );
         }
 
+    public void clearARGB32( final int aARGB32 )
+        {
+        canvas.drawColor( aARGB32 );
+        }
+
     public final void drawLine( final int aX1, final int aY1, final int aX2, final int aY2 )
         {
         myActivePaint.setStyle( Paint.Style.STROKE );

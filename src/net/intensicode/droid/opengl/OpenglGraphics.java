@@ -115,6 +115,12 @@ public final class OpenglGraphics extends DirectGraphics
         fillRect( 0, 0, myWidth, myHeight );
         }
 
+    public void clearARGB32( final int aARGB32 )
+        {
+        setColorARGB32( aARGB32 );
+        fillRect( 0, 0, myWidth, myHeight );
+        }
+
     public final void drawLine( final int aX1, final int aY1, final int aX2, final int aY2 )
         {
         if ( aX1 == aX2 && aY1 == aY2 ) myGeometryDrawer.drawPoint( aX1, aY1 );
