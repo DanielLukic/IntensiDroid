@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.view.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
-import net.intensicode.droid.canvas.*;
-import net.intensicode.droid.opengl.*;
 import net.intensicode.util.*;
 
 public abstract class IntensiDroid extends DebugLifeCycleActivity implements SystemContext
@@ -67,7 +65,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         Assert.isFalse( "game system already initialized", isGameSystemCreated() );
         //#endif
 
-        showDeviceSpecs();
+        AndroidUtilities.showDeviceSpecs();
 
         setWindowFeatures();
         setAudioFeatures();
@@ -79,18 +77,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         }
 
     // Implementation
-
-    private void showDeviceSpecs()
-        {
-        System.out.println( "Board: " + android.os.Build.BOARD );
-        System.out.println( "Brand: " + android.os.Build.BRAND );
-        System.out.println( "Device: " + android.os.Build.DEVICE );
-        System.out.println( "Display: " + android.os.Build.DISPLAY );
-        System.out.println( "Model: " + android.os.Build.MODEL );
-        System.out.println( "Product: " + android.os.Build.PRODUCT );
-        System.out.println( "Tags: " + android.os.Build.TAGS );
-        System.out.println( "Type: " + android.os.Build.TYPE );
-        }
 
     private void setWindowFeatures()
         {
@@ -112,7 +98,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     private synchronized void createGameViewAndGameSystem()
         {
-        final String resourcesSubFolder = determineResourcesSubFolder();
+        final String resourcesSubFolder = AndroidUtilities.determineResourcesSubFolder( this );
 
         final AndroidGameSystem system = new AndroidGameSystem( this );
         final AndroidGameEngine engine = new AndroidGameEngine( system );
@@ -155,101 +141,19 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
             //#if DEBUG
             Log.debug( "creating OPENGL video system" );
             //#endif
-            return createOpenglVideoSystem( aGameSystem );
+            return VideoSystem.createOpenglVideoSystem( this, aGameSystem );
             }
         else
             {
             //#if DEBUG
             Log.debug( "creating CANVAS video system" );
             //#endif
-            return createCanvasVideoSystem( aGameSystem );
+            return VideoSystem.createCanvasVideoSystem( this, aGameSystem );
             }
-        }
-
-    private VideoSystem createOpenglVideoSystem( final GameSystem aGameSystem )
-        {
-        final OpenglGameView screen = new OpenglGameView( this );
-        final OpenglGraphics graphics = new OpenglGraphics( aGameSystem );
-
-        screen.graphics = graphics;
-        screen.system = aGameSystem;
-
-        final VideoSystem videoSystem = new VideoSystem();
-        videoSystem.graphics = graphics;
-        videoSystem.screen = screen;
-        videoSystem.view = screen;
-        return videoSystem;
-        }
-
-    private VideoSystem createCanvasVideoSystem( final GameSystem aGameSystem )
-        {
-        final AndroidGameView screen = new AndroidGameView( this );
-        final AndroidCanvasGraphics graphics = new AndroidCanvasGraphics();
-
-        screen.graphics = graphics;
-        screen.system = aGameSystem;
-
-        final VideoSystem videoSystem = new VideoSystem();
-        videoSystem.graphics = graphics;
-        videoSystem.screen = screen;
-        videoSystem.view = screen;
-        return videoSystem;
-        }
-
-    private String determineResourcesSubFolder()
-        {
-        final Display display = getWindowManager().getDefaultDisplay();
-        final int orientation = display.getOrientation();
-        if ( orientation == ORIENTATION_PORTRAIT && looksLikePortrait() ) return SUB_FOLDER_PORTRAIT;
-        if ( orientation == ORIENTATION_LANDSCAPE && looksLikeLandscape() ) return SUB_FOLDER_LANDSCAPE;
-        if ( looksLikePortrait() ) return SUB_FOLDER_PORTRAIT;
-        if ( looksLikeLandscape() ) return SUB_FOLDER_LANDSCAPE;
-        if ( looksLikeSquare() ) return SUB_FOLDER_SQUARE;
-        return NO_SUB_FOLDER;
-        }
-
-    private boolean looksLikePortrait()
-        {
-        final Display display = getWindowManager().getDefaultDisplay();
-        return display.getWidth() < display.getHeight();
-        }
-
-    private boolean looksLikeLandscape()
-        {
-        final Display display = getWindowManager().getDefaultDisplay();
-        return display.getWidth() > display.getHeight();
-        }
-
-    private boolean looksLikeSquare()
-        {
-        final Display display = getWindowManager().getDefaultDisplay();
-        return display.getWidth() == display.getHeight();
         }
 
 
     private GameSystem myGameSystem;
 
     private SurfaceView myGameView;
-
-    private static final int ORIENTATION_PORTRAIT = 0;
-
-    private static final int ORIENTATION_LANDSCAPE = 1;
-
-    private static final String SUB_FOLDER_SQUARE = "s";
-
-    private static final String SUB_FOLDER_PORTRAIT = "p";
-
-    private static final String SUB_FOLDER_LANDSCAPE = "l";
-
-    private static final String NO_SUB_FOLDER = null;
-
-
-    private class VideoSystem
-        {
-        public SurfaceView view;
-
-        public DirectScreen screen;
-
-        public DirectGraphics graphics;
-        }
     }

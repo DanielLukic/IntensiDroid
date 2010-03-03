@@ -1,9 +1,9 @@
 package net.intensicode.droid.opengl;
 
 import android.content.Context;
-import android.os.Build;
 import android.view.*;
 import net.intensicode.core.*;
+import net.intensicode.droid.AndroidUtilities;
 import net.intensicode.util.*;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -197,12 +197,12 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
 
     private int[] getEglConfiguration()
         {
-        if ( isSamsungGalaxy() )
+        if ( AndroidUtilities.isSamsungGalaxy() )
             {
             // Samsung Galaxy needs this and other devices seem to be OK with it:
             return new int[]{ EGL10.EGL_DEPTH_SIZE, SAMSUNG_GALAXY_DEPTH_BITS, EGL10.EGL_NONE };
             }
-        if ( isDroidOrMilestone() )
+        if ( AndroidUtilities.isDroidOrMilestone() )
             {
             // Let's assume it can handle this:
             TextureUtilities.maximumTextureSize = DROID_MAX_TEXTURE_SIZE;
@@ -210,21 +210,6 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
             return new int[]{ EGL10.EGL_DEPTH_SIZE, DROID_RECOMMENDED_DEPTH_BITS, EGL10.EGL_NONE };
             }
         return new int[]{ EGL10.EGL_NONE };
-        }
-
-    private boolean isSamsungGalaxy()
-        {
-        final boolean isSamsung = Build.BRAND.toLowerCase().indexOf( "samsung" ) != -1;
-        final boolean isGalaxy = Build.MODEL.toLowerCase().indexOf( "galaxy" ) != -1;
-        return isSamsung && isGalaxy;
-        }
-
-    private boolean isDroidOrMilestone()
-        {
-        final boolean isSamsung = Build.BRAND.toLowerCase().indexOf( "moto" ) != -1;
-        final boolean isDroid = Build.MODEL.toLowerCase().indexOf( "droid" ) != -1;
-        final boolean isMilestone = Build.MODEL.toLowerCase().indexOf( "milestone" ) != -1;
-        return isSamsung && ( isDroid || isMilestone );
         }
 
     private void onSurfaceCreated()
