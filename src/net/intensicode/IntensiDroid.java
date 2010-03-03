@@ -116,12 +116,19 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         final AndroidStorageManager storage = new AndroidStorageManager( this );
         final AndroidAudioManager audio = new AndroidAudioManager( this );
 
+        //#if SENSORS
+        final AndroidSensorsManager sensors = new AndroidSensorsManager( this );
+        //#endif
+
         view.setOnTouchListener( touch );
         view.setOnKeyListener( keys );
 
         system.resources = resources;
         system.graphics = graphics;
         system.storage = storage;
+        //#if SENSORS
+        system.sensors = sensors;
+        //#endif
         system.engine = engine;
         system.screen = screen;
         //#ifdef TOUCH
