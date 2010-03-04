@@ -11,9 +11,9 @@ class StaticSquare
 
         final int size = VERTS_ACROSS * VERTS_DOWN;
 
-        mVertexBuffer = ByteBuffer.allocateDirect( BYTES_PER_FLOAT * size * BYTES_PER_VERTEX_COORD )
+        mVertexBuffer = ByteBuffer.allocateDirect( BYTES_PER_FLOAT * size * VERTEX_COORDS_PER_ENTRY )
                 .order( ByteOrder.nativeOrder() ).asFloatBuffer();
-        mTexCoordBuffer = ByteBuffer.allocateDirect( BYTES_PER_FLOAT * size * BYTES_PER_TEX_COORD )
+        mTexCoordBuffer = ByteBuffer.allocateDirect( BYTES_PER_FLOAT * size * TEX_COORDS_PER_ENTRY )
                 .order( ByteOrder.nativeOrder() ).asFloatBuffer();
 
         int quadW = mW - 1;
@@ -56,12 +56,12 @@ class StaticSquare
         {
         final int index = mW * j + i;
 
-        final int posIndex = index * BYTES_PER_VERTEX_COORD;
+        final int posIndex = index * VERTEX_COORDS_PER_ENTRY;
         mVertexBuffer.put( posIndex, x );
         mVertexBuffer.put( posIndex + 1, y );
         mVertexBuffer.put( posIndex + 2, z );
 
-        final int texIndex = index * BYTES_PER_TEX_COORD;
+        final int texIndex = index * TEX_COORDS_PER_ENTRY;
         mTexCoordBuffer.put( texIndex, u );
         mTexCoordBuffer.put( texIndex + 1, v );
         }
@@ -70,13 +70,13 @@ class StaticSquare
         {
         if ( !hasHardwareBuffers() )
             {
-            aGL.glTexCoordPointer( BYTES_PER_TEX_COORD, GL10.GL_FLOAT, 0, mTexCoordBuffer );
+            aGL.glTexCoordPointer( TEX_COORDS_PER_ENTRY, GL10.GL_FLOAT, 0, mTexCoordBuffer );
             }
         else
             {
             final GL11 gl11 = (GL11) aGL;
             gl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, mTextureCoordBufferIndex );
-            gl11.glTexCoordPointer( BYTES_PER_TEX_COORD, GL11.GL_FLOAT, 0, 0 );
+            gl11.glTexCoordPointer( TEX_COORDS_PER_ENTRY, GL11.GL_FLOAT, 0, 0 );
             }
         }
 
@@ -84,29 +84,29 @@ class StaticSquare
         {
         if ( !hasHardwareBuffers() )
             {
-            aGL.glVertexPointer( BYTES_PER_VERTEX_COORD, GL10.GL_FLOAT, 0, mVertexBuffer );
+            aGL.glVertexPointer( VERTEX_COORDS_PER_ENTRY, GL10.GL_FLOAT, 0, mVertexBuffer );
             }
         else
             {
             final GL11 gl11 = (GL11) aGL;
             gl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, mVertBufferIndex );
-            gl11.glVertexPointer( BYTES_PER_VERTEX_COORD, GL10.GL_FLOAT, 0, 0 );
+            gl11.glVertexPointer( VERTEX_COORDS_PER_ENTRY, GL10.GL_FLOAT, 0, 0 );
 
             gl11.glBindBuffer( GL11.GL_ELEMENT_ARRAY_BUFFER, mIndexBufferIndex );
             }
         }
 
-    public void draw( GL10 gl, int aX, int aY, int aWidth, int aHeight, boolean useTexture )
+    public void draw( GL10 gl, int aX, int aY, int aWidth, int aHeight )
         {
         gl.glPushMatrix();
         gl.glLoadIdentity();
         gl.glTranslatef( aX, aY, 0 );
         gl.glScalef( aWidth, aHeight, 1 );
-        drawDirect( gl, useTexture );
+        drawDirect( gl );
         gl.glPopMatrix();
         }
 
-    private void drawDirect( GL10 gl, boolean useTexture )
+    private void drawDirect( GL10 gl )
         {
         if ( !hasHardwareBuffers() )
             {
@@ -119,20 +119,25 @@ class StaticSquare
             }
         }
 
+    public final boolean hasHardwareBuffers()
+        {
+        return mVertBufferIndex != 0;
+        }
+
     public void freeHardwareBuffers( GL10 gl )
         {
-        if ( !hasHardwareBuffers() ) throw new IllegalStateException();
+        if ( !hasHardwareBuffers() ) return;
 
         GL11 gl11 = (GL11) gl;
-        int[] buffer = new int[1];
-        buffer[ 0 ] = mVertBufferIndex;
-        gl11.glDeleteBuffers( 1, buffer, 0 );
 
-        buffer[ 0 ] = mTextureCoordBufferIndex;
-        gl11.glDeleteBuffers( 1, buffer, 0 );
+        myBufferWorkspace[ 0 ] = mVertBufferIndex;
+        gl11.glDeleteBuffers( 1, myBufferWorkspace, 0 );
 
-        buffer[ 0 ] = mIndexBufferIndex;
-        gl11.glDeleteBuffers( 1, buffer, 0 );
+        myBufferWorkspace[ 0 ] = mTextureCoordBufferIndex;
+        gl11.glDeleteBuffers( 1, myBufferWorkspace, 0 );
+
+        myBufferWorkspace[ 0 ] = mIndexBufferIndex;
+        gl11.glDeleteBuffers( 1, myBufferWorkspace, 0 );
 
         mVertBufferIndex = 0;
         mIndexBufferIndex = 0;
@@ -141,51 +146,48 @@ class StaticSquare
 
     public void generateHardwareBuffers( GL10 gl )
         {
-        if ( hasHardwareBuffers() ) throw new IllegalStateException();
+        if ( hasHardwareBuffers() ) freeHardwareBuffers( gl );
 
         GL11 gl11 = (GL11) gl;
-        int[] buffer = new int[1];
-
-        // Allocate and fill the vertex buffer.
-        gl11.glGenBuffers( 1, buffer, 0 );
-        mVertBufferIndex = buffer[ 0 ];
-        gl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, mVertBufferIndex );
-        final int vertexSize = mVertexBuffer.capacity() * Float.SIZE;
-        gl11.glBufferData( GL11.GL_ARRAY_BUFFER, vertexSize, mVertexBuffer, GL11.GL_STATIC_DRAW );
-
-        // Allocate and fill the texture coordinate buffer.
-        gl11.glGenBuffers( 1, buffer, 0 );
-        mTextureCoordBufferIndex = buffer[ 0 ];
-        gl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, mTextureCoordBufferIndex );
-        final int texCoordSize = mTexCoordBuffer.capacity() * Float.SIZE;
-        gl11.glBufferData( GL11.GL_ARRAY_BUFFER, texCoordSize, mTexCoordBuffer, GL11.GL_STATIC_DRAW );
-
-        // Unbind the array buffer.
-        gl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, 0 );
-
-        // Allocate and fill the index buffer.
-        gl11.glGenBuffers( 1, buffer, 0 );
-        mIndexBufferIndex = buffer[ 0 ];
-        gl11.glBindBuffer( GL11.GL_ELEMENT_ARRAY_BUFFER, mIndexBufferIndex );
-        // A char is 2 bytes.
-        final int indexSize = mIndexBuffer.capacity() * 2;
-        gl11.glBufferData( GL11.GL_ELEMENT_ARRAY_BUFFER, indexSize, mIndexBuffer, GL11.GL_STATIC_DRAW );
-
-        // Unbind the element array buffer.
-        gl11.glBindBuffer( GL11.GL_ELEMENT_ARRAY_BUFFER, 0 );
+        generateIndexBuffer( gl11 );
+        generateVertexBuffer( gl11 );
+        generateTexCoordBuffer( gl11 );
         }
 
-    private boolean hasHardwareBuffers()
+    private void generateTexCoordBuffer( final GL11 aGl11 )
         {
-        return mVertBufferIndex != 0;
+        aGl11.glGenBuffers( 1, myBufferWorkspace, 0 );
+        mTextureCoordBufferIndex = myBufferWorkspace[ 0 ];
+        aGl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, mTextureCoordBufferIndex );
+        final int texCoordSize = mTexCoordBuffer.capacity() * BYTES_PER_FLOAT;
+        aGl11.glBufferData( GL11.GL_ARRAY_BUFFER, texCoordSize, mTexCoordBuffer, GL11.GL_STATIC_DRAW );
+
+        aGl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, 0 );
         }
 
+    private void generateVertexBuffer( final GL11 aGl11 )
+        {
+        aGl11.glGenBuffers( 1, myBufferWorkspace, 0 );
+        mVertBufferIndex = myBufferWorkspace[ 0 ];
+        aGl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, mVertBufferIndex );
+        final int vertexSize = mVertexBuffer.capacity() * BYTES_PER_FLOAT;
+        aGl11.glBufferData( GL11.GL_ARRAY_BUFFER, vertexSize, mVertexBuffer, GL11.GL_STATIC_DRAW );
 
-    private FloatBuffer mVertexBuffer;
+        aGl11.glBindBuffer( GL11.GL_ARRAY_BUFFER, 0 );
+        }
 
-    private FloatBuffer mTexCoordBuffer;
+    private void generateIndexBuffer( final GL11 aGl11 )
+        {
+        // Allocate and fill the index myBufferWorkspace.
+        aGl11.glGenBuffers( 1, myBufferWorkspace, 0 );
+        mIndexBufferIndex = myBufferWorkspace[ 0 ];
+        aGl11.glBindBuffer( GL11.GL_ELEMENT_ARRAY_BUFFER, mIndexBufferIndex );
+        final int indexSize = mIndexBuffer.capacity() * BYTES_PER_CHAR;
+        aGl11.glBufferData( GL11.GL_ELEMENT_ARRAY_BUFFER, indexSize, mIndexBuffer, GL11.GL_STATIC_DRAW );
 
-    private CharBuffer mIndexBuffer;
+        aGl11.glBindBuffer( GL11.GL_ELEMENT_ARRAY_BUFFER, 0 );
+        }
+
 
     private int mW;
 
@@ -197,6 +199,14 @@ class StaticSquare
 
     private int mTextureCoordBufferIndex;
 
+    private CharBuffer mIndexBuffer;
+
+    private FloatBuffer mVertexBuffer;
+
+    private FloatBuffer mTexCoordBuffer;
+
+    private final int[] myBufferWorkspace = new int[1];
+
     private static final int BYTES_PER_FLOAT = 4;
 
     private static final int BYTES_PER_CHAR = 2;
@@ -205,7 +215,7 @@ class StaticSquare
 
     private static final int VERTS_ACROSS = 2;
 
-    private static final int BYTES_PER_TEX_COORD = 2;
+    private static final int TEX_COORDS_PER_ENTRY = 2;
 
-    private static final int BYTES_PER_VERTEX_COORD = 3;
+    private static final int VERTEX_COORDS_PER_ENTRY = 3;
     }
