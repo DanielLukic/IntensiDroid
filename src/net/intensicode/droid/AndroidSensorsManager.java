@@ -35,13 +35,13 @@ public final class AndroidSensorsManager extends SensorsManager implements Senso
 
     public final synchronized void onControlTick()
         {
-        acceleration.x = myPreviousAcceleration[ 0 ];
-        acceleration.y = myPreviousAcceleration[ 1 ];
-        acceleration.z = myPreviousAcceleration[ 2 ];
+        acceleration.xFixed = (int) ( FixedMath.FIXED_1 * myPreviousAcceleration[ 0 ] );
+        acceleration.yFixed = (int) ( FixedMath.FIXED_1 * myPreviousAcceleration[ 1 ] );
+        acceleration.zFixed = (int) ( FixedMath.FIXED_1 * myPreviousAcceleration[ 2 ] );
 
-        orientation.azimuth = myPreviousOrientation[ 0 ];
-        orientation.pitch = myPreviousOrientation[ 1 ];
-        orientation.roll = myPreviousOrientation[ 2 ];
+        orientation.azimuthFixed = (int) ( FixedMath.FIXED_1 * myPreviousOrientation[ 0 ] );
+        orientation.pitchFixed = (int) ( FixedMath.FIXED_1 * myPreviousOrientation[ 1 ] );
+        orientation.rollFixed = (int) ( FixedMath.FIXED_1 * myPreviousOrientation[ 2 ] );
         }
 
     public final void enable()
@@ -71,30 +71,8 @@ public final class AndroidSensorsManager extends SensorsManager implements Senso
 
     public final synchronized void onSensorChanged( final SensorEvent aSensorEvent )
         {
-        if ( aSensorEvent.sensor == myAcceleration ) updateAccelerometerIfChanged( aSensorEvent.values );
-        if ( aSensorEvent.sensor == myOrientation ) updateOrientationIfChanged( aSensorEvent.values );
-        }
-
-    private void updateAccelerometerIfChanged( final float[] aValues )
-        {
-        if ( !valuesHaveChanged( aValues, myPreviousAcceleration ) ) return;
-        copyFromTo( aValues, myPreviousAcceleration );
-        }
-
-    private void updateOrientationIfChanged( final float[] aValues )
-        {
-        if ( !valuesHaveChanged( aValues, myPreviousOrientation ) ) return;
-        copyFromTo( aValues, myPreviousOrientation );
-        }
-
-    private boolean valuesHaveChanged( final float[] aValues, final float[] aPreviousValues )
-        {
-        Assert.equals( "size of value array matches", aValues.length, aPreviousValues.length );
-        for ( int idx = 0; idx < aPreviousValues.length; idx++ )
-            {
-            if ( aValues[ idx ] != aPreviousValues[ idx ] ) return true;
-            }
-        return false;
+        if ( aSensorEvent.sensor == myAcceleration ) copyFromTo( aSensorEvent.values, myPreviousAcceleration );
+        if ( aSensorEvent.sensor == myOrientation ) copyFromTo( aSensorEvent.values, myPreviousOrientation );
         }
 
     private void copyFromTo( final float[] aValues, final float[] aPreviousValues )
@@ -126,8 +104,12 @@ public final class AndroidSensorsManager extends SensorsManager implements Senso
     private void initSupportedSensors()
         {
         if ( AndroidUtilities.isEmulator() ) return;
-        myAcceleration = myService.getDefaultSensor( SensorManager.SENSOR_ACCELEROMETER );
-        myOrientation = myService.getDefaultSensor( SensorManager.SENSOR_ORIENTATION );
+
+        myAcceleration = myService.getDefaultSensor( Sensor.TYPE_ACCELEROMETER );
+        myOrientation = myService.getDefaultSensor( Sensor.TYPE_ORIENTATION );
+
+        if ( myAcceleration != null ) Log.debug( "Acceleration sensor: {}", myAcceleration.getName() );
+        if ( myOrientation != null ) Log.debug( "Orientation sensor: {}", myOrientation.getName() );
         }
 
     private String getTypeName( final Sensor aSensor )
@@ -141,7 +123,7 @@ public final class AndroidSensorsManager extends SensorsManager implements Senso
         if ( type == Sensor.TYPE_PRESSURE ) return "pressure";
         if ( type == Sensor.TYPE_PROXIMITY ) return "proximity";
         if ( type == Sensor.TYPE_TEMPERATURE ) return "temperature";
-        throw new IllegalArgumentException();
+        return "unknown";
         }
 
 
