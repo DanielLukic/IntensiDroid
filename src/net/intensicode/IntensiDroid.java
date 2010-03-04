@@ -30,11 +30,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         //#endif
         }
 
-    public void onApplicationShouldPause( final GameSystem aGameSystem )
-        {
-        // Default implementation does nothing..
-        }
-
     public void onFramesDropped( final GameSystem aGameSystem )
         {
         // Default implementation does nothing..
@@ -42,10 +37,15 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     public void onDebugTriggered()
         {
-        // Default implementation does nothing..
+        IntensiGameHelper.toggleDebugScreen( myGameSystem );
         }
 
     public void onCheatTriggered()
+        {
+        IntensiGameHelper.toggleCheatScreen( myGameSystem );
+        }
+
+    public void onStopApplication( final GameSystem aGameSystem )
         {
         // Default implementation does nothing..
         }
