@@ -1,10 +1,13 @@
 package net.intensicode.droid;
 
-import android.graphics.Bitmap;
+import android.graphics.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.canvas.AndroidCanvasGraphics;
 import net.intensicode.droid.opengl.Texture;
-import net.intensicode.util.Assert;
+import net.intensicode.util.*;
+
+import java.io.InputStream;
+import java.util.ArrayList;
 
 public final class AndroidImageResource implements ImageResource
     {
@@ -19,12 +22,36 @@ public final class AndroidImageResource implements ImageResource
     public Texture texture;
 
 
-    public AndroidImageResource( final Bitmap aBitmap )
+    public static ImageResource createFrom( final String aResourcePath, final InputStream aResourceStream )
+        {
+        final Bitmap bitmap = BitmapFactory.decodeStream( aResourceStream );
+        final AndroidImageResource resource = new AndroidImageResource( aResourcePath, bitmap );
+        theResources.add( resource );
+        return resource;
+        }
+
+    public static ImageResource createFrom( final int aWidth, final int aHeight )
+        {
+        final Bitmap bitmap = Bitmap.createBitmap( aWidth, aHeight, Bitmap.Config.ARGB_8888 );
+        final AndroidImageResource resource = new AndroidImageResource( bitmap );
+        theResources.add( resource );
+        return resource;
+        }
+
+    public static void purgeAll()
+        {
+        Log.debug( "purging {} AndroidImageResource instances", theResources.size() );
+        while ( !theResources.isEmpty() ) theResources.get( 0 ).purge();
+        }
+
+    private static final ArrayList<AndroidImageResource> theResources = new ArrayList<AndroidImageResource>();
+
+    private AndroidImageResource( final Bitmap aBitmap )
         {
         this( RUNTIME_IMAGE, aBitmap );
         }
 
-    public AndroidImageResource( final String aResourcePath, final Bitmap aBitmap )
+    private AndroidImageResource( final String aResourcePath, final Bitmap aBitmap )
         {
         //#if DEBUG
         Assert.notNull( "bitmap must be valid", aBitmap );
@@ -64,8 +91,11 @@ public final class AndroidImageResource implements ImageResource
 
     public final void purge()
         {
-        bitmap.recycle();
+        Log.debug( "puring AndroidImageResource {}", resourcePath );
+        final boolean removed = theResources.remove( this );
+        Assert.isTrue( "purged AndroidImageResource valid", removed );
         if ( texture != null ) texturePurger.purge( this );
+        bitmap.recycle();
         }
 
     // From Object

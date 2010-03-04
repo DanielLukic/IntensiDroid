@@ -4,7 +4,7 @@ import android.content.res.AssetManager;
 import android.graphics.*;
 import net.intensicode.core.*;
 import net.intensicode.graphics.*;
-import net.intensicode.util.*;
+import net.intensicode.util.Assert;
 
 import java.io.*;
 
@@ -32,17 +32,14 @@ public final class AndroidResourcesManager extends ResourcesManager
 
     public final ImageResource createImageResource( final int aWidth, final int aHeight )
         {
-        final Bitmap bitmap = Bitmap.createBitmap( aWidth, aHeight, Bitmap.Config.ARGB_8888 );
-        return new AndroidImageResource( bitmap );
+        return AndroidImageResource.createFrom( aWidth, aHeight );
         }
 
     public final ImageResource loadImageResource( final String aResourcePath )
         {
         final InputStream resourceStream = openStream( aResourcePath );
         if ( resourceStream == null ) throw new NullPointerException( aResourcePath );
-        final Bitmap bitmap = BitmapFactory.decodeStream( resourceStream );
-        if ( resourceStream == null ) throw new NullPointerException( aResourcePath );
-        return new AndroidImageResource( aResourcePath, bitmap );
+        return AndroidImageResource.createFrom( aResourcePath, resourceStream );
         }
 
     public final InputStream openStream( final String aResourcePath )
