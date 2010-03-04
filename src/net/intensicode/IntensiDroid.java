@@ -76,6 +76,39 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         setContentView( myGameView );
         }
 
+    protected void onStart()
+        {
+        super.onStart();
+//        myGameSystem.start(); => no surface yet!
+        }
+
+    protected void onResume()
+        {
+        super.onResume();
+//        myGameSystem.start(); => no surface yet!
+        }
+
+    protected void onPause()
+        {
+        myGameSystem.stop(); // this is really the only one that has an effect..
+        super.onPause();
+        }
+
+    protected void onStop()
+        {
+        myGameSystem.stop();
+        super.onStop();
+        }
+
+    protected void onDestroy()
+        {
+        myGameSystem.stop();
+        super.onDestroy();
+
+        AndroidImageResource.purgeAll();
+        System.gc();
+        }
+
     // Implementation
 
     private void setWindowFeatures()
