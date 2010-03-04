@@ -57,6 +57,12 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     // From Activity
 
+    public final boolean onTrackballEvent( final MotionEvent aMotionEvent )
+        {
+        myAnalogController.onTrackballEvent( aMotionEvent );
+        return false;
+        }
+
     public final void onCreate( final Bundle savedInstanceState )
         {
         super.onCreate( savedInstanceState );
@@ -153,9 +159,12 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         final AndroidSensorsManager sensors = new AndroidSensorsManager( this );
         //#endif
 
+        final AndroidAnalogController analog = new AndroidAnalogController();
+
         view.setOnTouchListener( touch );
         view.setOnKeyListener( keys );
 
+        system.analog = analog;
         system.resources = resources;
         system.graphics = graphics;
         system.storage = storage;
@@ -172,6 +181,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
         myGameView = view;
         myGameSystem = system;
+        myAnalogController = analog;
         }
 
     private VideoSystem createVideoSystem( final GameSystem aGameSystem )
@@ -196,4 +206,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
     private GameSystem myGameSystem;
 
     private SurfaceView myGameView;
+
+    private AndroidAnalogController myAnalogController;
     }
