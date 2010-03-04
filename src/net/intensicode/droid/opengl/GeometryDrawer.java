@@ -12,8 +12,13 @@ public final class GeometryDrawer
 
     public final void updateHardwareBuffers()
         {
-        myFillRectSquare.freeHardwareBuffers( gl );
+        freeHardwareBuffers();
         myFillRectSquare.generateHardwareBuffers( gl );
+        }
+
+    public final void freeHardwareBuffers()
+        {
+        if ( myFillRectSquare.hasHardwareBuffers() ) myFillRectSquare.freeHardwareBuffers( gl );
         }
 
     public final void drawPoint( final int aX1, final int aY1 )
@@ -45,7 +50,7 @@ public final class GeometryDrawer
             myVertexBufferIsUpToDate = true;
             }
 
-        myFillRectSquare.draw( gl, aX, aY, aWidth, aHeight, enableTextureCoordinates );
+        myFillRectSquare.draw( gl, aX, aY, aWidth, aHeight );
         }
 
     public final void drawTriangle( final int aX1, final int aY1, final int aX2, final int aY2, final int aX3, final int aY3 )
