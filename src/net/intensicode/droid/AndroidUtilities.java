@@ -61,6 +61,13 @@ public final class AndroidUtilities
         return display.getWidth() == display.getHeight();
         }
 
+    public static boolean isEmulator()
+        {
+        final boolean isGeneric= Build.BRAND.toLowerCase().indexOf( "generic" ) != -1;
+        final boolean isSdk = Build.MODEL.toLowerCase().indexOf( "sdk" ) != -1;
+        return isGeneric && isSdk;
+        }
+
     public static boolean isSamsungGalaxy()
         {
         final boolean isSamsung = Build.BRAND.toLowerCase().indexOf( "samsung" ) != -1;
