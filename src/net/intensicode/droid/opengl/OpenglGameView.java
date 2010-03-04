@@ -99,10 +99,7 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         {
         myTargetSize.setTo( aWidth, aHeight );
 
-        //#if DEBUG
         Log.debug( "Target screen size: {}x{}", width(), height() );
-        Log.debug( "Device screen size: {}x{}", getWidth(), getHeight() );
-        //#endif
         }
 
     // Internal API
@@ -119,9 +116,7 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
 
     public final void beginFrame()
         {
-        //#if DEBUG
         Assert.notNull( "opengl handle", myGL );
-        //#endif
 
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
         myGL.glLoadIdentity();
@@ -131,16 +126,12 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
 
     public final void endFrame()
         {
-        //#if DEBUG
         Assert.notNull( "opengl handle", myGL );
-        //#endif
 
         final int state = myEglHelper.swapAndReturnContextState();
         if ( state == EglHelper.CONTEXT_LOST )
             {
-            //#if DEBUG
             Log.debug( "graphics context lost" );
-            //#endif
             myEglHelper.finish();
             }
         }
@@ -172,24 +163,21 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
 
     public final void surfaceCreated( final SurfaceHolder aSurfaceHolder )
         {
-        //#if DEBUG
+        Log.debug( "surfaceCreated" );
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
-        //#endif
         }
 
     public final void surfaceChanged( final SurfaceHolder aSurfaceHolder, final int aFormat, final int aWidth, final int aHeight )
         {
-        //#if DEBUG
+        Log.debug( "surfaceChanged" );
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
-        //#endif
         system.start();
         }
 
     public final void surfaceDestroyed( final SurfaceHolder aSurfaceHolder )
         {
-        //#if DEBUG
+        Log.debug( "surfaceDestroyed" );
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
-        //#endif
         system.stop();
         }
 
