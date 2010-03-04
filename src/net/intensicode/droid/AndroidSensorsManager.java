@@ -11,6 +11,8 @@ import java.util.List;
 
 public final class AndroidSensorsManager extends SensorsManager implements SensorEventListener
     {
+    // TODO: Queue events, too. Handle in engine control tick..
+
     public AndroidSensorsManager( final Context aContext )
         {
         myService = (SensorManager) aContext.getSystemService( Context.SENSOR_SERVICE );
@@ -28,7 +30,7 @@ public final class AndroidSensorsManager extends SensorsManager implements Senso
 
     public final boolean hasAcceleration()
         {
-        return myAccelerometer != null;
+        return myAcceleration != null;
         }
 
     public final synchronized void onControlTick()
@@ -42,18 +44,35 @@ public final class AndroidSensorsManager extends SensorsManager implements Senso
         orientation.roll = myPreviousOrientation[ 2 ];
         }
 
+    public final void enable()
+        {
+        if ( myAcceleration != null )
+            {
+            Log.debug( "enabling acceleration sensor" );
+            myService.registerListener( this, myAcceleration, SensorManager.SENSOR_DELAY_GAME );
+            }
+        if ( myOrientation != null )
+            {
+            Log.debug( "enabling orientation sensor" );
+            myService.registerListener( this, myOrientation, SensorManager.SENSOR_DELAY_GAME );
+            }
+        }
+
+    public final void disable()
+        {
+        if ( myAcceleration != null || myOrientation != null )
+            {
+            Log.debug( "disabling sensors processing" );
+            myService.unregisterListener( this );
+            }
+        }
+
     // From SensorEventListener
 
     public final synchronized void onSensorChanged( final SensorEvent aSensorEvent )
         {
-        if ( aSensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER )
-            {
-            updateAccelerometerIfChanged( aSensorEvent.values );
-            }
-        if ( aSensorEvent.sensor.getType() == Sensor.TYPE_ORIENTATION )
-            {
-            updateOrientationIfChanged( aSensorEvent.values );
-            }
+        if ( aSensorEvent.sensor == myAcceleration ) updateAccelerometerIfChanged( aSensorEvent.values );
+        if ( aSensorEvent.sensor == myOrientation ) updateOrientationIfChanged( aSensorEvent.values );
         }
 
     private void updateAccelerometerIfChanged( final float[] aValues )
@@ -70,9 +89,7 @@ public final class AndroidSensorsManager extends SensorsManager implements Senso
 
     private boolean valuesHaveChanged( final float[] aValues, final float[] aPreviousValues )
         {
-        //#if DEBUG
         Assert.equals( "size of value array matches", aValues.length, aPreviousValues.length );
-        //#endif
         for ( int idx = 0; idx < aPreviousValues.length; idx++ )
             {
             if ( aValues[ idx ] != aPreviousValues[ idx ] ) return true;
@@ -108,39 +125,9 @@ public final class AndroidSensorsManager extends SensorsManager implements Senso
 
     private void initSupportedSensors()
         {
-        final List<Sensor> sensors = myService.getSensorList( Sensor.TYPE_ALL );
-        for ( final Sensor sensor : sensors )
-            {
-            final int type = sensor.getType();
-            if ( type == Sensor.TYPE_ACCELEROMETER ) setAccelerometerSensor( sensor );
-            if ( type == Sensor.TYPE_ORIENTATION ) setOrientationSensor( sensor );
-            }
-        }
-
-    private void setAccelerometerSensor( final Sensor aSensor )
-        {
-        //#if DEBUG
-        if ( myAccelerometer != null ) Log.debug( "replacing accelerometer sensor" );
-        //#endif
-        myService.registerListener( this, aSensor, SensorManager.SENSOR_DELAY_GAME );
-        myAccelerometer = aSensor;
-        }
-
-    private void setOrientationSensor( final Sensor aSensor )
-        {
-        if ( aSensor.getName().toLowerCase().endsWith( " raw" ) )
-            {
-            //#if DEBUG
-            Log.debug( "ignoring 'raw' orientation sensor {}", aSensor.getName() );
-            //#endif
-            return;
-            }
-
-        //#if DEBUG
-        if ( myOrientation != null ) Log.debug( "replacing orientation sensor" );
-        //#endif
-        myService.registerListener( this, aSensor, SensorManager.SENSOR_DELAY_GAME );
-        myOrientation = aSensor;
+        if ( AndroidUtilities.isEmulator() ) return;
+        myAcceleration = myService.getDefaultSensor( SensorManager.SENSOR_ACCELEROMETER );
+        myOrientation = myService.getDefaultSensor( SensorManager.SENSOR_ORIENTATION );
         }
 
     private String getTypeName( final Sensor aSensor )
@@ -160,7 +147,7 @@ public final class AndroidSensorsManager extends SensorsManager implements Senso
 
     private Sensor myOrientation;
 
-    private Sensor myAccelerometer;
+    private Sensor myAcceleration;
 
     private final SensorManager myService;
 
