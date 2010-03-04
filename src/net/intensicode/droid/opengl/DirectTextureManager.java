@@ -2,7 +2,7 @@ package net.intensicode.droid.opengl;
 
 import android.graphics.Bitmap;
 import net.intensicode.droid.*;
-import net.intensicode.util.Log;
+import net.intensicode.util.*;
 
 import java.util.ArrayList;
 
@@ -10,9 +10,7 @@ public final class DirectTextureManager implements TexturePurger
     {
     public final void addTexture( final AndroidImageResource aImageResource )
         {
-        //#if DEBUG
         Log.debug( "making texture for {}", aImageResource.resourcePath );
-        //#endif
 
         aImageResource.texture = makeTexture( aImageResource.bitmap );
         aImageResource.texturePurger = this;
@@ -21,22 +19,20 @@ public final class DirectTextureManager implements TexturePurger
 
     public final void purgeAllTextures()
         {
-        //#if DEBUG
         Log.debug( "purging {} texturized image resources", myTexturizedImageResources.size() );
-        //#endif
         while ( myTexturizedImageResources.size() > 0 )
             {
-            purge( myTexturizedImageResources.remove( myTexturizedImageResources.size() - 1 ) );
+            purge( myTexturizedImageResources.get( 0 ) );
             }
+        Assert.isTrue( "all textures purged", myTexturizedImageResources.isEmpty() );
+        myTexturizedImageResources.clear();
         }
 
     // From TexturePurger
 
     public final void purge( final AndroidImageResource aImageResource )
         {
-        //#if DEBUG
         Log.debug( "purging texture of {}", aImageResource.resourcePath );
-        //#endif
 
         if ( aImageResource.texture instanceof DirectTexture )
             {
@@ -47,9 +43,7 @@ public final class DirectTextureManager implements TexturePurger
         aImageResource.texturePurger = null;
 
         final boolean removed = myTexturizedImageResources.remove( aImageResource );
-        //#if DEBUG
-        if ( !removed ) Log.debug( "failed removing texturized image from internal list" );
-        //#endif
+        Assert.isTrue( "failed removing texturized image from internal list", removed );
         }
 
     // Implementation

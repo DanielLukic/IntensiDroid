@@ -217,9 +217,7 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
 
     public final void purge()
         {
-        //#if DEBUG_OPENGL
         Log.debug( "purging {} texturized image resources", myTexturizedImageResources.size() );
-        //#endif
 
         while ( myTexturizedImageResources.size() > 0 )
             {
@@ -228,9 +226,7 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
             lastImageResource.dropTexture();
             }
 
-        //#if DEBUG_OPENGL
         Log.debug( "all textures purged from atlas {} - purging atlas texture", this );
-        //#endif
 
         if ( myAtlasTexture != null ) myAtlasTexture.purge();
         myAtlasTexture = null;

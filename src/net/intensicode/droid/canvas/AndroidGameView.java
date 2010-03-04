@@ -60,10 +60,8 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         {
         myTargetSize.setTo( aWidth, aHeight );
 
-        //#if DEBUG
         Log.debug( "Target screen size: {}x{}", width(), height() );
         Log.debug( "Device screen size: {}x{}", getWidth(), getHeight() );
-        //#endif
         }
 
     // Internal API
@@ -80,9 +78,7 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
 
     public final void beginFrame()
         {
-        //#if DEBUG
         Assert.isNotNull( "surface holder should be initialized", mySurfaceHolder );
-        //#endif
 
         final Canvas canvas = graphics.canvas = mySurfaceHolder.lockCanvas();
         if ( canvas != null ) canvas.scale( getWidth() * 1.0f / width(), getHeight() * 1.0f / height() );
@@ -91,9 +87,7 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
 
     public final void endFrame()
         {
-        //#if DEBUG
         Assert.isNotNull( "surface holder should be initialized", mySurfaceHolder );
-        //#endif
 
         mySurfaceHolder.unlockCanvasAndPost( graphics.canvas );
         }
@@ -117,24 +111,18 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
 
     public final void surfaceCreated( final SurfaceHolder aSurfaceHolder )
         {
-        //#if DEBUG
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
-        //#endif
         }
 
     public final void surfaceChanged( final SurfaceHolder aSurfaceHolder, final int aFormat, final int aWidth, final int aHeight )
         {
-        //#if DEBUG
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
-        //#endif
         system.start();
         }
 
     public final void surfaceDestroyed( final SurfaceHolder aSurfaceHolder )
         {
-        //#if DEBUG
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
-        //#endif
         system.stop();
         }
 
