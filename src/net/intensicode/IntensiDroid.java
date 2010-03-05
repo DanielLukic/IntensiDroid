@@ -165,7 +165,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         final AndroidSensorsManager sensors = new AndroidSensorsManager( this );
         //#endif
 
+        //#if SENSORS
         final AndroidAnalogController analog = new AndroidAnalogController( sensors );
+        //#else
+        //# final AndroidAnalogController analog = new AndroidAnalogController();
+        //#endif
 
         view.setOnTouchListener( touch );
         view.setOnKeyListener( keys );

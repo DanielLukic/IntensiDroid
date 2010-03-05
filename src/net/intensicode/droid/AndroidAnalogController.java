@@ -6,10 +6,12 @@ import net.intensicode.util.FixedMath;
 
 public final class AndroidAnalogController extends AnalogController
     {
+    //#if SENSORS
     public AndroidAnalogController( final AndroidSensorsManager aSensorsManager )
         {
         mySensorsManager = aSensorsManager;
         }
+    //#endif
 
     public final synchronized void onTrackballEvent( final MotionEvent aMotionEvent )
         {
@@ -23,9 +25,11 @@ public final class AndroidAnalogController extends AnalogController
 
     protected final void mapOrientationToMovement()
         {
+        //#if SENSORS
         myLatestX = mySensorsManager.orientation.pitchFixed * -( 1f / 180f) / FixedMath.FIXED_1;
         myLatestY = mySensorsManager.orientation.rollFixed * ( 1f / 90f) / FixedMath.FIXED_1;
         myNewDataFlag = true;
+        //#endif
         }
 
     protected final void mapAccelerationToMovement()
@@ -52,5 +56,7 @@ public final class AndroidAnalogController extends AnalogController
 
     private boolean myNewDataFlag;
 
+    //#if SENSORS
     private final AndroidSensorsManager mySensorsManager;
+    //#endif
     }
