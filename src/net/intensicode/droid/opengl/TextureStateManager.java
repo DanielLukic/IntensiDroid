@@ -9,6 +9,18 @@ public final class TextureStateManager
     {
     public GL10 gl;
 
+    public final void reset()
+        {
+        disableTexturingIfNecessary();
+        disableAlpha();
+        bindTexture( null );
+        if ( isTextureMatrixPushed() ) popTextureMatrix();
+        myTextureMatrixPushedFlag = false;
+        myTextureEnabled = false;
+        myActiveTexture = null;
+        gl = null;
+        }
+
     public final void enableTexturingIfNecessary()
         {
         if ( myTextureEnabled ) return;
@@ -40,7 +52,8 @@ public final class TextureStateManager
 
     public final void bindTexture( final Texture aTexture )
         {
-        aTexture.bind();
+        if ( aTexture != null ) aTexture.bind();
+        else TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
         myActiveTexture = aTexture;
         }
 

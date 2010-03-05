@@ -9,6 +9,8 @@ import java.nio.IntBuffer;
 
 public final class TextureUtilities
     {
+    public static final int NO_TEXTURE_ID_SET = -1;
+
     public static final int MAX_TEXTURE_SIZE = 1024;
 
     // Note: Galaxy and G1 do not like 1024.. terrible slow downs.. assuming others have problems, too..
@@ -195,8 +197,6 @@ public final class TextureUtilities
     private static final int INTERNAL_TEXTURE_FORMAT_RGBA = GL10.GL_RGBA;
 
     private static final int BITMAP_DATA_FORMAT = GL10.GL_UNSIGNED_BYTE;
-
-    private static final int NO_TEXTURE_ID_SET = -1;
 
     private static final int NUMBER_OF_TEXTURE_UNITS = 2;
 

@@ -75,6 +75,16 @@ public final class OpenglGraphics extends DirectGraphics
 
     final void releaseGL()
         {
+        myGeometryDrawer.reset();
+        myTextureManager.purgeAllTextures();
+        myTextureStateManager.reset();
+
+        TextureUtilities.setAtlasTextureUnit();
+        TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
+        TextureUtilities.setRenderTextureUnit();
+        TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
+        TextureUtilities.gl = null;
+
         myGL = null;
         }
 

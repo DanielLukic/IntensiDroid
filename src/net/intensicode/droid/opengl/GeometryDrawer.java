@@ -10,6 +10,12 @@ public final class GeometryDrawer
     public boolean enableTextureCoordinates;
 
 
+    public final void reset()
+        {
+        freeHardwareBuffers();
+        myTextureBufferIsUpToDate = myVertexBufferIsUpToDate = false;
+        }
+
     public final void updateHardwareBuffers()
         {
         freeHardwareBuffers();
