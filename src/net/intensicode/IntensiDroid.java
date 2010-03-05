@@ -21,7 +21,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         return myGameSystem;
         }
 
-    public final boolean useOpenglIfPossible()
+    public boolean useOpenglIfPossible()
         {
         //#if OPENGL
         //# return true;
