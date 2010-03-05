@@ -101,6 +101,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     protected void onPause()
         {
+        onPauseApplication();
         myGameSystem.stop(); // this is really the only one that has an effect..
         super.onPause();
         }
