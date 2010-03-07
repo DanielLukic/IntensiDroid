@@ -98,8 +98,11 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
     public final void setTargetSize( final int aWidth, final int aHeight )
         {
         myTargetSize.setTo( aWidth, aHeight );
+        }
 
-        Log.debug( "Target screen size: {}x{}", width(), height() );
+    public final void setViewportMode( final int aViewportModeId )
+        {
+        myViewportMode = aViewportModeId;
         }
 
     // Internal API
@@ -223,23 +226,45 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
 
     private void onSurfaceChanged( final int aWidth, final int aHeight )
         {
-        myGL.glViewport( 0, 0, aWidth, aHeight );
+        updateDisplaySize( aWidth, aHeight );
+
+        myGL.glViewport( 0, ( aHeight - myDisplaySize.height ) / 2, myDisplaySize.width, myDisplaySize.height );
         myGL.glMatrixMode( GL10.GL_PROJECTION );
         myGL.glLoadIdentity();
-        myGL.glOrthof( 0, width(), 0, height(), -1, 1 );
-        myGL.glTranslatef( 0, height(), 0 );
+        final int virtualWidth = width();
+        final int virtualHeight = height();
+        myGL.glOrthof( 0, virtualWidth, 0, virtualHeight, -1, 1 );
+        myGL.glTranslatef( 0, virtualHeight, 0 );
         myGL.glScalef( 1.0f, -1.0f, 1.0f );
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
 
-        graphics.onSurfaceChanged( width(), height(), aWidth, aHeight );
+        graphics.onSurfaceChanged( virtualWidth, virtualHeight, myDisplaySize.width, myDisplaySize.height );
+        }
+
+    private void updateDisplaySize( final int aWidth, final int aHeight )
+        {
+        if ( myViewportMode == VIEWPORT_MODE_FULLSCREEN )
+            {
+            myDisplaySize.width = aWidth;
+            myDisplaySize.height = aHeight;
+            }
+        else // VIEWPORT_MODE_SYSTEM - let system do the scaling..
+            {
+            myDisplaySize.width = width();
+            myDisplaySize.height = height();
+            }
         }
 
 
     private GL10 myGL;
 
+    private int myViewportMode;
+
     private final SurfaceHolder mySurfaceHolder;
 
     private final Size myTargetSize = new Size();
+
+    private final Size myDisplaySize = new Size();
 
     private final EglHelper myEglHelper = new EglHelper();
 

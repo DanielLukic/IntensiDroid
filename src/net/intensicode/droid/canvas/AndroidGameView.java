@@ -59,9 +59,11 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
     public final void setTargetSize( final int aWidth, final int aHeight )
         {
         myTargetSize.setTo( aWidth, aHeight );
+        }
 
-        Log.debug( "Target screen size: {}x{}", width(), height() );
-        Log.debug( "Device screen size: {}x{}", getWidth(), getHeight() );
+    public final void setViewportMode( final int aViewportModeId )
+        {
+        myViewportMode = aViewportModeId;
         }
 
     // Internal API
@@ -81,7 +83,17 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         Assert.isNotNull( "surface holder should be initialized", mySurfaceHolder );
 
         final Canvas canvas = graphics.canvas = mySurfaceHolder.lockCanvas();
-        if ( canvas != null ) canvas.scale( getWidth() * 1.0f / width(), getHeight() * 1.0f / height() );
+        if ( canvas != null )
+            {
+            if ( myViewportMode == VIEWPORT_MODE_FULLSCREEN )
+                {
+                canvas.scale( getWidth() / (float) width(), getHeight() / (float) height() );
+                }
+            else // VIEWPORT_MODE_SYSTEM
+                {
+                canvas.clipRect( 0, 0, width(), height() );
+                }
+            }
         else Log.error( "lockCanvas failed with null object", null );
         }
 
@@ -104,8 +116,8 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
 
     public Position toTarget( final int aNativeX, final int aNativeY )
         {
-        myTransformedPosition.x = (int) ( aNativeX * width() / getWidth() );
-        myTransformedPosition.y = (int) ( aNativeY * height() / getHeight() );
+        myTransformedPosition.x = aNativeX * width() / getWidth();
+        myTransformedPosition.y = aNativeY * height() / getHeight();
         return myTransformedPosition;
         }
 
@@ -128,6 +140,8 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         system.stop();
         }
 
+
+    private int myViewportMode;
 
     private final SurfaceHolder mySurfaceHolder;
 
