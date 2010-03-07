@@ -2,7 +2,6 @@ package net.intensicode.droid;
 
 import android.view.*;
 import net.intensicode.core.KeysHandler;
-import net.intensicode.util.Log;
 
 public final class AndroidKeysHandler extends KeysHandler implements View.OnKeyListener
     {
@@ -21,9 +20,15 @@ public final class AndroidKeysHandler extends KeysHandler implements View.OnKeyL
         final int action = aKeyEvent.getAction();
         if ( action == KeyEvent.ACTION_DOWN ) queueSetEvent( keyID );
         if ( action == KeyEvent.ACTION_UP ) queueClearEvent( keyID );
-        //#if DEBUG
-        if ( action == KeyEvent.ACTION_MULTIPLE ) Log.debug( "unsupported 'multiple' key event: {}", aKeyEvent );
-        //#endif
+        if ( action != KeyEvent.ACTION_MULTIPLE ) return true;
+        if ( aKeyEvent.getKeyCode() == KeyEvent.KEYCODE_UNKNOWN ) return true;
+
+        final int count = aKeyEvent.getRepeatCount();
+        for ( int idx = 0; idx < count; idx++ )
+            {
+            queueSetEvent( keyID );
+            queueClearEvent( keyID );
+            }
 
         return true;
         }
