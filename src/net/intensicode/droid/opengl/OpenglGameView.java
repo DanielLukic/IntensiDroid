@@ -228,7 +228,8 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         {
         updateDisplaySize( aWidth, aHeight );
 
-        myGL.glViewport( 0, ( aHeight - myDisplaySize.height ) / 2, myDisplaySize.width, myDisplaySize.height );
+        final int yOffset = ( aHeight - myDisplaySize.height ) / 2;
+        myGL.glViewport( 0, yOffset, myDisplaySize.width, myDisplaySize.height );
         myGL.glMatrixMode( GL10.GL_PROJECTION );
         myGL.glLoadIdentity();
         final int virtualWidth = width();
@@ -239,6 +240,7 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
 
         graphics.onSurfaceChanged( virtualWidth, virtualHeight, myDisplaySize.width, myDisplaySize.height );
+        if ( AndroidUtilities.isEmulator() ) graphics.fixDrawTextureOffset( yOffset );
         }
 
     private void updateDisplaySize( final int aWidth, final int aHeight )

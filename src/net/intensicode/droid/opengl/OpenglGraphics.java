@@ -73,6 +73,11 @@ public final class OpenglGraphics extends DirectGraphics
         myScaleY = aDisplayHeight / (float) myHeight;
         }
 
+    void fixDrawTextureOffset( final float aVerticalOffset )
+        {
+        myOffsetY = aVerticalOffset;
+        }
+
     final void releaseGL()
         {
         myGeometryDrawer.reset();
@@ -207,7 +212,7 @@ public final class OpenglGraphics extends DirectGraphics
             final int y = myHeight - aTargetY - aSourceRect.height;
             final int width = aSourceRect.width;
             final int height = aSourceRect.height;
-            ( (GL11Ext) myGL ).glDrawTexfOES( x * myScaleX, y * myScaleY, 0, width * myScaleX, height * myScaleY );
+            ( (GL11Ext) myGL ).glDrawTexfOES( x * myScaleX, y * myScaleY + myOffsetY, 0, width * myScaleX, height * myScaleY );
             }
         else
             {
@@ -252,6 +257,8 @@ public final class OpenglGraphics extends DirectGraphics
     private float myScaleX;
 
     private float myScaleY;
+
+    private float myOffsetY;
 
     private int myColorARGB32;
 
