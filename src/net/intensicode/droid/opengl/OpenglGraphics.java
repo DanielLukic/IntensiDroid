@@ -51,12 +51,12 @@ public final class OpenglGraphics extends DirectGraphics
         myGeometryDrawer.gl = aGL10;
         if ( hasHardwareBuffers ) myGeometryDrawer.updateHardwareBuffers();
 
-        System.out.println( "GL vendor: " + vendor );
-        System.out.println( "GL renderer: " + renderer );
-        System.out.println( "GL version: " + version );
-        System.out.println( "GL extensions: " + extensions );
-        System.out.println( "GL has draw texture extension? " + hasDrawTextureExtension );
-        System.out.println( "GL has hardware buffers? " + hasHardwareBuffers );
+        Log.info( "GL vendor: " + vendor );
+        Log.info( "GL renderer: " + renderer );
+        Log.info( "GL version: " + version );
+        Log.info( "GL extensions: " + extensions );
+        Log.info( "GL has draw texture extension? " + hasDrawTextureExtension );
+        Log.info( "GL has hardware buffers? " + hasHardwareBuffers );
 
         myTextureManager.purgeAllTextures();
 

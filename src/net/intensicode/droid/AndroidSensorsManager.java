@@ -94,10 +94,10 @@ public final class AndroidSensorsManager extends SensorsManager implements Senso
         final List<Sensor> sensors = myService.getSensorList( Sensor.TYPE_ALL );
         for ( final Sensor sensor : sensors )
             {
-            System.out.println( "sensor found: " + sensor );
-            System.out.println( "type: " + getTypeName( sensor ) );
-            System.out.println( "name: " + sensor.getName() );
-            System.out.println( "vendor: " + sensor.getVendor() );
+            Log.info( "sensor found: " + sensor );
+            Log.info( "type: " + getTypeName( sensor ) );
+            Log.info( "name: " + sensor.getName() );
+            Log.info( "vendor: " + sensor.getVendor() );
             }
         }
 

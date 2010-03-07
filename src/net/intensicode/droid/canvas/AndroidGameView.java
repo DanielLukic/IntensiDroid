@@ -94,6 +94,8 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
 
     public final void initialize()
         {
+        Log.info( "Target screen size: {}x{}", width(), height() );
+        Log.info( "Device screen size: {}x{}", getWidth(), getHeight() );
         }
 
     public final void cleanup()

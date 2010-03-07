@@ -143,6 +143,9 @@ public final class OpenglGameView extends SurfaceView implements DirectScreen, S
 
     public final void initialize()
         {
+        Log.info( "Target screen size: {}x{}", width(), height() );
+        Log.info( "Device screen size: {}x{}", getWidth(), getHeight() );
+
         myEglHelper.start( getEglConfiguration() );
         myGL = (GL10) myEglHelper.createOrUpdateSurface( mySurfaceHolder );
         onSurfaceCreated();

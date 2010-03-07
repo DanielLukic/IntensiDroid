@@ -3,6 +3,7 @@ package net.intensicode.droid;
 import android.app.Activity;
 import android.os.Build;
 import android.view.Display;
+import net.intensicode.util.Log;
 
 public final class AndroidUtilities
     {
@@ -21,14 +22,14 @@ public final class AndroidUtilities
 
     public static void showDeviceSpecs()
         {
-        System.out.println( "Board: " + android.os.Build.BOARD );
-        System.out.println( "Brand: " + android.os.Build.BRAND );
-        System.out.println( "Device: " + android.os.Build.DEVICE );
-        System.out.println( "Display: " + android.os.Build.DISPLAY );
-        System.out.println( "Model: " + android.os.Build.MODEL );
-        System.out.println( "Product: " + android.os.Build.PRODUCT );
-        System.out.println( "Tags: " + android.os.Build.TAGS );
-        System.out.println( "Type: " + android.os.Build.TYPE );
+        Log.info( "Board: " + android.os.Build.BOARD );
+        Log.info( "Brand: " + android.os.Build.BRAND );
+        Log.info( "Device: " + android.os.Build.DEVICE );
+        Log.info( "Display: " + android.os.Build.DISPLAY );
+        Log.info( "Model: " + android.os.Build.MODEL );
+        Log.info( "Product: " + android.os.Build.PRODUCT );
+        Log.info( "Tags: " + android.os.Build.TAGS );
+        Log.info( "Type: " + android.os.Build.TYPE );
         }
 
     public static String determineResourcesSubFolder( final Activity aActivity )
@@ -63,7 +64,7 @@ public final class AndroidUtilities
 
     public static boolean isEmulator()
         {
-        final boolean isGeneric= Build.BRAND.toLowerCase().indexOf( "generic" ) != -1;
+        final boolean isGeneric = Build.BRAND.toLowerCase().indexOf( "generic" ) != -1;
         final boolean isSdk = Build.MODEL.toLowerCase().indexOf( "sdk" ) != -1;
         return isGeneric && isSdk;
         }

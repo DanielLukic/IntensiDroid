@@ -1,7 +1,7 @@
 package net.intensicode.droid.opengl;
 
 import android.view.SurfaceHolder;
-import net.intensicode.util.DynamicArray;
+import net.intensicode.util.*;
 
 import javax.microedition.khronos.egl.*;
 import javax.microedition.khronos.opengles.GL;
@@ -39,12 +39,12 @@ final class EglHelper
         final int[] numberOfConfigurations = new int[1];
         myEgl.eglGetConfigs( myDisplay, configurations, configurations.length, numberOfConfigurations );
 
-        System.out.println( "EGL configurations found: " + numberOfConfigurations[ 0 ] );
+        Log.info( "EGL configurations found: " + numberOfConfigurations[ 0 ] );
         for ( int idx = 0; idx < numberOfConfigurations[ 0 ]; idx++ )
             {
             final String configurationString = makeConfigurationString( configurations[ idx ] );
             availableConfigurations.add( configurationString );
-            System.out.println( "EGL configuration: " + configurationString );
+            Log.info( "EGL configuration: " + configurationString );
             }
 
         if ( aConfigurationSpec == CHOOSE_FIRST_AVAILABLE )
@@ -60,7 +60,7 @@ final class EglHelper
             }
 
         choosenConfiguration = makeConfigurationString( myConfiguration );
-        System.out.println( "EGL configuration choosen: " + choosenConfiguration );
+        Log.info( "EGL configuration choosen: " + choosenConfiguration );
 
         myContext = myEgl.eglCreateContext( myDisplay, myConfiguration, EGL10.EGL_NO_CONTEXT, null );
         }
