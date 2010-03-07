@@ -22,45 +22,53 @@ package org.muforge.musound.muxm;
  */
 
 /**
- * An audio sample. 
- * 
+ * An audio sample.
+ *
  * @author Martin Cameron
  */
- 
-class Sample {
-    
+
+class Sample
+    {
+
     public String name;
+
     public int volume, finetune;
+
     public int panning, relativeNote;
+
     public int loopStart, loopEnd;
+
     public boolean bidi;
+
     public short[] samples;
 
-    public Sample() {
-        this("Empty Sample", new short[1], false, 0, 0, false, 0, 128, 0, 0);
-    }
+    public Sample()
+        {
+        this( "Empty Sample", new short[1], false, 0, 0, false, 0, 128, 0, 0 );
+        }
 
-    public Sample(String name, short[] samples, boolean loop, int loopStart, int loopEnd, boolean bidi, int volume,
-            int panning, int finetune, int relativeNote) {
-        if (samples.length == 0)
+    public Sample( String name, short[] samples, boolean loop, int loopStart, int loopEnd, boolean bidi, int volume,
+                   int panning, int finetune, int relativeNote )
+        {
+        if ( samples.length == 0 )
             samples = new short[1];
-        if (loopStart < 0 || loopEnd < 0)
+        if ( loopStart < 0 || loopEnd < 0 )
             loop = false;
-        if (loopStart >= samples.length || loopEnd >= samples.length)
+        if ( loopStart >= samples.length || loopEnd >= samples.length )
             loop = false;
-        if (loopEnd < loopStart)
+        if ( loopEnd < loopStart )
             loop = false;
-        if (!loop)
+        if ( !loop )
             loopStart = loopEnd = samples.length - 1;
-        if (volume < 0)
+        if ( volume < 0 )
             volume = 0;
-        if (volume > 64)
+        if ( volume > 64 )
             volume = 64;
-        if (panning < 0 || panning > 255)
+        if ( panning < 0 || panning > 255 )
             panning = 128;
-        if (finetune < -128 || finetune > 127)
+        if ( finetune < -128 || finetune > 127 )
             finetune = 0;
-        if (relativeNote < -96 || relativeNote > 95)
+        if ( relativeNote < -96 || relativeNote > 95 )
             relativeNote = 0;
         this.name = name;
         this.samples = samples;
@@ -71,74 +79,76 @@ class Sample {
         this.panning = panning;
         this.finetune = finetune;
         this.relativeNote = relativeNote;
-    }
-
-    public void print() {
-        System.out.println("Sample:");
-        System.out.println("  Name: " + name);
-        System.out.println("  Volume: " + volume);
-        System.out.println("  Finetune: " + finetune);
-        System.out.println("  Panning: " + panning);
-        System.out.println("  Relativenote: " + relativeNote);
-        System.out.println("  Loopstart: " + loopStart);
-        System.out.println("  Loopend: " + loopEnd);
-        System.out.println("  Bidi: " + bidi);
-    }
+        }
 
     /*
      Decode the loop into the specified buffer.
      */
-    public void getSamples(int samplePos, short[] buffer, int offset, int length) {
+    public void getSamples( int samplePos, short[] buffer, int offset, int length )
+        {
         short[] samples = this.samples;
         boolean fwd = true;
-        int sidx = normalise(samplePos);
-        if (sidx > loopEnd) {
-            sidx = (loopEnd << 1) - sidx + 1;
+        int sidx = normalise( samplePos );
+        if ( sidx > loopEnd )
+            {
+            sidx = ( loopEnd << 1 ) - sidx + 1;
             fwd = false;
 
-        }
+            }
         int count;
-        if (sidx < 0) {
+        if ( sidx < 0 )
+            {
             count = -samplePos;
-            if (count > length)
+            if ( count > length )
                 count = length;
             length -= count;
             sidx = 0;
-            while (count-- > 0)
-                buffer[offset++] = 0;
-        }
-        while (length > 0) {
-            if (fwd) {
-                count = loopEnd - sidx + 1;
-                if (count > length)
-                    count = length;
-                length -= count;
-                while (count-- > 0)
-                    buffer[offset++] = samples[sidx++];
-            } else {
-                count = sidx - loopStart + 1;
-                if (count > length)
-                    count = length;
-                length -= count;
-                while (count-- > 0)
-                    buffer[offset++] = samples[sidx--];
+            while ( count-- > 0 )
+                {
+                buffer[ offset++ ] = 0;
+                }
             }
+        while ( length > 0 )
+            {
+            if ( fwd )
+                {
+                count = loopEnd - sidx + 1;
+                if ( count > length )
+                    count = length;
+                length -= count;
+                while ( count-- > 0 )
+                    {
+                    buffer[ offset++ ] = samples[ sidx++ ];
+                    }
+                }
+            else
+                {
+                count = sidx - loopStart + 1;
+                if ( count > length )
+                    count = length;
+                length -= count;
+                while ( count-- > 0 )
+                    {
+                    buffer[ offset++ ] = samples[ sidx-- ];
+                    }
+                }
             sidx = loopStart;
-            if (bidi) {
-                if (fwd)
+            if ( bidi )
+                {
+                if ( fwd )
                     sidx = loopEnd;
                 fwd = !fwd;
+                }
             }
         }
-    }
 
-    public int normalise(int samplePos) {
-        if (samplePos <= loopEnd)
+    public int normalise( int samplePos )
+        {
+        if ( samplePos <= loopEnd )
             return samplePos;
         int llen = loopEnd - loopStart + 1;
-        if (bidi)
+        if ( bidi )
             llen <<= 1;
-        return loopStart + (samplePos - loopStart) % llen;
+        return loopStart + ( samplePos - loopStart ) % llen;
+        }
     }
-}
-

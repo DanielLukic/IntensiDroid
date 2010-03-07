@@ -23,48 +23,41 @@ package org.muforge.musound.muxm;
 
 /**
  * This class represents a sequence of notes.
- * 
+ *
  * @author Martin Cameron
  */
-public class Pattern {
+public class Pattern
+    {
     public int rows, channels;
+
     public byte[] data;
 
-    public Pattern(int rows, int channels) {
+    public Pattern( int rows, int channels )
+        {
         this.rows = rows;
         this.channels = channels;
         data = new byte[rows * channels * 6];
-    }
-
-    public void getNote(Note n, int row, int channel) {
-        int idx = (row * channels + channel) * 6;
-        n.key = ((data[idx] & 0xFF) << 8) | (data[idx + 1] & 0xFF);
-        n.inst = data[idx + 2] & 0xFF;
-        n.vol = data[idx + 3] & 0xFF;
-        n.fx = data[idx + 4] & 0xFF;
-        n.fp = data[idx + 5] & 0xFF;
-    }
-
-    public void setNote(Note n, int row, int channel) {
-        int idx = (row * channels + channel) * 6;
-        data[idx] = (byte) (n.key >> 8);
-        data[idx + 1] = (byte) (n.key & 0xFF);
-        data[idx + 2] = (byte) n.inst;
-        data[idx + 3] = (byte) n.vol;
-        data[idx + 4] = (byte) n.fx;
-        data[idx + 5] = (byte) n.fp;
-    }
-
-    public void print() {
-        Note note = new Note();
-        for (int r = 0; r < rows; r++) {
-            System.out.println();
-            for (int c = 0; c < channels; c++) {
-                getNote(note, r, c);
-                System.out.print(note.key + " " + note.inst + ", ");
-            }
         }
+
+    public void getNote( Note n, int row, int channel )
+        {
+        int idx = ( row * channels + channel ) * 6;
+        n.key = ( ( data[ idx ] & 0xFF ) << 8 ) | ( data[ idx + 1 ] & 0xFF );
+        n.inst = data[ idx + 2 ] & 0xFF;
+        n.vol = data[ idx + 3 ] & 0xFF;
+        n.fx = data[ idx + 4 ] & 0xFF;
+        n.fp = data[ idx + 5 ] & 0xFF;
+        }
+
+    public void setNote( Note n, int row, int channel )
+        {
+        int idx = ( row * channels + channel ) * 6;
+        data[ idx ] = (byte) ( n.key >> 8 );
+        data[ idx + 1 ] = (byte) ( n.key & 0xFF );
+        data[ idx + 2 ] = (byte) n.inst;
+        data[ idx + 3 ] = (byte) n.vol;
+        data[ idx + 4 ] = (byte) n.fx;
+        data[ idx + 5 ] = (byte) n.fp;
+        }
+
     }
-
-}
-

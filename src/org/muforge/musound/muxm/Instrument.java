@@ -23,55 +23,50 @@ package org.muforge.musound.muxm;
 
 /**
  * An Instrument.
- * 
+ *
  * @author Martin Cameron
  */
-public class Instrument {
+public class Instrument
+    {
     public String name;
+
     public Sample[] samples;
+
     public Envelope volEnv, panEnv;
+
     public int[] sampleTable;
+
     public int vibratoType, vibratoSweep, vibratoDepth, vibratoRate;
+
     public int fadeOut;
 
-    public Instrument() {
-        this("Empty Instrument", new Sample[]{new Sample()}, new Envelope(), new Envelope(), new int[96], 0, 0, 0, 0, 0);
-    }
+    public Instrument()
+        {
+        this( "Empty Instrument", new Sample[]{ new Sample() }, new Envelope(), new Envelope(), new int[96], 0, 0, 0, 0, 0 );
+        }
 
-    public Instrument(String name, Sample[] samples, Envelope volEnv, Envelope panEnv, int[] sampleTable,
-            int vibratoType, int vibratoSweep, int vibratoDepth, int vibratoRate, int fadeOut) {
+    public Instrument( String name, Sample[] samples, Envelope volEnv, Envelope panEnv, int[] sampleTable,
+                       int vibratoType, int vibratoSweep, int vibratoDepth, int vibratoRate, int fadeOut )
+        {
         this.name = name;
-        if (samples.length == 0)
-            samples = new Sample[]{new Sample()};
+        if ( samples.length == 0 )
+            samples = new Sample[]{ new Sample() };
         this.samples = samples;
         this.volEnv = volEnv;
         this.panEnv = panEnv;
         this.sampleTable = new int[96];
-        for (int n = 0; n < sampleTable.length; n++) {
-            int sam = sampleTable[n];
-            if (sam >= samples.length | sam < 0)
+        for ( int n = 0; n < sampleTable.length; n++ )
+            {
+            int sam = sampleTable[ n ];
+            if ( sam >= samples.length | sam < 0 )
                 sam = 0;
-            this.sampleTable[n] = sam;
-        }
+            this.sampleTable[ n ] = sam;
+            }
         this.vibratoType = vibratoType;
         this.vibratoSweep = vibratoSweep;
         this.vibratoDepth = vibratoDepth;
         this.vibratoRate = vibratoRate;
         this.fadeOut = fadeOut;
+        }
+
     }
-
-    public void print() {
-        System.out.println("Instrument:");
-        System.out.println("  Name: " + name);
-        System.out.println("  Sample table: ");
-        for (int n = 0; n < sampleTable.length; n++)
-            System.out.print(sampleTable[n] + ",");
-        System.out.println();
-        System.out.println("  Samples:");
-        for (int n = 0; n < samples.length; n++)
-            samples[n].print();
-        //volEnv.print();
-    }
-
-}
-
