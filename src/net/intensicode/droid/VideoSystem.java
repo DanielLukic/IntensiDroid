@@ -1,14 +1,13 @@
 package net.intensicode.droid;
 
 import android.content.Context;
-import android.view.SurfaceView;
 import net.intensicode.core.*;
 import net.intensicode.droid.canvas.*;
 import net.intensicode.droid.opengl.*;
 
 public final class VideoSystem
     {
-    public SurfaceView view;
+    public AndroidGameView view;
 
     public DirectScreen screen;
 
@@ -32,8 +31,8 @@ public final class VideoSystem
 
     public static VideoSystem createCanvasVideoSystem( final Context aContext, final GameSystem aGameSystem )
         {
-        final AndroidGameView screen = new AndroidGameView( aContext );
-        final AndroidCanvasGraphics graphics = new AndroidCanvasGraphics();
+        final CanvasGameView screen = new CanvasGameView( aContext );
+        final CanvasGraphics graphics = new CanvasGraphics();
 
         screen.graphics = graphics;
         screen.system = aGameSystem;

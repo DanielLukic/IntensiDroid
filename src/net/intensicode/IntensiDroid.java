@@ -90,13 +90,13 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
     protected void onStart()
         {
         super.onStart();
-//        myGameSystem.start(); => no surface yet!
+        if ( myGameView.isInitialized() ) myGameSystem.start();
         }
 
     protected void onResume()
         {
         super.onResume();
-//        myGameSystem.start(); => no surface yet!
+        if ( myGameView.isInitialized() ) myGameSystem.start();
         }
 
     protected void onPause()
@@ -150,7 +150,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         final AndroidGameEngine engine = new AndroidGameEngine( system );
 
         final VideoSystem videoSystem = createVideoSystem( system );
-        final SurfaceView view = videoSystem.view;
+        final AndroidGameView view = videoSystem.view;
         final DirectScreen screen = videoSystem.screen;
         final DirectGraphics graphics = videoSystem.graphics;
 
@@ -216,7 +216,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     private GameSystem myGameSystem;
 
-    private SurfaceView myGameView;
+    private AndroidGameView myGameView;
 
     private AndroidAnalogController myAnalogController;
     }

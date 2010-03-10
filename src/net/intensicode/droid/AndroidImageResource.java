@@ -2,7 +2,7 @@ package net.intensicode.droid;
 
 import android.graphics.*;
 import net.intensicode.core.*;
-import net.intensicode.droid.canvas.AndroidCanvasGraphics;
+import net.intensicode.droid.canvas.CanvasGraphics;
 import net.intensicode.droid.opengl.Texture;
 import net.intensicode.util.*;
 
@@ -80,7 +80,7 @@ public final class AndroidImageResource implements ImageResource
 
     public final DirectGraphics getGraphics()
         {
-        if ( myGraphics == null ) myGraphics = new AndroidCanvasGraphics( bitmap );
+        if ( myGraphics == null ) myGraphics = new CanvasGraphics( bitmap );
         return myGraphics;
         }
 
@@ -116,5 +116,5 @@ public final class AndroidImageResource implements ImageResource
     //#endif
 
 
-    private AndroidCanvasGraphics myGraphics;
+    private CanvasGraphics myGraphics;
     }

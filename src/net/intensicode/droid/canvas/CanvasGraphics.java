@@ -6,17 +6,17 @@ import net.intensicode.util.*;
 import net.intensicode.droid.*;
 
 
-public final class AndroidCanvasGraphics extends DirectGraphics
+public final class CanvasGraphics extends DirectGraphics
     {
     public Canvas canvas;
 
 
-    public AndroidCanvasGraphics()
+    public CanvasGraphics()
         {
         myActivePaint.setTextAlign( Paint.Align.LEFT );
         }
 
-    public AndroidCanvasGraphics( final Bitmap aBitmap )
+    public CanvasGraphics( final Bitmap aBitmap )
         {
         this();
         canvas = new Canvas( aBitmap );

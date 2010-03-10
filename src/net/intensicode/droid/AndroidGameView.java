@@ -1,26 +1,24 @@
-package net.intensicode.droid.canvas;
+package net.intensicode.droid;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.view.*;
 import net.intensicode.core.*;
 import net.intensicode.util.*;
 
-
-public final class AndroidGameView extends SurfaceView implements DirectScreen, SurfaceHolder.Callback
+public abstract class AndroidGameView extends SurfaceView implements DirectScreen, SurfaceHolder.Callback
     {
-    public AndroidCanvasGraphics graphics;
-
     public GameSystem system;
 
 
-    public AndroidGameView( final Context aContext )
+    // Protected API
+
+    protected AndroidGameView( final Context aContext, final int aSurfaceType )
         {
         super( aContext );
 
         mySurfaceHolder = getHolder();
         mySurfaceHolder.addCallback( this );
-        mySurfaceHolder.setType( SurfaceHolder.SURFACE_TYPE_HARDWARE );
+        mySurfaceHolder.setType( aSurfaceType );
 
         setClickable( false );
         setFocusable( true );
@@ -78,40 +76,9 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         return getHeight();
         }
 
-    public final void beginFrame()
+    public final boolean isInitialized()
         {
-        Assert.isNotNull( "surface holder should be initialized", mySurfaceHolder );
-
-        final Canvas canvas = graphics.canvas = mySurfaceHolder.lockCanvas();
-        if ( canvas != null )
-            {
-            if ( myViewportMode == VIEWPORT_MODE_FULLSCREEN )
-                {
-                canvas.scale( getWidth() / (float) width(), getHeight() / (float) height() );
-                }
-            else // VIEWPORT_MODE_SYSTEM
-                {
-                canvas.clipRect( 0, 0, width(), height() );
-                }
-            }
-        else Log.error( "lockCanvas failed with null object", null );
-        }
-
-    public final void endFrame()
-        {
-        Assert.isNotNull( "surface holder should be initialized", mySurfaceHolder );
-
-        mySurfaceHolder.unlockCanvasAndPost( graphics.canvas );
-        }
-
-    public final void initialize()
-        {
-        Log.info( "Target screen size: {}x{}", width(), height() );
-        Log.info( "Device screen size: {}x{}", getWidth(), getHeight() );
-        }
-
-    public final void cleanup()
-        {
+        return myInitialized;
         }
 
     public Position toTarget( final int aNativeX, final int aNativeY )
@@ -125,25 +92,33 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
 
     public final void surfaceCreated( final SurfaceHolder aSurfaceHolder )
         {
+        Log.debug( "surfaceCreated" );
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
         }
 
     public final void surfaceChanged( final SurfaceHolder aSurfaceHolder, final int aFormat, final int aWidth, final int aHeight )
         {
+        Log.debug( "surfaceChanged" );
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
+        myInitialized = true;
         system.start();
         }
 
     public final void surfaceDestroyed( final SurfaceHolder aSurfaceHolder )
         {
+        Log.debug( "surfaceDestroyed" );
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
         system.stop();
+        myInitialized = false;
         }
 
 
-    private int myViewportMode;
+    protected int myViewportMode;
 
-    private final SurfaceHolder mySurfaceHolder;
+    protected final SurfaceHolder mySurfaceHolder;
+
+
+    private boolean myInitialized;
 
     private final Size myTargetSize = new Size();
 
