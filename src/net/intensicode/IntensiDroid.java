@@ -62,6 +62,58 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     // From Activity
 
+    public boolean onCreateOptionsMenu( final Menu aMenu )
+        {
+        final SubMenu trackballMenu = aMenu.addSubMenu( "TRACKBALL" );
+        trackballMenu.add( "System events mode" ).setCheckable( true );
+        trackballMenu.add( "Change responsivness" );
+        trackballMenu.add( "Change horizontal threshold" );
+        trackballMenu.add( "Change vertical threshold" );
+        trackballMenu.add( "Change horizontal sensitivity" );
+        trackballMenu.add( "Change vertical sensitivity" );
+
+        final SubMenu touchMenu = aMenu.addSubMenu( "TOUCH" );
+        touchMenu.add( "Emulate trackball" ).setCheckable( true );
+        touchMenu.add( "Change responsivness" );
+        touchMenu.add( "Change horizontal threshold" );
+        touchMenu.add( "Change vertical threshold" );
+        touchMenu.add( "Change horizontal sensitivity" );
+        touchMenu.add( "Change vertical sensitivity" );
+
+        final SubMenu orientationmenu = aMenu.addSubMenu( "ORIENTATION" );
+        orientationmenu.add( "Emulate trackball" ).setCheckable( true );
+        orientationmenu.add( "Change responsivness" );
+        orientationmenu.add( "Change horizontal threshold" );
+        orientationmenu.add( "Change vertical threshold" );
+        orientationmenu.add( "Change horizontal sensitivity" );
+        orientationmenu.add( "Change vertical sensitivity" );
+
+        final SubMenu acceleratorMenu = aMenu.addSubMenu( "ACCELERATOR" );
+        acceleratorMenu.add( "Emulate trackball" ).setCheckable( true );
+        acceleratorMenu.add( "Change responsivness" );
+        acceleratorMenu.add( "Change horizontal threshold" );
+        acceleratorMenu.add( "Change vertical threshold" );
+        acceleratorMenu.add( "Change horizontal sensitivity" );
+        acceleratorMenu.add( "Change vertical sensitivity" );
+
+        final SubMenu debugMenu = aMenu.addSubMenu( "DEBUG" );
+        debugMenu.add( "Dump Texture Atlases" );
+        debugMenu.add( "Select Dump Target" );
+
+        //#if CONSOLE
+        final SubMenu consoleMenu = aMenu.addSubMenu( "CONSOLE" );
+        consoleMenu.add( "Show console" ).setCheckable( true );
+        consoleMenu.add( "Set entry stay time" );
+        //#endif
+
+        return super.onCreateOptionsMenu( aMenu );
+        }
+
+    public boolean onPrepareOptionsMenu( final Menu aMenu )
+        {
+        return super.onPrepareOptionsMenu( aMenu );
+        }
+
     public final boolean onTrackballEvent( final MotionEvent aMotionEvent )
         {
         myAnalogController.onTrackballEvent( aMotionEvent );
