@@ -93,7 +93,7 @@ public final class AndroidImageResource implements ImageResource
         {
         Log.debug( "puring AndroidImageResource {}", resourcePath );
         final boolean removed = theResources.remove( this );
-        Assert.isTrue( "purged AndroidImageResource valid", removed );
+        if ( !removed ) Log.debug( "purged unknown AndroidImageResource" );
         if ( texture != null ) texturePurger.purge( this );
         bitmap.recycle();
         }
