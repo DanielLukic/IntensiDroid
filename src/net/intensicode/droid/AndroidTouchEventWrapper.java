@@ -23,6 +23,11 @@ public class AndroidTouchEventWrapper extends TouchEvent
 
     // From TouchEvent
 
+    public final long timestamp()
+        {
+        return myMotionEvent.getEventTime();
+        }
+
     public final boolean isPress()
         {
         return myMotionEvent.getAction() == MotionEvent.ACTION_DOWN;
