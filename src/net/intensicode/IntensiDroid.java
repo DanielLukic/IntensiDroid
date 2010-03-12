@@ -4,6 +4,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.*;
 import net.intensicode.core.*;
+import net.intensicode.dialogs.*;
 import net.intensicode.droid.*;
 import net.intensicode.util.*;
 
@@ -62,10 +63,31 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     // From Activity
 
+    public boolean onOptionsItemSelected( final MenuItem aMenuItem )
+        {
+        if ( aMenuItem.getTitle().equals( "silenceBeforeUpdateInMillis" ) )
+            {
+            new AnalogSilenceBeforeUpdateInMillis( this, myGameSystem ).createDialog();
+            }
+        else if ( aMenuItem.getTitle().equals( "multiEventThresholdInMillis" ) )
+            {
+            new AnalogMultiEventThresholdInMillis( this, myGameSystem ).createDialog();
+            }
+        else
+            {
+            Log.debug( "item {}", aMenuItem );
+            return super.onOptionsItemSelected( aMenuItem );
+            }
+
+        return true;
+        }
+
     public boolean onCreateOptionsMenu( final Menu aMenu )
         {
         final SubMenu trackballMenu = aMenu.addSubMenu( "TRACKBALL" );
-        trackballMenu.add( "System events mode" ).setCheckable( true );
+        trackballMenu.add( "silenceBeforeUpdateInMillis" );
+        trackballMenu.add( "multiEventThresholdInMillis" );
+        trackballMenu.add( "directionIgnoreFactor" );
         trackballMenu.add( "Change responsivness" );
         trackballMenu.add( "Change horizontal threshold" );
         trackballMenu.add( "Change vertical threshold" );
@@ -79,22 +101,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         touchMenu.add( "Change vertical threshold" );
         touchMenu.add( "Change horizontal sensitivity" );
         touchMenu.add( "Change vertical sensitivity" );
-
-        final SubMenu orientationmenu = aMenu.addSubMenu( "ORIENTATION" );
-        orientationmenu.add( "Emulate trackball" ).setCheckable( true );
-        orientationmenu.add( "Change responsivness" );
-        orientationmenu.add( "Change horizontal threshold" );
-        orientationmenu.add( "Change vertical threshold" );
-        orientationmenu.add( "Change horizontal sensitivity" );
-        orientationmenu.add( "Change vertical sensitivity" );
-
-        final SubMenu acceleratorMenu = aMenu.addSubMenu( "ACCELERATOR" );
-        acceleratorMenu.add( "Emulate trackball" ).setCheckable( true );
-        acceleratorMenu.add( "Change responsivness" );
-        acceleratorMenu.add( "Change horizontal threshold" );
-        acceleratorMenu.add( "Change vertical threshold" );
-        acceleratorMenu.add( "Change horizontal sensitivity" );
-        acceleratorMenu.add( "Change vertical sensitivity" );
 
         final SubMenu debugMenu = aMenu.addSubMenu( "DEBUG" );
         debugMenu.add( "Dump Texture Atlases" );
