@@ -14,6 +14,9 @@ public final class AndroidKeysHandler extends KeysHandler implements View.OnKeyL
 
     public final boolean onKey( final View aView, final int aKeyCode, final KeyEvent aKeyEvent )
         {
+        // Handled in IntensiDroid:
+        if ( aKeyCode == KeyEvent.KEYCODE_MENU ) return false;
+
         final int keyID = mapKeyCodeToKeyId( aKeyCode );
         if ( keyID == INVALID ) return false;
 
