@@ -120,6 +120,12 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         return false;
         }
 
+    public final void onWindowFocusChanged( final boolean aHasFocusFlag )
+        {
+        super.onWindowFocusChanged( aHasFocusFlag );
+        system().engine.paused = !aHasFocusFlag;
+        }
+
     public final void onCreate( final Bundle savedInstanceState )
         {
         super.onCreate( savedInstanceState );
