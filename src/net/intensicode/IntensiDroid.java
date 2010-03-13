@@ -4,7 +4,6 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.*;
 import net.intensicode.core.*;
-import net.intensicode.dialogs.*;
 import net.intensicode.droid.*;
 import net.intensicode.util.*;
 
@@ -56,6 +55,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         // Default implementation does nothing..
         }
 
+    public final void triggerEngineConfigurationMenu()
+        {
+        openOptionsMenu();
+        }
+
     public void terminateApplication()
         {
         finish();
@@ -65,58 +69,19 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     public boolean onOptionsItemSelected( final MenuItem aMenuItem )
         {
-        if ( aMenuItem.getTitle().equals( "silenceBeforeUpdateInMillis" ) )
-            {
-            new AnalogSilenceBeforeUpdateInMillis( this, myGameSystem ).createDialog();
-            }
-        else if ( aMenuItem.getTitle().equals( "multiEventThresholdInMillis" ) )
-            {
-            new AnalogMultiEventThresholdInMillis( this, myGameSystem ).createDialog();
-            }
-        else
-            {
-            Log.debug( "item {}", aMenuItem );
-            return super.onOptionsItemSelected( aMenuItem );
-            }
-
-        return true;
+        if ( myOptionsMenuHandler != null ) return myOptionsMenuHandler.onOptionsItemSelected( aMenuItem );
+        return super.onOptionsItemSelected( aMenuItem );
         }
 
     public boolean onCreateOptionsMenu( final Menu aMenu )
         {
-        final SubMenu trackballMenu = aMenu.addSubMenu( "TRACKBALL" );
-        trackballMenu.add( "silenceBeforeUpdateInMillis" );
-        trackballMenu.add( "multiEventThresholdInMillis" );
-        trackballMenu.add( "directionIgnoreFactor" );
-        trackballMenu.add( "Change responsivness" );
-        trackballMenu.add( "Change horizontal threshold" );
-        trackballMenu.add( "Change vertical threshold" );
-        trackballMenu.add( "Change horizontal sensitivity" );
-        trackballMenu.add( "Change vertical sensitivity" );
-
-        final SubMenu touchMenu = aMenu.addSubMenu( "TOUCH" );
-        touchMenu.add( "Emulate trackball" ).setCheckable( true );
-        touchMenu.add( "Change responsivness" );
-        touchMenu.add( "Change horizontal threshold" );
-        touchMenu.add( "Change vertical threshold" );
-        touchMenu.add( "Change horizontal sensitivity" );
-        touchMenu.add( "Change vertical sensitivity" );
-
-        final SubMenu debugMenu = aMenu.addSubMenu( "DEBUG" );
-        debugMenu.add( "Dump Texture Atlases" );
-        debugMenu.add( "Select Dump Target" );
-
-        //#if CONSOLE
-        final SubMenu consoleMenu = aMenu.addSubMenu( "CONSOLE" );
-        consoleMenu.add( "Show console" ).setCheckable( true );
-        consoleMenu.add( "Set entry stay time" );
-        //#endif
-
+        if ( myOptionsMenuHandler != null ) myOptionsMenuHandler.onCreateOptionsMenu( aMenu );
         return super.onCreateOptionsMenu( aMenu );
         }
 
     public boolean onPrepareOptionsMenu( final Menu aMenu )
         {
+        if ( myOptionsMenuHandler != null ) myOptionsMenuHandler.onPrepareOptionsMenu( aMenu );
         return super.onPrepareOptionsMenu( aMenu );
         }
 
@@ -253,6 +218,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         myGameView = view;
         myGameSystem = system;
         myAnalogController = analog;
+        myOptionsMenuHandler = new OptionsMenuHandler( this, myGameSystem );
         }
 
     private VideoSystem createVideoSystem( final GameSystem aGameSystem )
@@ -279,4 +245,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
     private AndroidGameView myGameView;
 
     private AndroidAnalogController myAnalogController;
+
+    private OptionsMenuHandler myOptionsMenuHandler;
     }
