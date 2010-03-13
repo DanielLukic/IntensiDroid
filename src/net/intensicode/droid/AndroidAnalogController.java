@@ -22,6 +22,6 @@ public final class AndroidAnalogController extends AnalogControllerBase
         Assert.equals( "non-fractional steps", 0, xMove - xSteps, 0.0001f );
         Assert.equals( "non-fractional y steps", 0, yMove - ySteps, 0.0001f );
 
-        onSystemUpdateEvent( xSteps, ySteps );
+        onSystemUpdateEvent( xSteps, ySteps, aMotionEvent.getEventTime() );
         }
     }
