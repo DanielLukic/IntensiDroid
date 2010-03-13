@@ -3,9 +3,9 @@ package net.intensicode.dialogs;
 import android.content.Context;
 import net.intensicode.core.GameSystem;
 
-public final class AnalogSilenceBeforeUpdateInMillis extends SeekBarDialogBase
+public final class silenceBeforeUpdateInMillis extends SeekBarDialogBase
     {
-    public AnalogSilenceBeforeUpdateInMillis( final Context aContext, final GameSystem aGameSystem )
+    public silenceBeforeUpdateInMillis( final Context aContext, final GameSystem aGameSystem )
         {
         super( aContext, aGameSystem );
         }

@@ -3,9 +3,9 @@ package net.intensicode.dialogs;
 import android.content.Context;
 import net.intensicode.core.GameSystem;
 
-public final class AnalogMultiEventThresholdInMillis extends SeekBarDialogBase
+public final class multiEventThresholdInMillis extends SeekBarDialogBase
     {
-    public AnalogMultiEventThresholdInMillis( final Context aContext, final GameSystem aGameSystem )
+    public multiEventThresholdInMillis( final Context aContext, final GameSystem aGameSystem )
         {
         super( aContext, aGameSystem );
         }
