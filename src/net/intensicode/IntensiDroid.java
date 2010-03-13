@@ -1,7 +1,7 @@
 package net.intensicode;
 
 import android.media.AudioManager;
-import android.os.Bundle;
+import android.os.*;
 import android.view.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
@@ -57,7 +57,13 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     public final void triggerEngineConfigurationMenu()
         {
-        openOptionsMenu();
+        myHandler.post( new Runnable()
+        {
+        public final void run()
+            {
+            openOptionsMenu();
+            }
+        } );
         }
 
     public void terminateApplication()
@@ -104,6 +110,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         //#if DEBUG
         Assert.isFalse( "game system already initialized", isGameSystemCreated() );
         //#endif
+
+        myHandler = new Handler( getMainLooper() );
 
         AndroidUtilities.showDeviceSpecs();
 
@@ -239,6 +247,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
             }
         }
 
+
+    private Handler myHandler;
 
     private GameSystem myGameSystem;
 
