@@ -1,5 +1,6 @@
 package net.intensicode.droid;
 
+import android.os.SystemClock;
 import android.view.MotionEvent;
 import net.intensicode.core.AnalogControllerBase;
 import net.intensicode.util.Assert;
@@ -23,5 +24,12 @@ public final class AndroidAnalogController extends AnalogControllerBase
         Assert.equals( "non-fractional y steps", 0, yMove - ySteps, 0.0001f );
 
         onSystemUpdateEvent( xSteps, ySteps, aMotionEvent.getEventTime() );
+        }
+
+    // From AnalogControllerBase
+
+    protected long systemSpecificNowInMillis()
+        {
+        return SystemClock.uptimeMillis();
         }
     }
