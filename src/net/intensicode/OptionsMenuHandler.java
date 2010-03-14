@@ -17,6 +17,7 @@ public final class OptionsMenuHandler
     public final void onCreateOptionsMenu( final Menu aMenu )
         {
         final SubMenu trackballMenu = aMenu.addSubMenu( "TRACKBALL" );
+        trackballMenu.add( "forcedSilenceBetweenEventsInMillis" );
         trackballMenu.add( "silenceBeforeUpdateInMillis" );
         trackballMenu.add( "multiEventThresholdInMillis" );
         trackballMenu.add( "directionIgnoreFactorFixed" );
@@ -41,7 +42,11 @@ public final class OptionsMenuHandler
 
     public final boolean onOptionsItemSelected( final MenuItem aMenuItem )
         {
-        if ( aMenuItem.getTitle().equals( "silenceBeforeUpdateInMillis" ) )
+        if ( aMenuItem.getTitle().equals( "forcedSilenceBetweenEventsInMillis" ) )
+            {
+            new forcedSilenceBetweenEventsInMillis( myContext, myGameSystem ).createDialog();
+            }
+        else if ( aMenuItem.getTitle().equals( "silenceBeforeUpdateInMillis" ) )
             {
             new silenceBeforeUpdateInMillis( myContext, myGameSystem ).createDialog();
             }
