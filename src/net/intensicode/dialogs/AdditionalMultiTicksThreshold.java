@@ -25,6 +25,7 @@ public final class AdditionalMultiTicksThreshold implements ConfigurableValue
 
     public final String getValueAsText( final int aSeekBarValue )
         {
+        if ( aSeekBarValue == 0 ) return "disable additional ticks";
         return aSeekBarValue + " ticks";
         }
 
