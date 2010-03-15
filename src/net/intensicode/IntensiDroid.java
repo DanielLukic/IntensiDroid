@@ -49,7 +49,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
 
     public final ConfigurationElementsTree getSystemValues()
         {
-        return ConfigurationElementsTree.EMPTY;
+        return myGameSystem.getSystemValues();
         }
 
     public ConfigurationElementsTree getApplicationValues()
