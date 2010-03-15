@@ -4,6 +4,7 @@ import android.os.Build;
 import net.intensicode.core.*;
 import net.intensicode.droid.opengl.*;
 import net.intensicode.util.*;
+import net.intensicode.SystemContext;
 
 public final class AndroidGameSystem extends GameSystem
     {

@@ -4,6 +4,7 @@ import android.media.AudioManager;
 import android.os.*;
 import android.view.*;
 import net.intensicode.core.*;
+import net.intensicode.dialogs.*;
 import net.intensicode.droid.*;
 import net.intensicode.util.*;
 
@@ -28,6 +29,32 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         //#else
         return false;
         //#endif
+        }
+
+    public final ConfigurationElementsTree getPlatformValues()
+        {
+        final ConfigurationElementsTree platform = new ConfigurationElementsTree( "Platform" );
+
+        final ConfigurationElementsTree trackball = platform.addSubTree( "Trackball" );
+        trackball.addLeaf( new InitialTicksThreshold( myGameSystem.analog ) );
+        trackball.addLeaf( new MultiTicksThreshold( myGameSystem.analog ) );
+        trackball.addLeaf( new AdditionalMultiTicksThreshold( myGameSystem.analog ) );
+        trackball.addLeaf( new SilenceBeforeUpdateInMillis( myGameSystem.analog ) );
+        trackball.addLeaf( new MultiEventThresholdInMillis( myGameSystem.analog ) );
+        trackball.addLeaf( new ForcedSilenceBetweenEventsInMillis( myGameSystem.analog ) );
+        trackball.addLeaf( new DirectionIgnoreFactorFixed( myGameSystem.analog ) );
+
+        return platform;
+        }
+
+    public final ConfigurationElementsTree getSystemValues()
+        {
+        return ConfigurationElementsTree.EMPTY;
+        }
+
+    public ConfigurationElementsTree getApplicationValues()
+        {
+        return ConfigurationElementsTree.EMPTY;
         }
 
     public void onFramesDropped()
@@ -55,7 +82,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         // Default implementation does nothing..
         }
 
-    public final void triggerEngineConfigurationMenu()
+    public final void triggerConfigurationMenu()
         {
         myHandler.post( new Runnable()
         {
@@ -83,12 +110,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         {
         if ( myOptionsMenuHandler != null ) myOptionsMenuHandler.onCreateOptionsMenu( aMenu );
         return super.onCreateOptionsMenu( aMenu );
-        }
-
-    public boolean onPrepareOptionsMenu( final Menu aMenu )
-        {
-        if ( myOptionsMenuHandler != null ) myOptionsMenuHandler.onPrepareOptionsMenu( aMenu );
-        return super.onPrepareOptionsMenu( aMenu );
         }
 
     public final boolean onTrackballEvent( final MotionEvent aMotionEvent )
