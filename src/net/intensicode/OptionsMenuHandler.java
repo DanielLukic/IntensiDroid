@@ -4,8 +4,9 @@ import android.content.Context;
 import android.view.*;
 import net.intensicode.core.GameSystem;
 import net.intensicode.dialogs.ConfigurationDialogBuilder;
-import net.intensicode.util.Assert;
+import net.intensicode.util.*;
 
+import java.io.IOException;
 import java.util.Hashtable;
 
 public final class OptionsMenuHandler
@@ -40,12 +41,17 @@ public final class OptionsMenuHandler
         consoleMenu.add( "Show console" ).setCheckable( true );
         consoleMenu.add( "Set entry stay time" );
         //#endif
+
+        aMenu.add( "Save" );
+        aMenu.add( "Load" );
         }
 
     private void addMenuEntries( final int aBaseGroupId, final Menu aMenu, final ConfigurationElementsTree aConfigurationElementsTree )
         {
         final int numberOfEntries = aConfigurationElementsTree.numberOfEntries();
         if ( numberOfEntries == 0 ) return;
+
+        myAvailableTrees.add( aConfigurationElementsTree );
 
         for ( int idx = 0; idx < numberOfEntries; idx++ )
             {
@@ -70,19 +76,64 @@ public final class OptionsMenuHandler
 
     public final boolean onOptionsItemSelected( final MenuItem aMenuItem )
         {
-        final String key = Integer.toString( aMenuItem.getGroupId() ) + "." + Integer.toString( aMenuItem.getItemId() );
+        if ( "Save".equals( aMenuItem.getTitle() ) )
+            {
+            saveConfiguration();
+            }
+        else if ( "Load".equals( aMenuItem.getTitle() ) )
+            {
+            loadConfiguration();
+            }
+        else
+            {
+            final String key = Integer.toString( aMenuItem.getGroupId() ) + "." + Integer.toString( aMenuItem.getItemId() );
 
-        final ConfigurableValue value = (ConfigurableValue) myMappedConfigurationValues.get( key );
-        if ( value == null ) return false;
+            final ConfigurableValue value = (ConfigurableValue) myMappedConfigurationValues.get( key );
+            if ( value == null ) return false;
 
-        new ConfigurationDialogBuilder( myContext ).using( value ).createDialog();
+            new ConfigurationDialogBuilder( myContext ).using( value ).createDialog();
+            }
         return true;
+        }
+
+    private void saveConfiguration()
+        {
+        for ( int idx = 0; idx < myAvailableTrees.size; idx++ )
+            {
+            final ConfigurationElementsTree tree = (ConfigurationElementsTree) myAvailableTrees.get( idx );
+            try
+                {
+                myGameSystem.storage.save( new ConfigurationElementsTreeIO( tree ) );
+                }
+            catch ( IOException e )
+                {
+                Log.error( "failed saving configuration elements tree {}", tree.label, e );
+                }
+            }
+        }
+
+    private void loadConfiguration()
+        {
+        for ( int idx = 0; idx < myAvailableTrees.size; idx++ )
+            {
+            final ConfigurationElementsTree tree = (ConfigurationElementsTree) myAvailableTrees.get( idx );
+            try
+                {
+                myGameSystem.storage.load( new ConfigurationElementsTreeIO( tree ) );
+                }
+            catch ( IOException e )
+                {
+                Log.error( "failed loading configuration elements tree {}", tree.label, e );
+                }
+            }
         }
 
 
     private final Context myContext;
 
     private final GameSystem myGameSystem;
+
+    private final DynamicArray myAvailableTrees = new DynamicArray();
 
     private final Hashtable myMappedConfigurationValues = new Hashtable();
     }
