@@ -9,6 +9,22 @@ public final class AndroidAnalogController extends AnalogControllerBase
     {
     public final void onTrackballEvent( final MotionEvent aMotionEvent )
         {
+        // collect system events until some 'silence in ms' has passed.
+        // how to check passed time?
+        // push them down and have the onControlTick check timestamps.
+        // so: dont queue up here. pass down right away.
+
+        // anyway: detecting separate strokes is the problem.
+
+        // timestamp is probably the easy part. the user should be able
+        // to set a 'silence in ms'. if this happens between two events,
+        // the accumulated events before the 'gap' should be made into
+        // an update.
+
+        // in this 'event stroke turned into an update' there should be
+        // some normalizing. like: for example six events make up the
+        // stroke. Only one has a x-delta. the x-delta should be nulled.
+
         if ( aMotionEvent.getAction() != MotionEvent.ACTION_MOVE ) return;
 
         Assert.equals( "x precision", 6, aMotionEvent.getXPrecision(), 0.0001f );
