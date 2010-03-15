@@ -32,16 +32,6 @@ public final class OptionsMenuHandler
         final ConfigurationElementsTree applicationValues = context.getApplicationValues();
         addMenuEntries( 300, aMenu, applicationValues );
 
-        final SubMenu debugMenu = aMenu.addSubMenu( "DEBUG" );
-        debugMenu.add( "Dump Texture Atlases" );
-        debugMenu.add( "Select Dump Target" );
-
-        //#if CONSOLE
-        final SubMenu consoleMenu = aMenu.addSubMenu( "CONSOLE" );
-        consoleMenu.add( "Show console" ).setCheckable( true );
-        consoleMenu.add( "Set entry stay time" );
-        //#endif
-
         aMenu.add( "Save" );
         aMenu.add( "Load" );
         }
