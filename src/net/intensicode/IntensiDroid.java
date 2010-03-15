@@ -36,6 +36,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         final ConfigurationElementsTree platform = new ConfigurationElementsTree( "Platform" );
 
         final ConfigurationElementsTree trackball = platform.addSubTree( "Trackball" );
+        trackball.addLeaf( new TrackballPreset( myGameSystem.analog ) );
         trackball.addLeaf( new InitialTicksThreshold( myGameSystem.analog ) );
         trackball.addLeaf( new MultiTicksThreshold( myGameSystem.analog ) );
         trackball.addLeaf( new AdditionalMultiTicksThreshold( myGameSystem.analog ) );
