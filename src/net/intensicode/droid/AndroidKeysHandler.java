@@ -5,6 +5,9 @@ import net.intensicode.core.KeysHandler;
 
 public final class AndroidKeysHandler extends KeysHandler implements View.OnKeyListener
     {
+    public boolean captureBackKey;
+
+
     public AndroidKeysHandler()
         {
         super( new AndroidKeysConfiguration() );
@@ -57,6 +60,7 @@ public final class AndroidKeysHandler extends KeysHandler implements View.OnKeyL
         if ( aKeyCode == softLeftCode ) return LEFT_SOFT;
         if ( aKeyCode == softRightCode ) return RIGHT_SOFT;
         if ( aKeyCode == softPauseCode ) return PAUSE_KEY;
+        if ( captureBackKey && aKeyCode == softBackCode ) return BACK_KEY;
 
         //#if DEBUG
         //# net.intensicode.util.Log.debug( "Unhandled keycode: {}", aKeyCode );
