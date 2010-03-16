@@ -139,10 +139,13 @@ public final class OpenglGameView extends AndroidGameView
         {
         updateDisplaySize( aWidth, aHeight );
 
+        final int xOffset = ( aWidth - myDisplaySize.width ) / 2;
+        myTransformOffsetX = xOffset;
+
         final int yOffset = ( aHeight - myDisplaySize.height ) / 2;
         myTransformOffsetY = yOffset;
 
-        myGL.glViewport( 0, yOffset, myDisplaySize.width, myDisplaySize.height );
+        myGL.glViewport( xOffset, yOffset, myDisplaySize.width, myDisplaySize.height );
         myGL.glMatrixMode( GL10.GL_PROJECTION );
         myGL.glLoadIdentity();
         final int virtualWidth = width();
