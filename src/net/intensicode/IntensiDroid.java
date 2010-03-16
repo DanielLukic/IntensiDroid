@@ -8,11 +8,18 @@ import net.intensicode.core.*;
 import net.intensicode.droid.*;
 import net.intensicode.util.*;
 
-public abstract class IntensiDroid extends DebugLifeCycleActivity implements SystemContext
+public abstract class IntensiDroid extends DebugLifeCycleActivity implements PlatformContext, SystemContext
     {
     protected IntensiDroid()
         {
         if ( Log.theLog == null || !( Log.theLog instanceof AndroidLog ) ) Log.theLog = new AndroidLog();
+        }
+
+    // From PlatformContext
+
+    public final long compatibleTimeInMillis()
+        {
+        return SystemClock.uptimeMillis();
         }
 
     // From SystemContext
@@ -233,7 +240,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         {
         final String resourcesSubFolder = AndroidUtilities.determineResourcesSubFolder( this );
 
-        final AndroidGameSystem system = new AndroidGameSystem( this );
+        final AndroidGameSystem system = new AndroidGameSystem( this, this );
         final AndroidGameEngine engine = new AndroidGameEngine( system );
 
         final VideoSystem videoSystem = createVideoSystem( system );

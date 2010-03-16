@@ -1,16 +1,16 @@
 package net.intensicode.droid;
 
 import android.os.Build;
-import net.intensicode.core.*;
+import net.intensicode.*;
+import net.intensicode.core.GameSystem;
 import net.intensicode.droid.opengl.*;
 import net.intensicode.util.*;
-import net.intensicode.SystemContext;
 
 public final class AndroidGameSystem extends GameSystem
     {
-    public AndroidGameSystem( final SystemContext aSystemContext )
+    public AndroidGameSystem( final SystemContext aSystemContext, final PlatformContext aPlatformContext )
         {
-        super( aSystemContext );
+        super( aSystemContext, aPlatformContext );
         }
 
     // From GameSystem
