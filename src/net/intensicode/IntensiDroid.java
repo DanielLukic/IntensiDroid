@@ -250,12 +250,12 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         final AndroidSensorsManager sensors = new AndroidSensorsManager( this );
         //#endif
 
-        final AndroidAnalogController analog = new AndroidAnalogController();
+        final AndroidTrackballController analog = new AndroidTrackballController();
 
         view.setOnTouchListener( touch );
         view.setOnKeyListener( keys );
 
-        system.analog = analog;
+        system.trackball = analog;
         system.resources = resources;
         system.graphics = graphics;
         system.storage = storage;
@@ -301,7 +301,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     private AndroidGameView myGameView;
 
-    private AndroidAnalogController myAnalogController;
+    private AndroidTrackballController myAnalogController;
 
     private OptionsMenuHandler myOptionsMenuHandler;
     }

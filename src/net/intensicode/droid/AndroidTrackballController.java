@@ -2,10 +2,10 @@ package net.intensicode.droid;
 
 import android.os.SystemClock;
 import android.view.MotionEvent;
-import net.intensicode.core.AnalogControllerBase;
+import net.intensicode.core.TrackballControllerBase;
 import net.intensicode.util.Assert;
 
-public final class AndroidAnalogController extends AnalogControllerBase
+public final class AndroidTrackballController extends TrackballControllerBase
     {
     public final void onTrackballEvent( final MotionEvent aMotionEvent )
         {
@@ -42,7 +42,7 @@ public final class AndroidAnalogController extends AnalogControllerBase
         onSystemUpdateEvent( xSteps, ySteps, aMotionEvent.getEventTime() );
         }
 
-    // From AnalogControllerBase
+    // From TrackballControllerBase
 
     protected long systemSpecificNowInMillis()
         {
