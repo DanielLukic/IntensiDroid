@@ -1,3 +1,5 @@
+//#condition TRACKBALL
+
 package net.intensicode.droid;
 
 import android.os.SystemClock;

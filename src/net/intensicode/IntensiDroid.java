@@ -3,7 +3,7 @@ package net.intensicode;
 import android.media.AudioManager;
 import android.os.*;
 import android.view.*;
-import net.intensicode.configuration.*;
+import net.intensicode.configuration.CaptureBackKey;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
 import net.intensicode.util.*;
@@ -136,11 +136,13 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         return super.onPrepareOptionsMenu( aMenu );
         }
 
+    //#if TRACKBALL
     public final boolean onTrackballEvent( final MotionEvent aMotionEvent )
         {
-        myAnalogController.onTrackballEvent( aMotionEvent );
+        myTrackballController.onTrackballEvent( aMotionEvent );
         return false;
         }
+    //#endif
 
     public final void onWindowFocusChanged( final boolean aHasFocusFlag )
         {
@@ -250,12 +252,16 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         final AndroidSensorsManager sensors = new AndroidSensorsManager( this );
         //#endif
 
-        final AndroidTrackballController analog = new AndroidTrackballController();
+        //#if TRACKBALL
+        final AndroidTrackballController trackball = new AndroidTrackballController();
+        //#endif
 
         view.setOnTouchListener( touch );
         view.setOnKeyListener( keys );
 
-        system.trackball = analog;
+        //#if TRACKBALL
+        system.trackball = trackball;
+        //#endif
         system.resources = resources;
         system.graphics = graphics;
         system.storage = storage;
@@ -272,7 +278,9 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         myGameView = view;
         myGameSystem = system;
-        myAnalogController = analog;
+        //#if TRACKBALL
+        myTrackballController = trackball;
+        //#endif
         myOptionsMenuHandler = new OptionsMenuHandler( this, myGameSystem );
         }
 
@@ -301,7 +309,9 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     private AndroidGameView myGameView;
 
-    private AndroidTrackballController myAnalogController;
-
     private OptionsMenuHandler myOptionsMenuHandler;
+
+    //#if TRACKBALL
+    private AndroidTrackballController myTrackballController;
+    //#endif
     }
