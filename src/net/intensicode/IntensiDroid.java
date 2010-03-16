@@ -132,6 +132,13 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         return super.onCreateOptionsMenu( aMenu );
         }
 
+    public boolean onPrepareOptionsMenu( final Menu aMenu )
+        {
+        aMenu.clear();
+        if ( myOptionsMenuHandler != null ) myOptionsMenuHandler.onCreateOptionsMenu( aMenu );
+        return super.onPrepareOptionsMenu( aMenu );
+        }
+
     public final boolean onTrackballEvent( final MotionEvent aMotionEvent )
         {
         myAnalogController.onTrackballEvent( aMotionEvent );
