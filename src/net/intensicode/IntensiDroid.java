@@ -3,8 +3,8 @@ package net.intensicode;
 import android.media.AudioManager;
 import android.os.*;
 import android.view.*;
-import net.intensicode.core.*;
 import net.intensicode.configuration.*;
+import net.intensicode.core.*;
 import net.intensicode.droid.*;
 import net.intensicode.util.*;
 
@@ -56,6 +56,22 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
     public ConfigurationElementsTree getApplicationValues()
         {
         return ConfigurationElementsTree.EMPTY;
+        }
+
+    public final void loadConfigurableValues()
+        {
+        final IntensiGameHelper helper = new IntensiGameHelper( myGameSystem );
+        helper.loadConfiguration( getPlatformValues() );
+        helper.loadConfiguration( getSystemValues() );
+        helper.loadConfiguration( getApplicationValues() );
+        }
+
+    public final void saveConfigurableValues()
+        {
+        final IntensiGameHelper helper = new IntensiGameHelper( myGameSystem );
+        helper.saveConfiguration( getPlatformValues() );
+        helper.saveConfiguration( getSystemValues() );
+        helper.saveConfiguration( getApplicationValues() );
         }
 
     public void onFramesDropped()
@@ -141,7 +157,9 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         setAudioFeatures();
 
         createGameViewAndGameSystem();
-        IntensiGameHelper.initGameSystemFromConfigurationFile( myGameSystem );
+
+        final IntensiGameHelper helper = new IntensiGameHelper( myGameSystem );
+        helper.initGameSystemFromConfigurationFile();
 
         setContentView( myGameView );
         }

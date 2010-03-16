@@ -2,11 +2,10 @@ package net.intensicode;
 
 import android.content.Context;
 import android.view.*;
-import net.intensicode.core.GameSystem;
 import net.intensicode.configuration.ConfigurationDialogBuilder;
+import net.intensicode.core.GameSystem;
 import net.intensicode.util.*;
 
-import java.io.IOException;
 import java.util.Hashtable;
 
 public final class OptionsMenuHandler
@@ -68,11 +67,11 @@ public final class OptionsMenuHandler
         {
         if ( "Save".equals( aMenuItem.getTitle() ) )
             {
-            saveConfiguration();
+            myGameSystem.context.saveConfigurableValues();
             }
         else if ( "Load".equals( aMenuItem.getTitle() ) )
             {
-            loadConfiguration();
+            myGameSystem.context.loadConfigurableValues();
             }
         else
             {
@@ -84,38 +83,6 @@ public final class OptionsMenuHandler
             new ConfigurationDialogBuilder( myContext ).using( value ).createDialog();
             }
         return true;
-        }
-
-    private void saveConfiguration()
-        {
-        for ( int idx = 0; idx < myAvailableTrees.size; idx++ )
-            {
-            final ConfigurationElementsTree tree = (ConfigurationElementsTree) myAvailableTrees.get( idx );
-            try
-                {
-                myGameSystem.storage.save( new ConfigurationElementsTreeIO( tree ) );
-                }
-            catch ( IOException e )
-                {
-                Log.error( "failed saving configuration elements tree {}", tree.label, e );
-                }
-            }
-        }
-
-    private void loadConfiguration()
-        {
-        for ( int idx = 0; idx < myAvailableTrees.size; idx++ )
-            {
-            final ConfigurationElementsTree tree = (ConfigurationElementsTree) myAvailableTrees.get( idx );
-            try
-                {
-                myGameSystem.storage.load( new ConfigurationElementsTreeIO( tree ) );
-                }
-            catch ( IOException e )
-                {
-                Log.error( "failed loading configuration elements tree {}", tree.label, e );
-                }
-            }
         }
 
 
