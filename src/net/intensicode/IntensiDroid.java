@@ -45,6 +45,9 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Sys
         trackball.addLeaf( new ForcedSilenceBetweenEventsInMillis( myGameSystem.analog ) );
         trackball.addLeaf( new DirectionIgnoreFactorFixed( myGameSystem.analog ) );
 
+        final ConfigurationElementsTree ui = platform.addSubTree( "UI" );
+        ui.addLeaf( new CaptureBackKey( (AndroidKeysHandler) myGameSystem.keys ) );
+
         return platform;
         }
 
