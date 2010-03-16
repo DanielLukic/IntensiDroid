@@ -1,4 +1,4 @@
-package net.intensicode.dialogs;
+package net.intensicode.configuration;
 
 import net.intensicode.core.AnalogController;
 import net.intensicode.ConfigurableValue;

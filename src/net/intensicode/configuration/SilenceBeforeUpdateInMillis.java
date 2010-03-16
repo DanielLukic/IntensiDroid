@@ -1,11 +1,11 @@
-package net.intensicode.dialogs;
+package net.intensicode.configuration;
 
 import net.intensicode.core.AnalogController;
 import net.intensicode.ConfigurableValue;
 
-public final class InitialTicksThreshold implements ConfigurableValue
+public final class SilenceBeforeUpdateInMillis implements ConfigurableValue
     {
-    public InitialTicksThreshold( final AnalogController aAnalogController )
+    public SilenceBeforeUpdateInMillis( final AnalogController aAnalogController )
         {
         myAnalogController = aAnalogController;
         }
@@ -14,33 +14,34 @@ public final class InitialTicksThreshold implements ConfigurableValue
 
     public final String getTitle()
         {
-        return "initialTicksThreshold";
+        return "silenceBeforeUpdateInMillis";
         }
 
     public final String getInfoText()
         {
-        return "Initial 'ticks' to ignore before considering a trackball event valid. " +
-               "The higher this value, the more the trackball has to move before an event is triggered. ";
+        return "Milliseconds before the current trackball changes are considered stable. " +
+               "Can be considered the responsiveness of the trackball. " +
+               "Unfortunately it is not that easy.. :)";
         }
 
     public final String getValueAsText( final int aSeekBarValue )
         {
-        return aSeekBarValue + " ticks";
+        return aSeekBarValue + " ms";
         }
 
     public final void setNewValue( final int aSeekBarValue )
         {
-        myAnalogController.initialTicksThreshold = aSeekBarValue;
+        myAnalogController.silenceBeforeUpdateInMillis = aSeekBarValue;
         }
 
     public final int getMaxValue()
         {
-        return MAXIMUM_INITIAL_TICKS_THRESHOLD;
+        return MAXIMUM_SILENCE_IN_MILLIS;
         }
 
     public final int getCurrentValue()
         {
-        return myAnalogController.initialTicksThreshold;
+        return myAnalogController.silenceBeforeUpdateInMillis;
         }
 
     public final int getStepSize()
@@ -51,5 +52,5 @@ public final class InitialTicksThreshold implements ConfigurableValue
 
     private final AnalogController myAnalogController;
 
-    private static final int MAXIMUM_INITIAL_TICKS_THRESHOLD = 30;
+    private static final int MAXIMUM_SILENCE_IN_MILLIS = 250;
     }

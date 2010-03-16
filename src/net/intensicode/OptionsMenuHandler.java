@@ -3,7 +3,7 @@ package net.intensicode;
 import android.content.Context;
 import android.view.*;
 import net.intensicode.core.GameSystem;
-import net.intensicode.dialogs.ConfigurationDialogBuilder;
+import net.intensicode.configuration.ConfigurationDialogBuilder;
 import net.intensicode.util.*;
 
 import java.io.IOException;

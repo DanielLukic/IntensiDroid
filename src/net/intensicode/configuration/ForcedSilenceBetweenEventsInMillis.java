@@ -1,27 +1,25 @@
-package net.intensicode.dialogs;
+package net.intensicode.configuration;
 
 import net.intensicode.core.AnalogController;
 import net.intensicode.ConfigurableValue;
 
-public final class SilenceBeforeUpdateInMillis implements ConfigurableValue
+public final class ForcedSilenceBetweenEventsInMillis implements ConfigurableValue
     {
-    public SilenceBeforeUpdateInMillis( final AnalogController aAnalogController )
+    public ForcedSilenceBetweenEventsInMillis( final AnalogController aAnalogController )
         {
         myAnalogController = aAnalogController;
         }
 
-    // From SeekBarDialogBase
+    // From ConfigurableValue
 
     public final String getTitle()
         {
-        return "silenceBeforeUpdateInMillis";
+        return "forcedSilenceBetweenEventsInMillis";
         }
 
     public final String getInfoText()
         {
-        return "Milliseconds before the current trackball changes are considered stable. " +
-               "Can be considered the responsiveness of the trackball. " +
-               "Unfortunately it is not that easy.. :)";
+        return "Milliseconds in which trackball changes are discared before starting a new event.";
         }
 
     public final String getValueAsText( final int aSeekBarValue )
@@ -31,7 +29,12 @@ public final class SilenceBeforeUpdateInMillis implements ConfigurableValue
 
     public final void setNewValue( final int aSeekBarValue )
         {
-        myAnalogController.silenceBeforeUpdateInMillis = aSeekBarValue;
+        myAnalogController.forcedSilenceBetweenEventsInMillis = aSeekBarValue;
+        }
+
+    public final int getMinValue()
+        {
+        return 0;
         }
 
     public final int getMaxValue()
@@ -41,7 +44,7 @@ public final class SilenceBeforeUpdateInMillis implements ConfigurableValue
 
     public final int getCurrentValue()
         {
-        return myAnalogController.silenceBeforeUpdateInMillis;
+        return myAnalogController.forcedSilenceBetweenEventsInMillis;
         }
 
     public final int getStepSize()

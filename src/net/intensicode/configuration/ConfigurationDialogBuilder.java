@@ -1,4 +1,4 @@
-package net.intensicode.dialogs;
+package net.intensicode.configuration;
 
 import android.content.Context;
 import net.intensicode.ConfigurableValue;

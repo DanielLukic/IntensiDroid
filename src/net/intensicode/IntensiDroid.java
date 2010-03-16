@@ -4,7 +4,7 @@ import android.media.AudioManager;
 import android.os.*;
 import android.view.*;
 import net.intensicode.core.*;
-import net.intensicode.dialogs.*;
+import net.intensicode.configuration.*;
 import net.intensicode.droid.*;
 import net.intensicode.util.*;
 
