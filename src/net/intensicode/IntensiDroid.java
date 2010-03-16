@@ -256,7 +256,9 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         final AndroidTrackballController trackball = new AndroidTrackballController();
         //#endif
 
+        //#if TOUCH
         view.setOnTouchListener( touch );
+        //#endif
         view.setOnKeyListener( keys );
 
         //#if TRACKBALL

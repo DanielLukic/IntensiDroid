@@ -1,3 +1,5 @@
+//#condition TOUCH
+
 package net.intensicode.droid;
 
 import android.os.Build;
