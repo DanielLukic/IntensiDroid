@@ -5,7 +5,7 @@ import net.intensicode.core.KeysHandler;
 
 public final class AndroidKeysHandler extends KeysHandler implements View.OnKeyListener
     {
-    public boolean captureBackKey;
+    public boolean captureBackKey = true;
 
 
     public AndroidKeysHandler()

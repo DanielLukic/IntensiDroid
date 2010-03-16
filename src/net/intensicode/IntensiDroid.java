@@ -42,16 +42,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         {
         final ConfigurationElementsTree platform = new ConfigurationElementsTree( "Platform" );
 
-        final ConfigurationElementsTree trackball = platform.addSubTree( "Trackball" );
-        trackball.addLeaf( new TrackballPreset( myGameSystem.analog ) );
-        trackball.addLeaf( new InitialTicksThreshold( myGameSystem.analog ) );
-        trackball.addLeaf( new MultiTicksThreshold( myGameSystem.analog ) );
-        trackball.addLeaf( new AdditionalMultiTicksThreshold( myGameSystem.analog ) );
-        trackball.addLeaf( new SilenceBeforeUpdateInMillis( myGameSystem.analog ) );
-        trackball.addLeaf( new MultiEventThresholdInMillis( myGameSystem.analog ) );
-        trackball.addLeaf( new ForcedSilenceBetweenEventsInMillis( myGameSystem.analog ) );
-        trackball.addLeaf( new DirectionIgnoreFactorFixed( myGameSystem.analog ) );
-
         final ConfigurationElementsTree ui = platform.addSubTree( "UI" );
         ui.addLeaf( new CaptureBackKey( (AndroidKeysHandler) myGameSystem.keys ) );
 

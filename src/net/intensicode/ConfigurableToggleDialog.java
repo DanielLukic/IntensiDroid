@@ -1,4 +1,4 @@
-package net.intensicode.configuration;
+package net.intensicode;
 
 import android.app.AlertDialog;
 import android.content.*;

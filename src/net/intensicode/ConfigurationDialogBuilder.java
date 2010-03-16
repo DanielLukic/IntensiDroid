@@ -1,4 +1,4 @@
-package net.intensicode.configuration;
+package net.intensicode;
 
 import android.content.Context;
 import net.intensicode.*;

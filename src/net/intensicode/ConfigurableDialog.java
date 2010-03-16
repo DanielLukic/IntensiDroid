@@ -1,4 +1,4 @@
-package net.intensicode.configuration;
+package net.intensicode;
 
 public interface ConfigurableDialog
     {
