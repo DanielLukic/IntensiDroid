@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.*;
 import net.intensicode.configuration.ConfigurationDialogBuilder;
 import net.intensicode.core.GameSystem;
-import net.intensicode.util.*;
+import net.intensicode.util.DynamicArray;
 
 import java.util.Hashtable;
 
@@ -18,21 +18,18 @@ public final class OptionsMenuHandler
 
     public final void onCreateOptionsMenu( final Menu aMenu )
         {
-        Assert.equals( "number of mappings", 0, myMappedConfigurationValues.size() );
+        myMappedConfigurationValues.clear();
 
         final SystemContext context = myGameSystem.context;
+
+        final ConfigurationElementsTree applicationValues = context.getApplicationValues();
+        addMenuEntries( 300, aMenu, applicationValues );
 
         final ConfigurationElementsTree platformValues = context.getPlatformValues();
         addMenuEntries( 100, aMenu, platformValues );
 
         final ConfigurationElementsTree systemValues = context.getSystemValues();
         addMenuEntries( 200, aMenu, systemValues );
-
-        final ConfigurationElementsTree applicationValues = context.getApplicationValues();
-        addMenuEntries( 300, aMenu, applicationValues );
-
-        aMenu.add( "Save" );
-        aMenu.add( "Load" );
         }
 
     private void addMenuEntries( final int aBaseGroupId, final Menu aMenu, final ConfigurationElementsTree aConfigurationElementsTree )
@@ -65,23 +62,13 @@ public final class OptionsMenuHandler
 
     public final boolean onOptionsItemSelected( final MenuItem aMenuItem )
         {
-        if ( "Save".equals( aMenuItem.getTitle() ) )
-            {
-            myGameSystem.context.saveConfigurableValues();
-            }
-        else if ( "Load".equals( aMenuItem.getTitle() ) )
-            {
-            myGameSystem.context.loadConfigurableValues();
-            }
-        else
-            {
-            final String key = Integer.toString( aMenuItem.getGroupId() ) + "." + Integer.toString( aMenuItem.getItemId() );
+        final String key = Integer.toString( aMenuItem.getGroupId() ) + "." + Integer.toString( aMenuItem.getItemId() );
 
-            final ConfigurableValue value = (ConfigurableValue) myMappedConfigurationValues.get( key );
-            if ( value == null ) return false;
+        final ConfigurableValue value = (ConfigurableValue) myMappedConfigurationValues.get( key );
+        if ( value == null ) return false;
 
-            new ConfigurationDialogBuilder( myContext ).using( value ).createDialog();
-            }
+        new ConfigurationDialogBuilder( myContext ).using( value ).createDialog();
+
         return true;
         }
 
