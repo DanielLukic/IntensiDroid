@@ -1,9 +1,9 @@
 package net.intensicode.configuration;
 
+import net.intensicode.ConfigurableIntegerValue;
 import net.intensicode.core.AnalogController;
-import net.intensicode.ConfigurableValue;
 
-public final class InitialTicksThreshold implements ConfigurableValue
+public final class InitialTicksThreshold implements ConfigurableIntegerValue
     {
     public InitialTicksThreshold( final AnalogController aAnalogController )
         {
@@ -23,14 +23,14 @@ public final class InitialTicksThreshold implements ConfigurableValue
                "The higher this value, the more the trackball has to move before an event is triggered. ";
         }
 
-    public final String getValueAsText( final int aSeekBarValue )
+    public final String getValueAsText( final int aConfiguredValue )
         {
-        return aSeekBarValue + " ticks";
+        return aConfiguredValue + " ticks";
         }
 
-    public final void setNewValue( final int aSeekBarValue )
+    public final void setNewValue( final int aConfiguredValue )
         {
-        myAnalogController.initialTicksThreshold = aSeekBarValue;
+        myAnalogController.initialTicksThreshold = aConfiguredValue;
         }
 
     public final int getMaxValue()

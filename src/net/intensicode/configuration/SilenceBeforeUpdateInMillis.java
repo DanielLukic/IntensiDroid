@@ -1,9 +1,9 @@
 package net.intensicode.configuration;
 
+import net.intensicode.ConfigurableIntegerValue;
 import net.intensicode.core.AnalogController;
-import net.intensicode.ConfigurableValue;
 
-public final class SilenceBeforeUpdateInMillis implements ConfigurableValue
+public final class SilenceBeforeUpdateInMillis implements ConfigurableIntegerValue
     {
     public SilenceBeforeUpdateInMillis( final AnalogController aAnalogController )
         {
@@ -24,14 +24,14 @@ public final class SilenceBeforeUpdateInMillis implements ConfigurableValue
                "Unfortunately it is not that easy.. :)";
         }
 
-    public final String getValueAsText( final int aSeekBarValue )
+    public final String getValueAsText( final int aConfiguredValue )
         {
-        return aSeekBarValue + " ms";
+        return aConfiguredValue + " ms";
         }
 
-    public final void setNewValue( final int aSeekBarValue )
+    public final void setNewValue( final int aConfiguredValue )
         {
-        myAnalogController.silenceBeforeUpdateInMillis = aSeekBarValue;
+        myAnalogController.silenceBeforeUpdateInMillis = aConfiguredValue;
         }
 
     public final int getMaxValue()

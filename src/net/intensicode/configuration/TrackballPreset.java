@@ -1,10 +1,10 @@
 package net.intensicode.configuration;
 
-import net.intensicode.ConfigurableValue;
+import net.intensicode.ConfigurableIntegerValue;
 import net.intensicode.core.AnalogController;
 import net.intensicode.util.*;
 
-public final class TrackballPreset implements ConfigurableValue
+public final class TrackballPreset implements ConfigurableIntegerValue
     {
     public TrackballPreset( final AnalogController aAnalogController )
         {
@@ -23,14 +23,14 @@ public final class TrackballPreset implements ConfigurableValue
         return "Apply a preset configuration to the trackball system.";
         }
 
-    public final String getValueAsText( final int aSeekBarValue )
+    public final String getValueAsText( final int aConfiguredValue )
         {
-        return PRESETS[ aSeekBarValue ];
+        return PRESETS[ aConfiguredValue ];
         }
 
-    public final void setNewValue( final int aSeekBarValue )
+    public final void setNewValue( final int aConfiguredValue )
         {
-        final String preset = PRESETS[ aSeekBarValue ];
+        final String preset = PRESETS[ aConfiguredValue ];
         Log.debug( "switching to trackball preset {}", preset );
         if ( "KEEP CURRENT".equals( preset ) ) return;
         if ( "DIRECT 1:1".equals( preset ) ) applyDirectPreset();

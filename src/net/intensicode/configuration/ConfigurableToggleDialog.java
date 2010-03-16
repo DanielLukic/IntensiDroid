@@ -4,11 +4,11 @@ import android.app.AlertDialog;
 import android.content.*;
 import android.view.ViewGroup;
 import android.widget.*;
-import net.intensicode.ConfigurableIntegerValue;
+import net.intensicode.ConfigurableBooleanValue;
 
-public final class ConfigurableSeekBarDialog implements ConfigurableDialog
+public final class ConfigurableToggleDialog implements ConfigurableDialog
     {
-    public ConfigurableSeekBarDialog( final Context aContext, final ConfigurableIntegerValue aConfigurableValue )
+    public ConfigurableToggleDialog( final Context aContext, final ConfigurableBooleanValue aConfigurableValue )
         {
         myContext = aContext;
         myConfigurableValue = aConfigurableValue;
@@ -22,13 +22,11 @@ public final class ConfigurableSeekBarDialog implements ConfigurableDialog
         infoText.setText( getInfoText() );
 
         final TextView currentValue = new TextView( myContext );
-        currentValue.setText( getValueAsText( getValueForSeekBar() ) );
+        currentValue.setText( getValueAsText( getValueForCheckBox() ) );
 
-        final SeekBar valueControl = new SeekBar( myContext );
-        valueControl.setMax( getMaximumForSeekBar() );
-        valueControl.setProgress( getValueForSeekBar() );
-        valueControl.setKeyProgressIncrement( getStepSize() );
-        valueControl.setOnSeekBarChangeListener( new MyOnSeekBarChangeListener( currentValue ) );
+        final CheckBox valueControl = new CheckBox( myContext );
+        valueControl.setChecked( myConfigurableValue.getCurrentValue() );
+        valueControl.setOnCheckedChangeListener( new MyOnCheckedChangeListener( currentValue ) );
 
         final LinearLayout view = new LinearLayout( myContext );
         view.setOrientation( LinearLayout.VERTICAL );
@@ -46,7 +44,7 @@ public final class ConfigurableSeekBarDialog implements ConfigurableDialog
         {
         public void onClick( final DialogInterface aDialogInterface, final int i )
             {
-            setNewValue( valueControl.getProgress() );
+            setNewValue( valueControl.isChecked() );
             }
         } );
 
@@ -66,55 +64,37 @@ public final class ConfigurableSeekBarDialog implements ConfigurableDialog
         return myConfigurableValue.getInfoText();
         }
 
-    private String getValueAsText( final int aConfiguredValue )
+    private String getValueAsText( final boolean aConfiguredValue )
         {
         return myConfigurableValue.getValueAsText( aConfiguredValue );
         }
 
-    private void setNewValue( final int aConfiguredValue )
+    private void setNewValue( final boolean aConfiguredValue )
         {
         myConfigurableValue.setNewValue( aConfiguredValue );
         }
 
-    private int getMaximumForSeekBar()
-        {
-        return myConfigurableValue.getMaxValue();
-        }
-
-    private int getValueForSeekBar()
+    private boolean getValueForCheckBox()
         {
         return myConfigurableValue.getCurrentValue();
-        }
-
-    protected int getStepSize()
-        {
-        return myConfigurableValue.getStepSize();
         }
 
 
     private final Context myContext;
 
-    private final ConfigurableIntegerValue myConfigurableValue;
+    private final ConfigurableBooleanValue myConfigurableValue;
 
 
-    private class MyOnSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener
+    private class MyOnCheckedChangeListener implements CheckBox.OnCheckedChangeListener
         {
-        public MyOnSeekBarChangeListener( final TextView aCurrentValue )
+        public MyOnCheckedChangeListener( final TextView aCurrentValue )
             {
             myCurrentValue = aCurrentValue;
             }
 
-        public final void onProgressChanged( final SeekBar aSeekBar, final int i, final boolean b )
+        public final void onCheckedChanged( final CompoundButton aCompoundButton, final boolean aCheckedState )
             {
-            myCurrentValue.setText( getValueAsText( i ) );
-            }
-
-        public final void onStartTrackingTouch( final SeekBar aSeekBar )
-            {
-            }
-
-        public final void onStopTrackingTouch( final SeekBar aSeekBar )
-            {
+            myCurrentValue.setText( getValueAsText( aCheckedState ) );
             }
 
         private final TextView myCurrentValue;

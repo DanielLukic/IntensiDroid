@@ -1,7 +1,7 @@
 package net.intensicode.configuration;
 
 import android.content.Context;
-import net.intensicode.ConfigurableValue;
+import net.intensicode.*;
 
 public final class ConfigurationDialogBuilder
     {
@@ -10,9 +10,24 @@ public final class ConfigurationDialogBuilder
         myContext = aContext;
         }
 
-    public final ConfigurableSeekBarDialog using( final ConfigurableValue aConfigurableValue )
+    public final ConfigurableDialog using( final ConfigurableValue aConfigurableValue )
         {
-        return new ConfigurableSeekBarDialog( myContext, aConfigurableValue );
+        if ( aConfigurableValue instanceof ConfigurableIntegerValue )
+            {
+            return new ConfigurableSeekBarDialog( myContext, (ConfigurableIntegerValue) aConfigurableValue );
+            }
+        else if ( aConfigurableValue instanceof ConfigurableBooleanValue )
+            {
+            return new ConfigurableToggleDialog( myContext, (ConfigurableBooleanValue) aConfigurableValue );
+            }
+        else if ( aConfigurableValue instanceof ConfigurableActionValue )
+                {
+                return new ConfigurableActionDialog( myContext, (ConfigurableActionValue) aConfigurableValue );
+                }
+            else
+                {
+                throw new RuntimeException( "nyi" );
+                }
         }
 
     private final Context myContext;

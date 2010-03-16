@@ -1,9 +1,9 @@
 package net.intensicode.configuration;
 
-import net.intensicode.ConfigurableValue;
+import net.intensicode.ConfigurableBooleanValue;
 import net.intensicode.droid.AndroidKeysHandler;
 
-public final class CaptureBackKey implements ConfigurableValue
+public final class CaptureBackKey implements ConfigurableBooleanValue
     {
     public CaptureBackKey( final AndroidKeysHandler aKeysHandler )
         {
@@ -22,29 +22,19 @@ public final class CaptureBackKey implements ConfigurableValue
         return "If enabled, the BACK key will not exit the application.";
         }
 
-    public final String getValueAsText( final int aSeekBarValue )
+    public final String getValueAsText( final boolean aConfiguredValue )
         {
-        return aSeekBarValue != 0 ? "ON" : "OFF";
+        return aConfiguredValue ? "ON" : "OFF";
         }
 
-    public final void setNewValue( final int aSeekBarValue )
+    public final void setNewValue( final boolean aConfiguredValue )
         {
-        myKeysHandler.captureBackKey = aSeekBarValue != 0;
+        myKeysHandler.captureBackKey = aConfiguredValue;
         }
 
-    public final int getMaxValue()
+    public final boolean getCurrentValue()
         {
-        return 1;
-        }
-
-    public final int getCurrentValue()
-        {
-        return 0;
-        }
-
-    public final int getStepSize()
-        {
-        return DEFAULT_STEP_SIZE;
+        return myKeysHandler.captureBackKey;
         }
 
 

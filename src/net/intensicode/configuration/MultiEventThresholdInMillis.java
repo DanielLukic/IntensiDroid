@@ -1,9 +1,9 @@
 package net.intensicode.configuration;
 
+import net.intensicode.ConfigurableIntegerValue;
 import net.intensicode.core.AnalogController;
-import net.intensicode.ConfigurableValue;
 
-public final class MultiEventThresholdInMillis implements ConfigurableValue
+public final class MultiEventThresholdInMillis implements ConfigurableIntegerValue
     {
     public MultiEventThresholdInMillis( final AnalogController aAnalogController )
         {
@@ -23,14 +23,14 @@ public final class MultiEventThresholdInMillis implements ConfigurableValue
                "This value determines in what interval trackball events are fired if the user continously moves the trackball. ";
         }
 
-    public final String getValueAsText( final int aSeekBarValue )
+    public final String getValueAsText( final int aConfiguredValue )
         {
-        return aSeekBarValue + " ms";
+        return aConfiguredValue + " ms";
         }
 
-    public final void setNewValue( final int aSeekBarValue )
+    public final void setNewValue( final int aConfiguredValue )
         {
-        myAnalogController.multiEventThresholdInMillis = aSeekBarValue;
+        myAnalogController.multiEventThresholdInMillis = aConfiguredValue;
         }
 
     public final int getMaxValue()

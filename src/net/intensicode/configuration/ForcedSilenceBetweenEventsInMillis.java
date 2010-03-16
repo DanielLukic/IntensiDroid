@@ -1,9 +1,9 @@
 package net.intensicode.configuration;
 
+import net.intensicode.ConfigurableIntegerValue;
 import net.intensicode.core.AnalogController;
-import net.intensicode.ConfigurableValue;
 
-public final class ForcedSilenceBetweenEventsInMillis implements ConfigurableValue
+public final class ForcedSilenceBetweenEventsInMillis implements ConfigurableIntegerValue
     {
     public ForcedSilenceBetweenEventsInMillis( final AnalogController aAnalogController )
         {
@@ -22,14 +22,14 @@ public final class ForcedSilenceBetweenEventsInMillis implements ConfigurableVal
         return "Milliseconds in which trackball changes are discared before starting a new event.";
         }
 
-    public final String getValueAsText( final int aSeekBarValue )
+    public final String getValueAsText( final int aConfiguredValue )
         {
-        return aSeekBarValue + " ms";
+        return aConfiguredValue + " ms";
         }
 
-    public final void setNewValue( final int aSeekBarValue )
+    public final void setNewValue( final int aConfiguredValue )
         {
-        myAnalogController.forcedSilenceBetweenEventsInMillis = aSeekBarValue;
+        myAnalogController.forcedSilenceBetweenEventsInMillis = aConfiguredValue;
         }
 
     public final int getMinValue()
