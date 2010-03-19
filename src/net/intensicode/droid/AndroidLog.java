@@ -2,11 +2,9 @@ package net.intensicode.droid;
 
 import net.intensicode.util.Log;
 
-import java.util.regex.*;
-
 public final class AndroidLog extends Log
     {
-    //#ifdef DEBUG
+    //#if TRACE
 
     protected final void doTrace()
         {
@@ -14,6 +12,20 @@ public final class AndroidLog extends Log
         addCodeHint( buffer );
         android.util.Log.i( LOG_TAG, buffer.toString() );
         }
+
+    //#endif
+
+    //#if INFO
+
+    protected final void doInfo( final StringBuffer aBufferWithMessage )
+        {
+        addCodeHint( aBufferWithMessage );
+        android.util.Log.d( LOG_TAG, aBufferWithMessage.toString(), null );
+        }
+
+    //#endif
+
+    //#ifdef DEBUG
 
     protected final void doDebug( final StringBuffer aBufferWithMessage )
         {
