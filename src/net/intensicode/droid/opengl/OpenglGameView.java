@@ -156,7 +156,7 @@ public final class OpenglGameView extends AndroidGameView
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
 
         graphics.onSurfaceChanged( virtualWidth, virtualHeight, myDisplaySize.width, myDisplaySize.height );
-        if ( AndroidUtilities.isEmulator() ) graphics.fixDrawTextureOffset( yOffset );
+        if ( AndroidUtilities.isEmulator() ) graphics.fixDrawTextureOffset( xOffset, yOffset );
         }
 
     private void updateDisplaySize( final int aWidth, final int aHeight )
