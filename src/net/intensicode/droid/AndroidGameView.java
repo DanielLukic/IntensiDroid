@@ -59,11 +59,6 @@ public abstract class AndroidGameView extends SurfaceView implements DirectScree
         myTargetSize.setTo( aWidth, aHeight );
         }
 
-    public final void setViewportMode( final int aViewportModeId )
-        {
-        myViewportMode = aViewportModeId;
-        }
-
     // Internal API
 
     public final int getNativeWidth()
@@ -83,10 +78,8 @@ public abstract class AndroidGameView extends SurfaceView implements DirectScree
 
     public Position toTarget( final int aNativeX, final int aNativeY )
         {
-        // What seems to happen is that Android scales the pixel coordinates, but not the touch event coordinates.
-        // Therefore the offset has to be taken into account like this:
-        myTransformedPosition.x = aNativeX * ( width() + myTransformOffsetX * 2 ) / getWidth() - myTransformOffsetX;
-        myTransformedPosition.y = aNativeY * ( height() + myTransformOffsetY * 2 ) / getHeight() - myTransformOffsetY;
+        myTransformedPosition.x = aNativeX * width() / getWidth();
+        myTransformedPosition.y = aNativeY * height() / getHeight();
         return myTransformedPosition;
         }
 
@@ -114,12 +107,6 @@ public abstract class AndroidGameView extends SurfaceView implements DirectScree
         myInitialized = false;
         }
 
-
-    protected int myViewportMode;
-
-    protected int myTransformOffsetX;
-
-    protected int myTransformOffsetY;
 
     protected final SurfaceHolder mySurfaceHolder;
 

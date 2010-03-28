@@ -137,46 +137,22 @@ public final class OpenglGameView extends AndroidGameView
 
     private void onSurfaceChanged( final int aWidth, final int aHeight )
         {
-        updateDisplaySize( aWidth, aHeight );
-
-        final int xOffset = ( aWidth - myDisplaySize.width ) / 2;
-        myTransformOffsetX = xOffset;
-
-        final int yOffset = ( aHeight - myDisplaySize.height ) / 2;
-        myTransformOffsetY = yOffset;
-
-        myGL.glViewport( xOffset, yOffset, myDisplaySize.width, myDisplaySize.height );
-        myGL.glMatrixMode( GL10.GL_PROJECTION );
-        myGL.glLoadIdentity();
         final int virtualWidth = width();
         final int virtualHeight = height();
+
+        myGL.glViewport( 0, 0, aWidth, aHeight );
+        myGL.glMatrixMode( GL10.GL_PROJECTION );
+        myGL.glLoadIdentity();
         myGL.glOrthof( 0, virtualWidth, 0, virtualHeight, -1, 1 );
         myGL.glTranslatef( 0, virtualHeight, 0 );
         myGL.glScalef( 1.0f, -1.0f, 1.0f );
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
 
-        graphics.onSurfaceChanged( virtualWidth, virtualHeight, myDisplaySize.width, myDisplaySize.height );
-        if ( AndroidUtilities.isEmulator() ) graphics.fixDrawTextureOffset( xOffset, yOffset );
-        }
-
-    private void updateDisplaySize( final int aWidth, final int aHeight )
-        {
-        if ( myViewportMode == VIEWPORT_MODE_FULLSCREEN )
-            {
-            myDisplaySize.width = aWidth;
-            myDisplaySize.height = aHeight;
-            }
-        else // VIEWPORT_MODE_SYSTEM - let system do the scaling..
-            {
-            myDisplaySize.width = width();
-            myDisplaySize.height = height();
-            }
+        graphics.onSurfaceChanged( virtualWidth, virtualHeight, aWidth, aHeight );
         }
 
 
     private GL10 myGL;
-
-    private final Size myDisplaySize = new Size();
 
     private final EglHelper myEglHelper = new EglHelper();
 

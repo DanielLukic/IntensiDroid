@@ -26,14 +26,9 @@ public final class CanvasGameView extends AndroidGameView
         final Canvas canvas = graphics.canvas = mySurfaceHolder.lockCanvas();
         if ( canvas != null )
             {
-            if ( myViewportMode == VIEWPORT_MODE_FULLSCREEN )
-                {
-                canvas.scale( getWidth() / (float) width(), getHeight() / (float) height() );
-                }
-            else // VIEWPORT_MODE_SYSTEM
-                {
-                canvas.clipRect( 0, 0, width(), height() );
-                }
+            final float scaleX = getWidth() / (float) width();
+            final float scaleY = getHeight() / (float) height();
+            canvas.scale( scaleX, scaleY );
             }
         else Log.error( "lockCanvas failed with null object", null );
         }
