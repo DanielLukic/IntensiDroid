@@ -49,7 +49,7 @@ public final class TextureAtlasTexture
         aMatrix4x4[ Texture.TEXTURE_MATRIX_INDEX_OF_WIDTH ] = aSourceRect.width / (float) myWidth;
         aMatrix4x4[ Texture.TEXTURE_MATRIX_INDEX_OF_HEIGHT ] = -aSourceRect.height / (float) myHeight;
         aMatrix4x4[ Texture.TEXTURE_MATRIX_INDEX_OF_X ] = ( aAtlasRectangle.x + aSourceRect.x ) / (float) myWidth;
-        aMatrix4x4[ Texture.TEXTURE_MATRIX_INDEX_OF_Y ] = ( aAtlasRectangle.y + aSourceRect.y ) / (float) myHeight - aMatrix4x4[ 5 ];
+        aMatrix4x4[ Texture.TEXTURE_MATRIX_INDEX_OF_Y ] = ( aAtlasRectangle.y + aSourceRect.y ) / (float) myHeight - aMatrix4x4[ Texture.TEXTURE_MATRIX_INDEX_OF_HEIGHT ];
         }
 
     public void cropTextureIfNecessary( final Rectangle aSourceRect, final Rectangle aAtlasRectangle )

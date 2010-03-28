@@ -149,7 +149,7 @@ public final class TextureUtilities
         {
         theCropWorkspace[ 0 ] = aRectangle.x;
         theCropWorkspace[ 1 ] = aRectangle.y + aRectangle.height;
-        theCropWorkspace[ NUMBER_OF_TEXTURE_UNITS ] = aRectangle.width;
+        theCropWorkspace[ 2 ] = aRectangle.width;
         theCropWorkspace[ 3 ] = -aRectangle.height;
 
         final GL11 gl11 = (GL11) gl;

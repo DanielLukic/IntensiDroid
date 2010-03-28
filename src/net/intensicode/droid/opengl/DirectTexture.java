@@ -45,7 +45,7 @@ public final class DirectTexture implements Texture
         aMatrix4x4[ TEXTURE_MATRIX_INDEX_OF_WIDTH ] = aSourceRect.width / (float) myWidth;
         aMatrix4x4[ TEXTURE_MATRIX_INDEX_OF_HEIGHT ] = -aSourceRect.height / (float) myHeight;
         aMatrix4x4[ TEXTURE_MATRIX_INDEX_OF_X ] = aSourceRect.x / (float) myWidth;
-        aMatrix4x4[ TEXTURE_MATRIX_INDEX_OF_Y ] = aSourceRect.y / (float) myHeight - aMatrix4x4[ 5 ];
+        aMatrix4x4[ TEXTURE_MATRIX_INDEX_OF_Y ] = aSourceRect.y / (float) myHeight - aMatrix4x4[ TEXTURE_MATRIX_INDEX_OF_HEIGHT ];
         }
 
     public final void setTextureCrop( final Rectangle aRect )
