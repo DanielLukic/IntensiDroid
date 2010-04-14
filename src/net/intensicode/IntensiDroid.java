@@ -3,7 +3,7 @@ package net.intensicode;
 import android.media.AudioManager;
 import android.os.*;
 import android.view.*;
-import net.intensicode.configuration.CaptureBackKey;
+import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
 import net.intensicode.util.*;
@@ -44,6 +44,13 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         final ConfigurationElementsTree ui = platform.addSubTree( "UI" );
         ui.addLeaf( new CaptureBackKey( (AndroidKeysHandler) myGameSystem.keys ) );
+
+        //#if PROFILING
+        final ConfigurationElementsTree profiling = platform.addSubTree( "Profiling" );
+        profiling.addLeaf( new StartProfiling() );
+        profiling.addLeaf( new StopProfiling() );
+        profiling.addLeaf( new DumpHprofData() );
+        //#endif
 
         return platform;
         }
