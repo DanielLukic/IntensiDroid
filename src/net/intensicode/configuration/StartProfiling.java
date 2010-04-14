@@ -22,16 +22,18 @@ public final class StartProfiling implements ConfigurableActionValue
         {
         try
             {
-            final File dataDirectory = Environment.getDataDirectory();
+            final File dataDirectory = Environment.getExternalStorageDirectory();
             final File intensigameFolder = new File( dataDirectory, "intensigame" );
             intensigameFolder.mkdirs();
             final File profilingDataFile = new File( intensigameFolder, "profiling.dat" );
             profilingDataFile.createNewFile();
-            Debug.startMethodTracing( profilingDataFile.getAbsolutePath() );
+            Debug.startMethodTracing( profilingDataFile.getAbsolutePath(), BUFFERSIZE_128_MB );
             }
         catch ( IOException e )
             {
             Log.error( "failed dumping atlas image", e );
             }
         }
+
+    private static final int BUFFERSIZE_128_MB = 128 * 1024 * 1024;
     }

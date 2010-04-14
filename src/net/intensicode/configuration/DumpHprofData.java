@@ -22,7 +22,7 @@ public final class DumpHprofData implements ConfigurableActionValue
         {
         try
             {
-            final File dataDirectory = Environment.getDataDirectory();
+            final File dataDirectory = Environment.getExternalStorageDirectory();
             final File intensigameFolder = new File( dataDirectory, "intensigame" );
             intensigameFolder.mkdirs();
             final File profilingDataFile = new File( intensigameFolder, "hprof.dat" );
