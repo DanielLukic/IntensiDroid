@@ -64,8 +64,6 @@ public final class OpenglGameView extends AndroidGameView
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
         myGL.glLoadIdentity();
 
-        myGL.glClear( GL10.GL_COLOR_BUFFER_BIT );
-
         TextureUtilities.setAtlasTextureUnit();
         TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
         TextureUtilities.setRenderTextureUnit();
