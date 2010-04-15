@@ -27,7 +27,7 @@ public final class StartProfiling implements ConfigurableActionValue
             intensigameFolder.mkdirs();
             final File profilingDataFile = new File( intensigameFolder, "profiling.dat" );
             profilingDataFile.createNewFile();
-            Debug.startMethodTracing( profilingDataFile.getAbsolutePath(), BUFFERSIZE_128_MB );
+            Debug.startMethodTracing( profilingDataFile.getAbsolutePath(), BUFFERSIZE_16_MB );
             }
         catch ( IOException e )
             {
@@ -35,5 +35,5 @@ public final class StartProfiling implements ConfigurableActionValue
             }
         }
 
-    private static final int BUFFERSIZE_128_MB = 128 * 1024 * 1024;
+    private static final int BUFFERSIZE_16_MB = 16 * 1024 * 1024;
     }
