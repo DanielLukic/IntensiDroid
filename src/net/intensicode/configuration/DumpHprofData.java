@@ -25,7 +25,7 @@ public final class DumpHprofData implements ConfigurableActionValue
             final File dataDirectory = Environment.getExternalStorageDirectory();
             final File intensigameFolder = new File( dataDirectory, "intensigame" );
             intensigameFolder.mkdirs();
-            final File profilingDataFile = new File( intensigameFolder, "hprof.dat" );
+            final File profilingDataFile = new File( intensigameFolder, "memory" );
             profilingDataFile.createNewFile();
             Debug.dumpHprofData( profilingDataFile.getAbsolutePath() );
             }

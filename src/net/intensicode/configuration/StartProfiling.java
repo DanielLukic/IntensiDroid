@@ -25,7 +25,7 @@ public final class StartProfiling implements ConfigurableActionValue
             final File dataDirectory = Environment.getExternalStorageDirectory();
             final File intensigameFolder = new File( dataDirectory, "intensigame" );
             intensigameFolder.mkdirs();
-            final File profilingDataFile = new File( intensigameFolder, "profiling.dat" );
+            final File profilingDataFile = new File( intensigameFolder, "calls" );
             profilingDataFile.createNewFile();
             Debug.startMethodTracing( profilingDataFile.getAbsolutePath(), BUFFERSIZE_16_MB );
             }
