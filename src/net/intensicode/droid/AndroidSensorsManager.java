@@ -5,7 +5,7 @@ package net.intensicode.droid;
 import android.content.Context;
 import android.hardware.*;
 import net.intensicode.core.SensorsManager;
-import net.intensicode.util.*;
+import net.intensicode.util.Log;
 
 import java.util.List;
 
@@ -35,13 +35,13 @@ public final class AndroidSensorsManager extends SensorsManager implements Senso
 
     public final synchronized void onControlTick()
         {
-        acceleration.xFixed = (int) ( FixedMath.FIXED_1 * myPreviousAcceleration[ 0 ] );
-        acceleration.yFixed = (int) ( FixedMath.FIXED_1 * myPreviousAcceleration[ 1 ] );
-        acceleration.zFixed = (int) ( FixedMath.FIXED_1 * myPreviousAcceleration[ 2 ] );
+        acceleration.x = myPreviousAcceleration[ 0 ];
+        acceleration.y = myPreviousAcceleration[ 1 ];
+        acceleration.z = myPreviousAcceleration[ 2 ];
 
-        orientation.azimuthFixed = (int) ( FixedMath.FIXED_1 * myPreviousOrientation[ 0 ] );
-        orientation.pitchFixed = (int) ( FixedMath.FIXED_1 * myPreviousOrientation[ 1 ] );
-        orientation.rollFixed = (int) ( FixedMath.FIXED_1 * myPreviousOrientation[ 2 ] );
+        orientation.azimuth = myPreviousOrientation[ 0 ];
+        orientation.pitch = myPreviousOrientation[ 1 ];
+        orientation.roll = myPreviousOrientation[ 2 ];
         }
 
     public final void enable()
