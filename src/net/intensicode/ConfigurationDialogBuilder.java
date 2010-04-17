@@ -1,7 +1,6 @@
 package net.intensicode;
 
 import android.content.Context;
-import net.intensicode.*;
 
 public final class ConfigurationDialogBuilder
     {
@@ -24,10 +23,15 @@ public final class ConfigurationDialogBuilder
                 {
                 return new ConfigurableActionDialog( myContext, (ConfigurableActionValue) aConfigurableValue );
                 }
-            else
-                {
-                throw new RuntimeException( "nyi" );
-                }
+            else if ( aConfigurableValue instanceof ConfigurableFloatValue )
+                    {
+                    final ConfigurableFloatValue floatValue = (ConfigurableFloatValue) aConfigurableValue;
+                    return new ConfigurableSeekBarDialog( myContext, new WrappedFloatAsIntegerValue( floatValue ) );
+                    }
+                else
+                    {
+                    throw new RuntimeException( "nyi" );
+                    }
         }
 
     private final Context myContext;
