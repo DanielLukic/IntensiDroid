@@ -11,8 +11,6 @@ import java.util.ArrayList;
 
 public final class AndroidImageResource implements ImageResource
     {
-    public static final String RUNTIME_IMAGE = "[runtime_image]";
-
     public final String resourcePath;
 
     public final Bitmap bitmap;
@@ -48,7 +46,12 @@ public final class AndroidImageResource implements ImageResource
 
     private AndroidImageResource( final Bitmap aBitmap )
         {
-        this( RUNTIME_IMAGE, aBitmap );
+        this( makeRuntimeImageId( aBitmap ), aBitmap );
+        }
+
+    private static String makeRuntimeImageId( final Bitmap aBitmap )
+        {
+        return aBitmap.getWidth() + "x" + aBitmap.getHeight();
         }
 
     private AndroidImageResource( final String aResourcePath, final Bitmap aBitmap )

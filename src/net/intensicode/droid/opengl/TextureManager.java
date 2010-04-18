@@ -19,7 +19,7 @@ public final class TextureManager
 
     public final void addTexture( final AndroidImageResource aImageResource )
         {
-        final String imageId = getImageOrDefaultId( aImageResource.resourcePath );
+        final String imageId = getImageOrDefaultId( aImageResource );
         if ( configuredAsDirectTexture( imageId ) )
             {
             myDirectTextureManager.addTexture( aImageResource );
@@ -30,9 +30,10 @@ public final class TextureManager
             }
         }
 
-    private String getImageOrDefaultId( final String aResourcePath )
+    private String getImageOrDefaultId( final AndroidImageResource aImageResource )
         {
-        if ( aResourcePath == null || aResourcePath.length() == 0 ) return AndroidImageResource.RUNTIME_IMAGE;
+        final String aResourcePath = aImageResource.resourcePath;
+        if ( aResourcePath == null || aResourcePath.length() == 0 ) throw new IllegalArgumentException( aImageResource.toString() );
         final int lastDotPos = aResourcePath.lastIndexOf( '.' );
         if ( lastDotPos == -1 ) return aResourcePath;
         return aResourcePath.substring( 0, lastDotPos );
