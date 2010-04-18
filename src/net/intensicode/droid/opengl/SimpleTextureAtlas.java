@@ -96,6 +96,11 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
         //#endif
         }
 
+    public final void add( final AndroidImageResource aImageResource, final Position aInsertPosition )
+        {
+        throw new UnsupportedOperationException();
+        }
+
     public final void purge()
         {
         //#if DEBUG

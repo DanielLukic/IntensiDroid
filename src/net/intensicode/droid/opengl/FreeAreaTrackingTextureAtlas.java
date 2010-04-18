@@ -9,16 +9,21 @@ import java.util.ArrayList;
 
 public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, TexturePurger
     {
-    public FreeAreaTrackingTextureAtlas( final int aID )
+    public FreeAreaTrackingTextureAtlas( final String aID )
         {
         this( aID, TextureUtilities.maximumTextureSize, TextureUtilities.maximumTextureSize );
         }
 
-    public FreeAreaTrackingTextureAtlas( final int aID, final int aWidth, final int aHeight )
+    public FreeAreaTrackingTextureAtlas( final String aID, final int aWidth, final int aHeight )
         {
         myID = aID;
         myWidth = aWidth;
         myHeight = aHeight;
+        }
+
+    public final boolean is( final String aAtlasId )
+        {
+        return myID.equalsIgnoreCase( aAtlasId );
         }
 
     // From TextureAtlas
@@ -48,6 +53,12 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
         {
         final Rectangle rectangle = myFreeAreas.findFreeAreaBigEnoughFor( aImageResource.getWidth(), aImageResource.getHeight() );
         return rectangle != null;
+        }
+
+    public final void add( final AndroidImageResource aImageResource, final Position aInsertPosition )
+        {
+        createAtlasTextureIfNecessary();
+        insertImageAndCreateTexture( aImageResource, aInsertPosition.x, aInsertPosition.y );
         }
 
     public final void add( final AndroidImageResource aImageResource )
@@ -390,7 +401,7 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
 
     private TextureAtlasTexture myAtlasTexture;
 
-    private final int myID;
+    private final String myID;
 
     private final int myWidth;
 

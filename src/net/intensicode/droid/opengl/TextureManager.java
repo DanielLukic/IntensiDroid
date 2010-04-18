@@ -26,14 +26,34 @@ public final class TextureManager
             }
         else
             {
-            myAtlasTextureManager.addTexture( aImageResource );
+            final AtlasHints hints = getConfiguredAtlasHints( imageId );
+            myAtlasTextureManager.addTexture( aImageResource, hints );
+            }
+        }
+
+    private AtlasHints getConfiguredAtlasHints( final String aImageId )
+        {
+        try
+            {
+            final String hints = myConfiguration.readString( aImageId, "atlas", null );
+            if ( hints == null ) return NO_ATLAS_HINTS;
+            return AtlasHints.parse( hints );
+            }
+        catch ( final Exception e )
+            {
+            Log.error( "bad atlas hints for {} ignored", aImageId, e );
+            return NO_ATLAS_HINTS;
             }
         }
 
     private String getImageOrDefaultId( final AndroidImageResource aImageResource )
         {
         final String aResourcePath = aImageResource.resourcePath;
-        if ( aResourcePath == null || aResourcePath.length() == 0 ) throw new IllegalArgumentException( aImageResource.toString() );
+        if ( aResourcePath == null || aResourcePath.length() == 0 )
+            {
+            throw new IllegalArgumentException( aImageResource.toString() );
+            }
+
         final int lastDotPos = aResourcePath.lastIndexOf( '.' );
         if ( lastDotPos == -1 ) return aResourcePath;
         return aResourcePath.substring( 0, lastDotPos );
@@ -68,4 +88,6 @@ public final class TextureManager
     private final DirectTextureManager myDirectTextureManager = new DirectTextureManager();
 
     private static final boolean DEFAULT_DIRECT_TEXTURE_CONFIGURATION = false;
+
+    private static final AtlasHints NO_ATLAS_HINTS = new AtlasHints();
     }
