@@ -1,20 +1,19 @@
 package net.intensicode.droid.opengl;
 
-import android.graphics.Bitmap;
 import net.intensicode.core.Configuration;
 import net.intensicode.droid.AndroidImageResource;
 import net.intensicode.util.Log;
 
 public final class TextureManager
     {
+    public final AtlasTextureManager atlasTextureManager = new AtlasTextureManager();
+
+    public final DirectTextureManager directTextureManager = new DirectTextureManager();
+
+
     public final void setConfiguration( final Configuration aConfiguration )
         {
         myConfiguration = aConfiguration;
-        }
-
-    public final Bitmap[] dumpTextureAtlases()
-        {
-        return myAtlasTextureManager.dumpTextureAtlases();
         }
 
     public final void addTexture( final AndroidImageResource aImageResource )
@@ -22,12 +21,12 @@ public final class TextureManager
         final String imageId = getImageOrDefaultId( aImageResource );
         if ( configuredAsDirectTexture( imageId ) )
             {
-            myDirectTextureManager.addTexture( aImageResource );
+            directTextureManager.addTexture( aImageResource );
             }
         else
             {
             final AtlasHints hints = getConfiguredAtlasHints( imageId );
-            myAtlasTextureManager.addTexture( aImageResource, hints );
+            atlasTextureManager.addTexture( aImageResource, hints );
             }
         }
 
@@ -61,8 +60,8 @@ public final class TextureManager
 
     public final void purgeAllTextures()
         {
-        myAtlasTextureManager.purgeAllTextures();
-        myDirectTextureManager.purgeAllTextures();
+        atlasTextureManager.purgeAllTextures();
+        directTextureManager.purgeAllTextures();
 
         TextureUtilities.setAtlasTextureUnit();
         TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
@@ -82,10 +81,6 @@ public final class TextureManager
 
 
     private Configuration myConfiguration = Configuration.NULL_CONFIGURATION;
-
-    private final AtlasTextureManager myAtlasTextureManager = new AtlasTextureManager();
-
-    private final DirectTextureManager myDirectTextureManager = new DirectTextureManager();
 
     private static final boolean DEFAULT_DIRECT_TEXTURE_CONFIGURATION = false;
 

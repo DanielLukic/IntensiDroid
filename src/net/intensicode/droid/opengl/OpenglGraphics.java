@@ -1,15 +1,17 @@
 package net.intensicode.droid.opengl;
 
-import android.graphics.Bitmap;
 import net.intensicode.core.*;
 import net.intensicode.droid.AndroidImageResource;
 import net.intensicode.util.*;
 
 import javax.microedition.khronos.opengles.*;
+import java.util.ArrayList;
 
 
 public final class OpenglGraphics extends DirectGraphics
     {
+    public final TextureManager textureManager = new TextureManager();
+
     public String vendor;
 
     public String renderer;
@@ -28,15 +30,10 @@ public final class OpenglGraphics extends DirectGraphics
         myGameSystem = aGameSystem;
         }
 
-    public final Bitmap[] dumpTextureAtlases()
-        {
-        return myTextureManager.dumpTextureAtlases();
-        }
-
     public final void lateInitialize()
         {
         final Configuration configuration = myGameSystem.resources.loadConfigurationOrUseDefaults( "opengl.properties" );
-        myTextureManager.setConfiguration( configuration );
+        textureManager.setConfiguration( configuration );
         }
 
     final void onSurfaceCreated( final GL10 aGL10 )
@@ -64,7 +61,7 @@ public final class OpenglGraphics extends DirectGraphics
         Log.info( "GL has draw texture extension? " + hasDrawTextureExtension );
         Log.info( "GL has hardware buffers? " + hasHardwareBuffers );
 
-        myTextureManager.purgeAllTextures();
+        textureManager.purgeAllTextures();
 
         myGL.glEnableClientState( GL10.GL_VERTEX_ARRAY );
 
@@ -88,7 +85,7 @@ public final class OpenglGraphics extends DirectGraphics
     final void releaseGL()
         {
         myGeometryDrawer.reset();
-        myTextureManager.purgeAllTextures();
+        textureManager.purgeAllTextures();
         myTextureStateManager.reset();
 
         TextureUtilities.gl = null;
@@ -246,7 +243,7 @@ public final class OpenglGraphics extends DirectGraphics
 
     private Texture getOrLoadTexture( final AndroidImageResource aImage )
         {
-        if ( aImage.texture == null ) myTextureManager.addTexture( aImage );
+        if ( aImage.texture == null ) textureManager.addTexture( aImage );
         return aImage.texture;
         }
 
@@ -273,8 +270,6 @@ public final class OpenglGraphics extends DirectGraphics
     private final Rectangle myFullRect = new Rectangle();
 
     private final GeometryDrawer myGeometryDrawer = new GeometryDrawer();
-
-    private final TextureManager myTextureManager = new TextureManager();
 
     private final TextureStateManager myTextureStateManager = new TextureStateManager();
 

@@ -9,6 +9,9 @@ import java.util.ArrayList;
 
 public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, TexturePurger
     {
+    public final String id;
+
+
     public FreeAreaTrackingTextureAtlas( final String aID )
         {
         this( aID, TextureUtilities.maximumTextureSize, TextureUtilities.maximumTextureSize );
@@ -16,14 +19,14 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
 
     public FreeAreaTrackingTextureAtlas( final String aID, final int aWidth, final int aHeight )
         {
-        myID = aID;
+        id = aID;
         myWidth = aWidth;
         myHeight = aHeight;
         }
 
     public final boolean is( final String aAtlasId )
         {
-        return myID.equalsIgnoreCase( aAtlasId );
+        return id.equalsIgnoreCase( aAtlasId );
         }
 
     // From TextureAtlas
@@ -336,7 +339,7 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
         {
         final StringBuilder builder = new StringBuilder( "FreeAreaTrackingTextureAtlas" );
         builder.append( '[' );
-        builder.append( myID );
+        builder.append( id );
         builder.append( ':' );
         builder.append( myWidth );
         builder.append( 'x' );
@@ -400,8 +403,6 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
     private int myCurrentY;
 
     private TextureAtlasTexture myAtlasTexture;
-
-    private final String myID;
 
     private final int myWidth;
 

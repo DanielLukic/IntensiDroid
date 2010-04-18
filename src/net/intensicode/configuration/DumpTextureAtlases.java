@@ -3,16 +3,17 @@ package net.intensicode.configuration;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import net.intensicode.ConfigurableActionValue;
-import net.intensicode.droid.opengl.OpenglGraphics;
+import net.intensicode.droid.opengl.*;
 import net.intensicode.util.Log;
 
 import java.io.*;
+import java.util.ArrayList;
 
 public final class DumpTextureAtlases implements ConfigurableActionValue
     {
     public DumpTextureAtlases( final OpenglGraphics aOpenglGraphics )
         {
-        myOpenglGraphics = aOpenglGraphics;
+        myAtlasManager = aOpenglGraphics.textureManager.atlasTextureManager;
         }
 
     public final String getTitle()
@@ -33,13 +34,15 @@ public final class DumpTextureAtlases implements ConfigurableActionValue
             final File intensigameFolder = new File( dataDirectory, "intensigame" );
             intensigameFolder.mkdirs();
 
-            final Bitmap[] bitmaps = myOpenglGraphics.dumpTextureAtlases();
-            for ( int idx = 0; idx < bitmaps.length; idx++ )
+            final ArrayList<FreeAreaTrackingTextureAtlas> atlases = myAtlasManager.getTextureAtlases();
+            for ( final FreeAreaTrackingTextureAtlas atlas : atlases )
                 {
-                final File dumpFile = new File( intensigameFolder, "atlas" + ( 1 + idx ) + ".png" );
+                final File dumpFile = new File( intensigameFolder, "atlas" + atlas.id + ".png" );
                 dumpFile.createNewFile();
                 final FileOutputStream stream = new FileOutputStream( dumpFile );
-                final boolean done = bitmaps[ idx ].compress( Bitmap.CompressFormat.PNG, 100, stream );
+                final Bitmap bitmap = atlas.dumpLayout();
+                final boolean done = bitmap.compress( Bitmap.CompressFormat.PNG, 100, stream );
+                bitmap.recycle();
                 if ( !done ) throw new IOException();
                 stream.close();
                 }
@@ -50,5 +53,5 @@ public final class DumpTextureAtlases implements ConfigurableActionValue
             }
         }
 
-    private final OpenglGraphics myOpenglGraphics;
+    private final AtlasTextureManager myAtlasManager;
     }
