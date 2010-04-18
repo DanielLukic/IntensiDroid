@@ -89,7 +89,7 @@ public final class AtlasTextureManager
     private TextureAtlas createNewAtlas()
         {
         final int newAtlasId = myTextureAtlases.size() + 1;
-        return getOrCreateAtlas( Integer.toString( newAtlasId ) );
+        return createNewAtlas( Integer.toString( newAtlasId ) );
         }
 
 
