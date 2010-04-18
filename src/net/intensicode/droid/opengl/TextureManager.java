@@ -35,6 +35,11 @@ public final class TextureManager
         {
         myAtlasTextureManager.purgeAllTextures();
         myDirectTextureManager.purgeAllTextures();
+
+        TextureUtilities.setAtlasTextureUnit();
+        TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
+        TextureUtilities.setRenderTextureUnit();
+        TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
         }
 
     // Implementation
