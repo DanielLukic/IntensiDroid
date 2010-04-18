@@ -145,6 +145,11 @@ public final class FreeAreas
         return bestMatch;
         }
 
+    ArrayList<Rectangle> accessFreeAreasList()
+        {
+        return myFreeList;
+        }
+
 
     private final ArrayList<Rectangle> myFreeList = new ArrayList<Rectangle>();
     }

@@ -1,5 +1,6 @@
 package net.intensicode.droid.opengl;
 
+import android.graphics.Bitmap;
 import net.intensicode.droid.AndroidImageResource;
 
 public final class NullTextureAtlas implements TextureAtlas
@@ -15,6 +16,11 @@ public final class NullTextureAtlas implements TextureAtlas
         }
 
     public final void purge()
+        {
+        throw new UnsupportedOperationException();
+        }
+
+    public final Bitmap dumpLayout()
         {
         throw new UnsupportedOperationException();
         }

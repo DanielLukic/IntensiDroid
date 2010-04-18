@@ -1,5 +1,6 @@
 package net.intensicode.droid.opengl;
 
+import android.graphics.Bitmap;
 import net.intensicode.droid.AndroidImageResource;
 import net.intensicode.util.Log;
 
@@ -15,6 +16,16 @@ public final class AtlasTextureManager
 
         final TextureAtlas atlas = getAtlasWithEnoughRoomFor( aImageResource );
         atlas.add( aImageResource );
+        }
+
+    public final Bitmap[] dumpTextureAtlases()
+        {
+        final Bitmap[] bitmaps = new Bitmap[myTextureAtlases.size()];
+        for ( int idx = 0; idx < myTextureAtlases.size(); idx++ )
+            {
+            bitmaps[ idx ] = myTextureAtlases.get( idx ).dumpLayout();
+            }
+        return bitmaps;
         }
 
     private TextureAtlas getAtlasWithEnoughRoomFor( final AndroidImageResource aImageResource )

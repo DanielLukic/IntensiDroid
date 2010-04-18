@@ -1,13 +1,20 @@
 package net.intensicode.droid.opengl;
 
+import android.graphics.Bitmap;
 import net.intensicode.core.Configuration;
 import net.intensicode.droid.AndroidImageResource;
+import net.intensicode.util.Log;
 
 public final class TextureManager
     {
     public final void setConfiguration( final Configuration aConfiguration )
         {
         myConfiguration = aConfiguration;
+        }
+
+    public final Bitmap[] dumpTextureAtlases()
+        {
+        return myAtlasTextureManager.dumpTextureAtlases();
         }
 
     public final void addTexture( final AndroidImageResource aImageResource )

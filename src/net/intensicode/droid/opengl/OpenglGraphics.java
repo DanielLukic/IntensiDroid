@@ -1,5 +1,6 @@
 package net.intensicode.droid.opengl;
 
+import android.graphics.Bitmap;
 import net.intensicode.core.*;
 import net.intensicode.droid.AndroidImageResource;
 import net.intensicode.util.*;
@@ -25,6 +26,11 @@ public final class OpenglGraphics extends DirectGraphics
     public OpenglGraphics( final GameSystem aGameSystem )
         {
         myGameSystem = aGameSystem;
+        }
+
+    public final Bitmap[] dumpTextureAtlases()
+        {
+        return myTextureManager.dumpTextureAtlases();
         }
 
     public final void lateInitialize()

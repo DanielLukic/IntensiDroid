@@ -31,7 +31,7 @@ public final class DumpHprofData implements ConfigurableActionValue
             }
         catch ( IOException e )
             {
-            Log.error( "failed dumping atlas image", e );
+            Log.error( "failed dumping hprof data", e );
             }
         }
     }

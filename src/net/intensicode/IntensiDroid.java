@@ -6,6 +6,7 @@ import android.view.*;
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
+import net.intensicode.droid.opengl.OpenglGraphics;
 import net.intensicode.util.*;
 
 public abstract class IntensiDroid extends DebugLifeCycleActivity implements PlatformContext, SystemContext
@@ -51,6 +52,13 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         profiling.addLeaf( new StopProfiling() );
         profiling.addLeaf( new DumpHprofData() );
         //#endif
+
+        final DirectGraphics graphics = myGameSystem.graphics;
+        if ( graphics instanceof OpenglGraphics )
+            {
+            final ConfigurationElementsTree opengl = platform.addSubTree( "OpenGL" );
+            opengl.addLeaf( new DumpTextureAtlases( (OpenglGraphics) graphics ) );
+            }
 
         return platform;
         }

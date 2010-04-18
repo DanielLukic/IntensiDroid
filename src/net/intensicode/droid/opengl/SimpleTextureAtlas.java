@@ -1,5 +1,6 @@
 package net.intensicode.droid.opengl;
 
+import android.graphics.Bitmap;
 import net.intensicode.core.ImageResource;
 import net.intensicode.droid.*;
 import net.intensicode.util.*;
@@ -109,6 +110,11 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
 
         if ( myAtlasTexture != null ) myAtlasTexture.purge();
         myAtlasTexture = null;
+        }
+
+    public final Bitmap dumpLayout()
+        {
+        throw new UnsupportedOperationException();
         }
 
     // From TexturePurger

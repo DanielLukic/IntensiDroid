@@ -31,7 +31,7 @@ public final class StartProfiling implements ConfigurableActionValue
             }
         catch ( IOException e )
             {
-            Log.error( "failed dumping atlas image", e );
+            Log.error( "failed starting profiling", e );
             }
         }
 

@@ -1,6 +1,7 @@
 package net.intensicode.droid.opengl;
 
 import net.intensicode.droid.AndroidImageResource;
+import android.graphics.Bitmap;
 
 public interface TextureAtlas
     {
@@ -9,4 +10,6 @@ public interface TextureAtlas
     void add( final AndroidImageResource aImageResource );
 
     void purge();
+
+    Bitmap dumpLayout();
     }

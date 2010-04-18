@@ -1,5 +1,6 @@
 package net.intensicode.droid.opengl;
 
+import android.graphics.*;
 import net.intensicode.core.ImageResource;
 import net.intensicode.droid.*;
 import net.intensicode.util.*;
@@ -234,6 +235,59 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
         myFreeAreas.clear();
 
         myCurrentX = myCurrentY = myNextX = myNextY = 0;
+        }
+
+    public final Bitmap dumpLayout()
+        {
+        //#if DEBUG_OPENGL
+        Log.debug( "dumping texture atlas {}", this );
+        //#endif
+
+        final Bitmap bitmap = Bitmap.createBitmap( myWidth, myHeight, Bitmap.Config.ARGB_8888 );
+        final Canvas canvas = new Canvas( bitmap );
+        final Paint paint = new Paint();
+        paint.setStyle( Paint.Style.FILL );
+        paint.setColor( 0xFF000000 );
+        canvas.drawRect( 0, 0, myWidth, myHeight, paint );
+
+        paint.setColor( 0x4000FF00 );
+        final Rectangle atlasRect = new Rectangle();
+        final int numberOfImages = myTexturizedImageResources.size();
+        for ( int idx = 0; idx < numberOfImages; idx++ )
+            {
+            final AndroidImageResource imageResource = myTexturizedImageResources.get( idx );
+            final AtlasTexture texture = (AtlasTexture) imageResource.texture;
+            texture.copyAtlasRectTo( atlasRect );
+            final int left = atlasRect.x;
+            final int top = atlasRect.y;
+            final int right = left + atlasRect.width;
+            final int bottom = top + atlasRect.height;
+            canvas.drawBitmap( imageResource.bitmap, left, top, paint );
+            canvas.drawRect( left, top, right, bottom, paint );
+            }
+
+        final ArrayList<Rectangle> freeList = myFreeAreas.accessFreeAreasList();
+        final int numberOfFreeAreas = freeList.size();
+        for ( int idx = 0; idx < numberOfFreeAreas; idx++ )
+            {
+            final Rectangle freeArea = freeList.get( idx );
+            final int left = freeArea.x;
+            final int top = freeArea.y;
+            final int right = left + freeArea.width;
+            final int bottom = top + freeArea.height;
+
+            paint.setColor( 0x40FF0000 );
+            paint.setStyle( Paint.Style.FILL );
+            canvas.drawRect( left, top, right, bottom, paint );
+
+            paint.setColor( 0x40FFFFFF );
+            paint.setStyle( Paint.Style.STROKE );
+            canvas.drawRect( left, top, right, bottom, paint );
+            canvas.drawLine( left, top, right, bottom, paint );
+            canvas.drawLine( left, bottom, right, top, paint );
+            }
+
+        return bitmap;
         }
 
     // From TexturePurger
