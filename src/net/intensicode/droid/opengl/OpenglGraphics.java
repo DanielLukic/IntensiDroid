@@ -84,6 +84,8 @@ public final class OpenglGraphics extends DirectGraphics
 
     final void releaseGL()
         {
+        AndroidImageResource.purgeAllTextures();
+
         myGeometryDrawer.reset();
         textureManager.purgeAllTextures();
         myTextureStateManager.reset();

@@ -158,6 +158,9 @@ public final class TextureUtilities
 
     public static void purge( final int aOglTextureId )
         {
+        Assert.notNull( "GL context valid", gl );
+        if ( gl == null ) return;
+
         final int[] workspace = new int[1];
         workspace[ 0 ] = aOglTextureId;
         gl.glDeleteTextures( 1, workspace, 0 );

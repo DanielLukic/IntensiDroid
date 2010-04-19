@@ -42,6 +42,15 @@ public final class AndroidImageResource implements ImageResource
         while ( !theResources.isEmpty() ) theResources.get( 0 ).purge();
         }
 
+    public static void purgeAllTextures()
+        {
+        Log.debug( "purging {} AndroidImageResource textures", theResources.size() );
+        for ( final AndroidImageResource resource : theResources )
+            {
+            if ( resource.texture != null ) resource.texturePurger.purge( resource );
+            }
+        }
+
     private static final ArrayList<AndroidImageResource> theResources = new ArrayList<AndroidImageResource>();
 
     private AndroidImageResource( final Bitmap aBitmap )
