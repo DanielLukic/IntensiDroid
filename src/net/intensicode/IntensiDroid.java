@@ -1,6 +1,8 @@
 package net.intensicode;
 
+import android.content.Intent;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.*;
 import android.view.*;
 import net.intensicode.configuration.*;
@@ -21,6 +23,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     public final long compatibleTimeInMillis()
         {
         return SystemClock.uptimeMillis();
+        }
+
+    public final void openWebBrowser( final String aURL )
+        {
+        startActivity( new Intent( Intent.ACTION_VIEW, Uri.parse( aURL ) ) );
         }
 
     // From SystemContext
