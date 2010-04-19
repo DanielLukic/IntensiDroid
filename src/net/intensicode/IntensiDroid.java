@@ -154,8 +154,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     //#if TRACKBALL
     public final boolean onTrackballEvent( final MotionEvent aMotionEvent )
         {
-        myTrackballController.onTrackballEvent( aMotionEvent );
-        return false;
+        return myTrackballHandler.onTrackballEvent( aMotionEvent );
         }
     //#endif
 
@@ -268,7 +267,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#endif
 
         //#if TRACKBALL
-        final AndroidTrackballController trackball = new AndroidTrackballController();
+        final AndroidTrackballHandler trackball = new AndroidTrackballHandler();
         //#endif
 
         //#if TOUCH
@@ -296,7 +295,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         myGameView = view;
         myGameSystem = system;
         //#if TRACKBALL
-        myTrackballController = trackball;
+        myTrackballHandler = trackball;
         //#endif
         myOptionsMenuHandler = new OptionsMenuHandler( this, myGameSystem );
         }
@@ -329,6 +328,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     private OptionsMenuHandler myOptionsMenuHandler;
 
     //#if TRACKBALL
-    private AndroidTrackballController myTrackballController;
+    private AndroidTrackballHandler myTrackballHandler;
     //#endif
     }

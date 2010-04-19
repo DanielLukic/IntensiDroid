@@ -2,7 +2,6 @@ package net.intensicode;
 
 import android.content.Context;
 import android.view.*;
-import net.intensicode.ConfigurationDialogBuilder;
 import net.intensicode.core.GameSystem;
 import net.intensicode.util.DynamicArray;
 
