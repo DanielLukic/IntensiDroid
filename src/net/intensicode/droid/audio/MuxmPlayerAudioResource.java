@@ -4,10 +4,9 @@ import net.intensicode.core.AudioResourceEx;
 
 public final class MuxmPlayerAudioResource implements AudioResourceEx
     {
-    public MuxmPlayerAudioResource( final MuxmPlayer aPlayer, final String aResourcePath )
+    public MuxmPlayerAudioResource( final MuxmPlayer aPlayer )
         {
         myPlayer = aPlayer;
-        myResourcePath = aResourcePath;
         }
 
     // From AudioResourceEx
@@ -93,6 +92,4 @@ public final class MuxmPlayerAudioResource implements AudioResourceEx
     private boolean myEnabledFlag = true;
 
     private final MuxmPlayer myPlayer;
-
-    private final String myResourcePath;
     }

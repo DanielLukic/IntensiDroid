@@ -21,10 +21,10 @@ public final class MuxmPlayerBackend implements AudioBackend
         {
         final String resourceFilePath = makeResourceFilePath( ReleaseProperties.MUSIC_FOLDER, aMusicName, ReleaseProperties.MUSIC_FORMAT_SUFFIX );
         final MuxmPlayer player = createPlayerForModule( resourceFilePath );
-        return new MuxmPlayerAudioResource( player, resourceFilePath );
+        return new MuxmPlayerAudioResource( player );
         }
 
-    public final AudioResourceEx loadSound( final String aSoundName ) throws IOException
+    public final AudioResourceEx loadSound( final String aSoundName )
         {
         throw new UnsupportedOperationException();
         }
