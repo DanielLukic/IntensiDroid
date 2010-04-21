@@ -39,12 +39,16 @@ final class EglHelper
         final int[] numberOfConfigurations = new int[1];
         myEgl.eglGetConfigs( myDisplay, configurations, configurations.length, numberOfConfigurations );
 
-        Log.info( "EGL configurations found: " + numberOfConfigurations[ 0 ] );
+        //#if DEBUG_OPENGL
+        Log.debug( "EGL configurations found: " + numberOfConfigurations[ 0 ] );
+        //#endif
         for ( int idx = 0; idx < numberOfConfigurations[ 0 ]; idx++ )
             {
             final String configurationString = makeConfigurationString( configurations[ idx ] );
             availableConfigurations.add( configurationString );
-            Log.info( "EGL configuration: " + configurationString );
+            //#if DEBUG_OPENGL
+            Log.debug( "EGL configuration: " + configurationString );
+            //#endif
             }
 
         if ( aConfigurationSpec == CHOOSE_FIRST_AVAILABLE )
@@ -60,7 +64,9 @@ final class EglHelper
             }
 
         choosenConfiguration = makeConfigurationString( myConfiguration );
-        Log.info( "EGL configuration choosen: " + choosenConfiguration );
+        //#if DEBUG_OPENGL
+        Log.debug( "EGL configuration choosen: " + choosenConfiguration );
+        //#endif
 
         myContext = myEgl.eglCreateContext( myDisplay, myConfiguration, EGL10.EGL_NO_CONTEXT, null );
         }
