@@ -5,7 +5,6 @@ import net.intensicode.droid.AndroidImageResource;
 import net.intensicode.util.*;
 
 import javax.microedition.khronos.opengles.*;
-import java.util.ArrayList;
 
 
 public final class OpenglGraphics extends DirectGraphics
@@ -59,7 +58,7 @@ public final class OpenglGraphics extends DirectGraphics
         Log.info( "GL version: " + version );
         Log.info( "GL extensions: " + extensions );
         Log.info( "GL has draw texture extension? " + hasDrawTextureExtension );
-        Log.info( "GL has hardware buffers? " + hasHardwareBuffers );
+        Log.info( "GL has hardware buffers? " + isVersion1_0 );
 
         textureManager.purgeAllTextures();
 
@@ -68,15 +67,18 @@ public final class OpenglGraphics extends DirectGraphics
         myTextureStateManager.gl = aGL10;
         }
 
-    void onSurfaceChanged( final int aWidth, final int aHeight, final int aDisplayWidth, final int aDisplayHeight )
+    void onSurfaceChanged( final int aWidth, final int aHeight, final float aDisplayWidth, final float aDisplayHeight )
         {
         myWidth = aWidth;
         myHeight = aHeight;
         myScaleX = aDisplayWidth / (float) myWidth;
         myScaleY = aDisplayHeight / (float) myHeight;
+        //#if DEBUG_OPENGL
+        Log.info( "OpenglGraphics surface scale: {} {}", myScaleX, myScaleY );
+        //#endif
         }
 
-    void fixDrawTextureOffset( final float aOffsetX, final int aOffsetY )
+    void fixDrawTextureExtensionOffset( final float aOffsetX, final float aOffsetY )
         {
         myOffsetX = aOffsetX;
         myOffsetY = aOffsetY;

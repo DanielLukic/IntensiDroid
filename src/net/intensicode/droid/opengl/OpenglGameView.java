@@ -6,7 +6,7 @@ import net.intensicode.droid.*;
 import net.intensicode.util.*;
 
 import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.opengles.*;
 
 
 public final class OpenglGameView extends AndroidGameView
@@ -68,6 +68,8 @@ public final class OpenglGameView extends AndroidGameView
         TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
         TextureUtilities.setRenderTextureUnit();
         TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
+
+        if ( myTargetOffset.validDirection() ) myGL.glClear( GL11.GL_COLOR_BUFFER_BIT );
         }
 
     public final void endFrame()
@@ -138,15 +140,33 @@ public final class OpenglGameView extends AndroidGameView
         final int virtualWidth = width();
         final int virtualHeight = height();
 
-        myGL.glViewport( 0, 0, aWidth, aHeight );
+        final float hFactor = aWidth / (float) virtualWidth;
+        final float vFactor = aHeight / (float) virtualHeight;
+        final float factor = Math.min( hFactor, vFactor );
+
+        final float targetWidth = virtualWidth * factor;
+        final float targetHeight = virtualHeight * factor;
+
+        final float xDelta = aWidth - targetWidth;
+        final float yDelta = aHeight - targetHeight;
+
+        final float xOffset = xDelta / factor / 2f;
+        final float yOffset = yDelta / factor / 2f;
+
         myGL.glMatrixMode( GL10.GL_PROJECTION );
         myGL.glLoadIdentity();
-        myGL.glOrthof( 0, virtualWidth, 0, virtualHeight, -1, 1 );
-        myGL.glTranslatef( 0, virtualHeight, 0 );
-        myGL.glScalef( 1.0f, -1.0f, 1.0f );
+        final float left = -xOffset;
+        final float right = virtualWidth + xOffset;
+        final float bottom = virtualHeight + yOffset;
+        final float top = -yOffset;
+        myGL.glOrthof( left, right, bottom, top, -1, 1 );
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
 
-        graphics.onSurfaceChanged( virtualWidth, virtualHeight, aWidth, aHeight );
+        graphics.fixDrawTextureExtensionOffset( xDelta / 2f, yDelta / 2f );
+        graphics.onSurfaceChanged( virtualWidth, virtualHeight, targetWidth, targetHeight );
+
+        myTargetOffset.x = (int) xOffset;
+        myTargetOffset.y = (int) yOffset;
         }
 
 
