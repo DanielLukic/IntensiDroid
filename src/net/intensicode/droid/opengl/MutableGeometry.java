@@ -3,9 +3,9 @@ package net.intensicode.droid.opengl;
 import javax.microedition.khronos.opengles.GL10;
 import java.nio.*;
 
-class MutableTriangle
+class MutableGeometry
     {
-    MutableTriangle()
+    MutableGeometry()
         {
         final ByteOrder NATIVE_ORDER = ByteOrder.nativeOrder();
 
@@ -15,11 +15,15 @@ class MutableTriangle
         myIndexBuffer.put( 0, (char) 0 );
         myIndexBuffer.put( 1, (char) 1 );
         myIndexBuffer.put( 2, (char) 2 );
+        myIndexBuffer.put( 3, (char) 3 );
+        myIndexBuffer.put( 4, (char) 4 );
 
         // Clear z values..
         myVertexBuffer.put( 2, 0 );
         myVertexBuffer.put( 4, 0 );
         myVertexBuffer.put( 6, 0 );
+        myVertexBuffer.put( 8, 0 );
+        myVertexBuffer.put( 10, 0 );
         }
 
     final void set( final int aVertexIndex, final float aX, final float aY )
@@ -29,10 +33,22 @@ class MutableTriangle
         myVertexBuffer.put( bufferIndex + 1, aY );
         }
 
-    final void drawTriangle( final GL10 gl )
+    final void drawRectangle( final GL10 gl )
+        {
+        gl.glVertexPointer( DIMENSIONS, GL10.GL_FLOAT, 0, myVertexBuffer );
+        gl.glDrawElements( GL10.GL_LINE_STRIP, 5, GL10.GL_UNSIGNED_SHORT, myIndexBuffer );
+        }
+
+    final void fillTriangle( final GL10 gl )
         {
         gl.glVertexPointer( DIMENSIONS, GL10.GL_FLOAT, 0, myVertexBuffer );
         gl.glDrawElements( GL10.GL_TRIANGLES, 3, GL10.GL_UNSIGNED_SHORT, myIndexBuffer );
+        }
+
+    final void drawTriangle( final GL10 gl )
+        {
+        gl.glVertexPointer( DIMENSIONS, GL10.GL_FLOAT, 0, myVertexBuffer );
+        gl.glDrawElements( GL10.GL_LINE_STRIP, 4, GL10.GL_UNSIGNED_SHORT, myIndexBuffer );
         }
 
     final void drawLine( final GL10 gl )
@@ -58,5 +74,5 @@ class MutableTriangle
 
     private final static int DIMENSIONS = 3;
 
-    private final static int MAX_VERTICES = 3;
+    private final static int MAX_VERTICES = 5;
     }

@@ -19,53 +19,74 @@ public final class GeometryDrawer
     public final void updateHardwareBuffers()
         {
         freeHardwareBuffers();
-        myFillRectSquare.generateHardwareBuffers( gl );
+        myFillRectRectangle.generateHardwareBuffers( gl );
         }
 
     public final void freeHardwareBuffers()
         {
-        if ( myFillRectSquare.hasHardwareBuffers() ) myFillRectSquare.freeHardwareBuffers( gl );
+        if ( myFillRectRectangle.hasHardwareBuffers() ) myFillRectRectangle.freeHardwareBuffers( gl );
         }
 
     public final void drawPoint( final int aX1, final int aY1 )
         {
-        myTriangle.set( 0, aX1, aY1 );
-        myTriangle.drawPoint( gl );
+        myGeometry.set( 0, aX1, aY1 );
+        myGeometry.drawPoint( gl );
         myVertexBufferIsUpToDate = false;
         }
 
     public final void drawLine( final int aX1, final int aY1, final int aX2, final int aY2 )
         {
-        myTriangle.set( 0, aX1, aY1 );
-        myTriangle.set( 1, aX2, aY2 );
-        myTriangle.drawLine( gl );
+        myGeometry.set( 0, aX1, aY1 );
+        myGeometry.set( 1, aX2, aY2 );
+        myGeometry.drawLine( gl );
         myVertexBufferIsUpToDate = false;
         }
 
-    public final void drawSquare( final int aX, final int aY, final int aWidth, final int aHeight )
+    public final void fillTriangle( final int aX1, final int aY1, final int aX2, final int aY2, final int aX3, final int aY3 )
+        {
+        myGeometry.set( 0, aX1, aY1 );
+        myGeometry.set( 1, aX2, aY2 );
+        myGeometry.set( 2, aX3, aY3 );
+        myGeometry.fillTriangle( gl );
+        myVertexBufferIsUpToDate = false;
+        }
+
+    public final void drawTriangle( final int aX1, final int aY1, final int aX2, final int aY2, final int aX3, final int aY3 )
+        {
+        myGeometry.set( 0, aX1, aY1 );
+        myGeometry.set( 1, aX2, aY2 );
+        myGeometry.set( 2, aX3, aY3 );
+        myGeometry.set( 3, aX1, aY1 );
+        myGeometry.drawTriangle( gl );
+        myVertexBufferIsUpToDate = false;
+        }
+
+    public final void drawRect( final int aX, final int aY, final int aWidth, final int aHeight )
+        {
+        myGeometry.set( 0, aX, aY );
+        myGeometry.set( 1, aX + aWidth, aY );
+        myGeometry.set( 2, aX + aWidth, aY + aHeight );
+        myGeometry.set( 3, aX, aY + aHeight );
+        myGeometry.set( 4, aX, aY );
+        myGeometry.drawRectangle( gl );
+        myVertexBufferIsUpToDate = false;
+        }
+
+    public final void fillRect( final int aX, final int aY, final int aWidth, final int aHeight )
         {
         if ( !myTextureBufferIsUpToDate )
             {
-            myFillRectSquare.updateTextureBuffer( gl );
+            myFillRectRectangle.updateTextureBuffer( gl );
             myTextureBufferIsUpToDate = true;
             }
 
         if ( !myVertexBufferIsUpToDate )
             {
-            myFillRectSquare.updateVertexBuffer( gl );
+            myFillRectRectangle.updateVertexBuffer( gl );
             myVertexBufferIsUpToDate = true;
             }
 
-        myFillRectSquare.draw( gl, aX, aY, aWidth, aHeight );
-        }
-
-    public final void drawTriangle( final int aX1, final int aY1, final int aX2, final int aY2, final int aX3, final int aY3 )
-        {
-        myTriangle.set( 0, aX1, aY1 );
-        myTriangle.set( 1, aX2, aY2 );
-        myTriangle.set( 2, aX3, aY3 );
-        myTriangle.drawTriangle( gl );
-        myVertexBufferIsUpToDate = false;
+        myFillRectRectangle.draw( gl, aX, aY, aWidth, aHeight );
         }
 
 
@@ -73,7 +94,7 @@ public final class GeometryDrawer
 
     private boolean myTextureBufferIsUpToDate;
 
-    private final MutableTriangle myTriangle = new MutableTriangle();
+    private final MutableGeometry myGeometry = new MutableGeometry();
 
-    private final StaticSquare myFillRectSquare = new StaticSquare();
+    private final StaticRectangle myFillRectRectangle = new StaticRectangle();
     }

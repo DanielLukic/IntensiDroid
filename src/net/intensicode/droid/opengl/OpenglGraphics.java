@@ -142,13 +142,15 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void drawLine( final int aX1, final int aY1, final int aX2, final int aY2 )
         {
+        myTextureStateManager.disableTexturingIfNecessary();
         if ( aX1 == aX2 && aY1 == aY2 ) myGeometryDrawer.drawPoint( aX1, aY1 );
         else myGeometryDrawer.drawLine( aX1, aY1, aX2, aY2 );
         }
 
     public final void drawRect( final int aX, final int aY, final int aWidth, final int aHeight )
         {
-        fillColoredRect( aX, aY, aWidth, aHeight );
+        myTextureStateManager.disableTexturingIfNecessary();
+        myGeometryDrawer.drawRect( aX, aY, aWidth, aHeight );
         }
 
     public final void drawRGB( final int[] aARGB32, final int aOffsetX, final int aScanlineSize, final int aX, final int aY, final int aWidth, final int aHeight, final boolean aUseAlpha )
@@ -163,7 +165,7 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void fillTriangle( final int aX1, final int aY1, final int aX2, final int aY2, final int aX3, final int aY3 )
         {
-        myGeometryDrawer.drawTriangle( aX1, aY1, aX2, aY2, aX3, aY3 );
+        myGeometryDrawer.fillTriangle( aX1, aY1, aX2, aY2, aX3, aY3 );
         }
 
     public final void blendImage( final ImageResource aImage, final int aX, final int aY, final int aAlpha256 )
@@ -223,7 +225,7 @@ public final class OpenglGraphics extends DirectGraphics
             myTextureStateManager.updateMatrix( aSourceRect );
 
             myGeometryDrawer.enableTextureCoordinates = true;
-            myGeometryDrawer.drawSquare( aTargetX, aTargetY, aSourceRect.width, aSourceRect.height );
+            myGeometryDrawer.fillRect( aTargetX, aTargetY, aSourceRect.width, aSourceRect.height );
             }
         }
 
@@ -242,7 +244,7 @@ public final class OpenglGraphics extends DirectGraphics
         myTextureStateManager.disableTexturingIfNecessary();
 
         myGeometryDrawer.enableTextureCoordinates = false;
-        myGeometryDrawer.drawSquare( aX, aY, aWidth, aHeight );
+        myGeometryDrawer.fillRect( aX, aY, aWidth, aHeight );
         }
 
     private Texture getOrLoadTexture( final AndroidImageResource aImage )

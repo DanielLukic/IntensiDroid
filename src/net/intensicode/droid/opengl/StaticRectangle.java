@@ -3,9 +3,9 @@ package net.intensicode.droid.opengl;
 import javax.microedition.khronos.opengles.*;
 import java.nio.*;
 
-class StaticSquare
+class StaticRectangle
     {
-    public StaticSquare()
+    public StaticRectangle()
         {
         mW = VERTS_ACROSS;
 
