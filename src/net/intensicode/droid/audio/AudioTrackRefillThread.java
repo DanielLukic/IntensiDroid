@@ -53,7 +53,9 @@ final class AudioTrackRefillThread extends Thread implements AudioTrack.OnPlayba
                 }
             catch ( final InterruptedException e )
                 {
-                Log.info( "AudioTrackRefillThread interrupted. Bailing out.." );
+                //#if DEBUG_AUDIO
+                Log.debug( "AudioTrackRefillThread interrupted. Bailing out.." );
+                //#endif
                 break;
                 }
             }
@@ -63,7 +65,9 @@ final class AudioTrackRefillThread extends Thread implements AudioTrack.OnPlayba
 
     public final void onMarkerReached( final AudioTrack aAudioTrack )
         {
-        Log.info( "onMarkerReached audiotrack thread: {}", Thread.currentThread() );
+        //#if DEBUG_AUDIO
+        Log.debug( "onMarkerReached audiotrack thread: {}", Thread.currentThread() );
+        //#endif
         synchronized ( this )
             {
             notify();
@@ -72,14 +76,18 @@ final class AudioTrackRefillThread extends Thread implements AudioTrack.OnPlayba
 
     public final void onPeriodicNotification( final AudioTrack aAudioTrack )
         {
-        Log.info( "onPeriodicNotification audiotrack thread: {}", Thread.currentThread() );
+        //#if DEBUG_AUDIO
+        Log.debug( "onPeriodicNotification audiotrack thread: {}", Thread.currentThread() );
+        //#endif
         }
 
     // Implementation
 
     public final void fillAudioTrackBuffer()
         {
-        Log.info( "fillAudioTrackBuffer audiotrack thread: {}", Thread.currentThread() );
+        //#if DEBUG_AUDIO
+        Log.debug( "fillAudioTrackBuffer audiotrack thread: {}", Thread.currentThread() );
+        //#endif
 
         myModuleEngine.getAudio( myAudioBuffer, 0, myBufferSizeInFrames, true );
         myAudioTrack.write( myAudioBuffer, 0, myAudioBuffer.length );
