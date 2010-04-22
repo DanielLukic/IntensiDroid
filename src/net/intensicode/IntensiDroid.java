@@ -101,6 +101,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         // Default implementation does nothing..
         }
 
+    public void onInfoTriggered()
+        {
+        // Default implementation does nothing..
+        }
+
     public void onDebugTriggered()
         {
         IntensiGameHelper.toggleDebugScreen( myGameSystem );
