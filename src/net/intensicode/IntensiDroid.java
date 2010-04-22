@@ -30,6 +30,52 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         startActivity( new Intent( Intent.ACTION_VIEW, Uri.parse( aURL ) ) );
         }
 
+    public final void sendEmail( final EmailData aEmailData )
+        {
+        final Intent emailIntent = new Intent( android.content.Intent.ACTION_SEND );
+        emailIntent.setType( "text/plain" );
+        emailIntent.putExtra( Intent.EXTRA_EMAIL, new String[]{ aEmailData.to } );
+        emailIntent.putExtra( Intent.EXTRA_SUBJECT, aEmailData.subject );
+        emailIntent.putExtra( Intent.EXTRA_TEXT, aEmailData.text );
+        startActivity( Intent.createChooser( emailIntent, "Send mail" ) );
+        }
+
+    public final String getPlatformSpecString()
+        {
+        final StringBuffer buffer = new StringBuffer();
+        buffer.append( Build.BRAND );
+        buffer.append( " * " );
+        buffer.append( Build.MODEL );
+        buffer.append( " * " );
+        buffer.append( Build.DEVICE );
+        buffer.append( " * " );
+        buffer.append( Build.DISPLAY );
+        buffer.append( " * " );
+        buffer.append( Build.PRODUCT );
+        return buffer.toString();
+        }
+
+    public final String getGraphicsSpecString()
+        {
+        final DirectGraphics graphics = myGameSystem.graphics;
+        if ( graphics instanceof OpenglGraphics )
+            {
+            final OpenglGraphics opengl = (OpenglGraphics) graphics;
+
+            final StringBuffer buffer = new StringBuffer();
+            buffer.append( opengl.vendor );
+            buffer.append( " * " );
+            buffer.append( opengl.renderer );
+            buffer.append( " * " );
+            buffer.append( opengl.version );
+            return buffer.toString();
+            }
+        else
+            {
+            return "AndroidCanvasGraphics";
+            }
+        }
+
     // From SystemContext
 
     public final GameSystem system()
