@@ -58,7 +58,7 @@ public final class OpenglGraphics extends DirectGraphics
         Log.info( "GL version: " + version );
         Log.info( "GL extensions: " + extensions );
         Log.info( "GL has draw texture extension? " + hasDrawTextureExtension );
-        Log.info( "GL has hardware buffers? " + isVersion1_0 );
+        Log.info( "GL has hardware buffers? " + !isVersion1_0 );
 
         textureManager.purgeAllTextures();
 
