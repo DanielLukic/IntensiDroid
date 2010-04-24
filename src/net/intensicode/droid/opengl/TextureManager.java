@@ -19,15 +19,22 @@ public final class TextureManager
     public final void addTexture( final AndroidImageResource aImageResource )
         {
         final String imageId = getImageOrDefaultId( aImageResource );
-        if ( configuredAsDirectTexture( imageId ) )
+        if ( !configuredAsDirectTexture( imageId ) )
             {
-            directTextureManager.addTexture( aImageResource );
+            try
+                {
+                final AtlasHints hints = getConfiguredAtlasHints( imageId );
+                atlasTextureManager.addTexture( aImageResource, hints );
+                return;
+                }
+            catch ( final IllegalStateException e )
+                {
+                Log.error( e );
+                }
+            Log.info( "falling back to direct texture" );
             }
-        else
-            {
-            final AtlasHints hints = getConfiguredAtlasHints( imageId );
-            atlasTextureManager.addTexture( aImageResource, hints );
-            }
+
+        directTextureManager.addTexture( aImageResource );
         }
 
     private AtlasHints getConfiguredAtlasHints( final String aImageId )
