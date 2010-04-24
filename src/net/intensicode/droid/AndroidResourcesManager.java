@@ -10,6 +10,8 @@ import java.io.*;
 
 public final class AndroidResourcesManager extends ResourcesManager
     {
+    public static final int MAX_IMAGE_RESOURCE_SIZE = 512;
+
     public AndroidResourcesManager( final AssetManager aAssetManager, final String aSubFolderOrNull )
         {
         myAssetManager = aAssetManager;
@@ -28,6 +30,11 @@ public final class AndroidResourcesManager extends ResourcesManager
         //#endif
         final AndroidFontResource fontResource = new AndroidFontResource( paint );
         return new SystemFontGenerator( fontResource );
+        }
+
+    public final int maxImageResourceSize()
+        {
+        return MAX_IMAGE_RESOURCE_SIZE;
         }
 
     public final ImageResource createImageResource( final int aWidth, final int aHeight )
