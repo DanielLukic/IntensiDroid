@@ -117,6 +117,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         //#endif
 
+        platform.addLeaf( new DumpMemory() );
+
         return platform;
         }
 
