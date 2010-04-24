@@ -15,10 +15,12 @@ public final class MuxmPlayer
         final int minBufferSize = AudioTrack.getMinBufferSize( DEFAULT_SAMPLE_RATE, AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT );
         final int frameCompatibleBuffer = minBufferSize * AudioTrackRefillThread.FRAME_SIZE_IN_BYTES;
 
+        //#if DEBUG_AUDIO
         Log.info( "AudioTrack Native Sample Rate: {}", AudioTrack.getNativeOutputSampleRate( AudioTrack.MODE_STREAM ) );
         Log.info( "AudioTrack Volume Range: {} - {}", AudioTrack.getMinVolume(), AudioTrack.getMaxVolume() );
         Log.info( "AudioTrack MinBufferSize: {}", minBufferSize );
         Log.info( "Choosen BufferSize: {}", frameCompatibleBuffer );
+        //#endif
 
         final AudioTrack audioTrack = new AudioTrack( AudioManager.STREAM_MUSIC, DEFAULT_SAMPLE_RATE, AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT, frameCompatibleBuffer, AudioTrack.MODE_STREAM );
         audioTrack.setPlaybackRate( DEFAULT_SAMPLE_RATE );
@@ -33,12 +35,16 @@ public final class MuxmPlayer
         myRefillThread.setDaemon( true );
         myRefillThread.start();
 
+        //#if DEBUG_AUDIO
         Log.info( "initial audiotrack thread: {}", Thread.currentThread() );
+        //#endif
         }
 
     public final void start()
         {
+        //#if DEBUG_AUDIO
         Log.info( "start audiotrack thread: {}", Thread.currentThread() );
+        //#endif
 
         if ( isPlaying() ) return;
         myRefillThread.startAudioTrack();
