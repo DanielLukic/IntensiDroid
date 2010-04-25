@@ -99,14 +99,14 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         final ConfigurationElementsTree ui = platform.addSubTree( "UI" );
         ui.addLeaf( new CaptureBackKey( (AndroidKeysHandler) myGameSystem.keys ) );
 
-        //#if !RELEASE
-
         //#if PROFILING
         final ConfigurationElementsTree profiling = platform.addSubTree( "Profiling" );
         profiling.addLeaf( new StartProfiling() );
         profiling.addLeaf( new StopProfiling() );
         profiling.addLeaf( new DumpHprofData() );
         //#endif
+
+        //#if !RELEASE
 
         final DirectGraphics graphics = myGameSystem.graphics;
         if ( graphics instanceof OpenglGraphics )
