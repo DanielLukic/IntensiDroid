@@ -178,7 +178,6 @@ class StaticRectangle
 
     private void generateIndexBuffer( final GL11 aGl11 )
         {
-        // Allocate and fill the index myBufferWorkspace.
         aGl11.glGenBuffers( 1, myBufferWorkspace, 0 );
         mIndexBufferIndex = myBufferWorkspace[ 0 ];
         aGl11.glBindBuffer( GL11.GL_ELEMENT_ARRAY_BUFFER, mIndexBufferIndex );
