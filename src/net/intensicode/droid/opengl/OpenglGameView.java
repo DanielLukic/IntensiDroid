@@ -61,6 +61,14 @@ public final class OpenglGameView extends AndroidGameView
         {
         Assert.notNull( "opengl handle", myGL );
 
+        //#if DEBUG_OPENGL
+        if ( myGL instanceof TrackingGL )
+            {
+            final TrackingGL gl = (TrackingGL) myGL;
+            gl.beginFrame();
+            }
+        //#endif
+
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
         myGL.glLoadIdentity();
 
@@ -75,6 +83,14 @@ public final class OpenglGameView extends AndroidGameView
     public final void endFrame()
         {
         Assert.notNull( "opengl handle", myGL );
+
+        //#if DEBUG_OPENGL
+        if ( myGL instanceof TrackingGL )
+            {
+            final TrackingGL gl = (TrackingGL) myGL;
+            gl.endFrame();
+            }
+        //#endif
 
         final int state = myEglHelper.swapAndReturnContextState();
         if ( state == EglHelper.CONTEXT_LOST )
@@ -91,6 +107,9 @@ public final class OpenglGameView extends AndroidGameView
 
         myEglHelper.start( getEglConfiguration() );
         myGL = (GL10) myEglHelper.createOrUpdateSurface( mySurfaceHolder );
+        //#if DEBUG_OPENGL
+        myGL = new TrackingGL( myGL );
+        //#endif
         onSurfaceCreated();
         onSurfaceChanged( getWidth(), getHeight() );
         graphics.lateInitialize();
@@ -109,14 +128,10 @@ public final class OpenglGameView extends AndroidGameView
         {
         if ( AndroidUtilities.isSamsungGalaxy() )
             {
-            // Samsung Galaxy needs this and other devices seem to be OK with it:
             return new int[]{ EGL10.EGL_DEPTH_SIZE, SAMSUNG_GALAXY_DEPTH_BITS, EGL10.EGL_NONE };
             }
         if ( AndroidUtilities.isDroidOrMilestone() )
             {
-            // Let's assume it can handle this:
-            TextureUtilities.maximumTextureSize = DROID_MAX_TEXTURE_SIZE;
-
             return new int[]{ EGL10.EGL_DEPTH_SIZE, DROID_RECOMMENDED_DEPTH_BITS, EGL10.EGL_NONE };
             }
         return new int[]{ EGL10.EGL_NONE };
@@ -177,6 +192,4 @@ public final class OpenglGameView extends AndroidGameView
     private static final int SAMSUNG_GALAXY_DEPTH_BITS = 16;
 
     private static final int DROID_RECOMMENDED_DEPTH_BITS = 24;
-
-    private static final int DROID_MAX_TEXTURE_SIZE = TextureUtilities.MAX_TEXTURE_SIZE;
     }
