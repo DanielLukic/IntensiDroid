@@ -57,9 +57,16 @@ public final class TextureStateManager
         myActiveTexture = aTexture;
         }
 
+    private Texture myCurrentlyCroppedTexture;
+
+    private final Rectangle myCurrentlyCroppedRectangle = new Rectangle();
+
     public final void updateCrop( final Rectangle aRectangle )
         {
+        if ( myCurrentlyCroppedTexture == myActiveTexture && myCurrentlyCroppedRectangle.equals( aRectangle ) ) return;
         myActiveTexture.setTextureCrop( aRectangle );
+        myCurrentlyCroppedTexture = myActiveTexture;
+        myCurrentlyCroppedRectangle.setTo( aRectangle );
         }
 
     public final void updateMatrix( final Rectangle aRectangle )
