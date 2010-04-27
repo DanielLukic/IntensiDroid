@@ -20,6 +20,9 @@ public final class AndroidKeysHandler extends KeysHandler implements View.OnKeyL
         // Handled in IntensiDroid:
         if ( aKeyCode == KeyEvent.KEYCODE_MENU ) return false;
 
+        lastCode = aKeyCode;
+        lastAction = 0;
+
         final int keyID = mapKeyCodeToKeyId( aKeyCode );
         if ( keyID == INVALID ) return false;
 
@@ -43,9 +46,6 @@ public final class AndroidKeysHandler extends KeysHandler implements View.OnKeyL
 
     private int mapKeyCodeToKeyId( final int aKeyCode )
         {
-        lastCode = aKeyCode;
-        lastAction = 0;
-
         if ( aKeyCode == leftCode ) return LEFT;
         if ( aKeyCode == rightCode ) return RIGHT;
         if ( aKeyCode == upCode ) return UP;
