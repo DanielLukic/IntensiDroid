@@ -1,7 +1,8 @@
 package net.intensicode.droid.opengl;
 
+import android.graphics.Rect;
 import net.intensicode.core.*;
-import net.intensicode.droid.AndroidImageResource;
+import net.intensicode.droid.*;
 import net.intensicode.util.*;
 
 import javax.microedition.khronos.opengles.*;
@@ -126,6 +127,7 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void setFont( final FontResource aFont )
         {
+        myFont = aFont;
         }
 
     public void clearRGB24( final int aRGB24 )
@@ -229,12 +231,31 @@ public final class OpenglGraphics extends DirectGraphics
             }
         }
 
+    private final Rect mySubstringRect = new Rect();
+
+    private ImageResource mySubstringBuffer;
+
     public final void drawSubstring( final String aText, final int aStart, final int aEnd, final int aX, final int aY )
         {
+        final AndroidFontResource resource = (AndroidFontResource) myFont;
+        resource.paint.getTextBounds( aText, aStart, aEnd, mySubstringRect );
+
+        if ( mySubstringBuffer != null && mySubstringBuffer.getWidth() < mySubstringRect.width() )
+            mySubstringBuffer = null;
+        if ( mySubstringBuffer != null && mySubstringBuffer.getHeight() < mySubstringRect.height() )
+            mySubstringBuffer = null;
+        if ( mySubstringBuffer == null )
+            mySubstringBuffer = AndroidImageResource.createFrom( mySubstringRect.width(), mySubstringRect.height() );
+
+        final DirectGraphics graphics = mySubstringBuffer.getGraphics();
+        graphics.setFont( myFont );
+        graphics.drawSubstring( aText, aStart, aEnd, aX, aY );
         }
 
     public void drawChar( final char aCharCode, final int aX, final int aY )
         {
+        // TODO: Implement like drawSubstring.
+        drawSubstring( Character.toString( aCharCode ), 0, 1, aX, aY );
         }
 
     // Implementation
@@ -269,6 +290,8 @@ public final class OpenglGraphics extends DirectGraphics
     private float myOffsetY;
 
     private int myColorARGB32;
+
+    private FontResource myFont;
 
 
     private final GameSystem myGameSystem;
