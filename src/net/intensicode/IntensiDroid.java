@@ -115,9 +115,9 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
             opengl.addLeaf( new DumpTextureAtlases( (OpenglGraphics) graphics ) );
             }
 
-        //#endif
-
         platform.addLeaf( new DumpMemory() );
+
+        //#endif
 
         return platform;
         }
