@@ -96,28 +96,35 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         {
         final ConfigurationElementsTree platform = new ConfigurationElementsTree( "Platform" );
 
-        final ConfigurationElementsTree ui = platform.addSubTree( "UI" );
-        ui.addLeaf( new CaptureBackKey( (AndroidKeysHandler) myGameSystem.keys ) );
-
-        //#if PROFILING
-        final ConfigurationElementsTree profiling = platform.addSubTree( "Profiling" );
-        profiling.addLeaf( new StartProfiling() );
-        profiling.addLeaf( new StopProfiling() );
-        profiling.addLeaf( new DumpHprofData() );
-        //#endif
-
-        //#if !RELEASE
-
-        final DirectGraphics graphics = myGameSystem.graphics;
-        if ( graphics instanceof OpenglGraphics )
+        try
             {
-            final ConfigurationElementsTree opengl = platform.addSubTree( "OpenGL" );
-            opengl.addLeaf( new DumpTextureAtlases( (OpenglGraphics) graphics ) );
+            final ConfigurationElementsTree ui = platform.addSubTree( "UI" );
+            ui.addLeaf( new CaptureBackKey( (AndroidKeysHandler) myGameSystem.keys ) );
+
+            //#if PROFILING
+            final ConfigurationElementsTree profiling = platform.addSubTree( "Profiling" );
+            profiling.addLeaf( new StartProfiling() );
+            profiling.addLeaf( new StopProfiling() );
+            profiling.addLeaf( new DumpHprofData() );
+            //#endif
+
+            //#if !RELEASE
+
+            final DirectGraphics graphics = myGameSystem.graphics;
+            if ( graphics instanceof OpenglGraphics )
+                {
+                final ConfigurationElementsTree opengl = platform.addSubTree( "OpenGL" );
+                opengl.addLeaf( new DumpTextureAtlases( (OpenglGraphics) graphics ) );
+                }
+
+            platform.addLeaf( new DumpMemory() );
+
+            //#endif
             }
-
-        platform.addLeaf( new DumpMemory() );
-
-        //#endif
+        catch ( final Exception e )
+            {
+            system().showError( "failed preparing platform values for configuration menu. ignored.", e );
+            }
 
         return platform;
         }
