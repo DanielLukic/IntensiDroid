@@ -52,6 +52,19 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         buffer.append( Build.DISPLAY );
         buffer.append( " * " );
         buffer.append( Build.PRODUCT );
+        try
+            {
+            buffer.append( " * " );
+            buffer.append( Build.VERSION.SDK );
+            buffer.append( " * " );
+            buffer.append( Build.VERSION.RELEASE );
+            buffer.append( " * " );
+            buffer.append( Build.VERSION.INCREMENTAL );
+            }
+        catch ( final Exception e )
+            {
+            Log.error( "failed adding version information. ignored.", e );
+            }
         return buffer.toString();
         }
 
