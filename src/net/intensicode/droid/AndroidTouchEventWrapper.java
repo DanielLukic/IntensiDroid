@@ -5,6 +5,7 @@ package net.intensicode.droid;
 import android.view.MotionEvent;
 import net.intensicode.core.*;
 import net.intensicode.util.Position;
+import net.intensicode.touch.TouchEvent;
 
 public class AndroidTouchEventWrapper extends TouchEvent
     {

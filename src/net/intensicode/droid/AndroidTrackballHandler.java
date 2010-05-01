@@ -3,7 +3,7 @@
 package net.intensicode.droid;
 
 import android.view.MotionEvent;
-import net.intensicode.core.TrackballHandler;
+import net.intensicode.trackball.TrackballHandler;
 import net.intensicode.util.*;
 
 public final class AndroidTrackballHandler extends TrackballHandler

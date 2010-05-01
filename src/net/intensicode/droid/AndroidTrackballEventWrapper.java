@@ -3,7 +3,7 @@
 package net.intensicode.droid;
 
 import android.view.MotionEvent;
-import net.intensicode.core.TrackballEvent;
+import net.intensicode.trackball.TrackballEvent;
 import net.intensicode.util.Position;
 
 public class AndroidTrackballEventWrapper extends TrackballEvent

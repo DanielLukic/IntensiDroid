@@ -6,6 +6,7 @@ import android.os.Build;
 import android.view.*;
 import net.intensicode.core.*;
 import net.intensicode.util.Log;
+import net.intensicode.touch.TouchHandler;
 
 public final class AndroidTouchHandler extends TouchHandler implements View.OnTouchListener
     {
