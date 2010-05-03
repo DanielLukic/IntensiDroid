@@ -115,13 +115,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         return myGameSystem;
         }
 
-    public boolean useOpenglIfPossible()
+    public final void fillEmailData( final EmailData aEmailData )
         {
-        //#if OPENGL
-        //# return true;
-        //#else
-        return false;
-        //#endif
         }
 
     public final ConfigurationElementsTree getPlatformValues()
@@ -405,20 +400,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     private VideoSystem createVideoSystem( final GameSystem aGameSystem )
         {
-        if ( useOpenglIfPossible() )
-            {
-            //#if DEBUG
-            Log.debug( "creating OPENGL video system" );
-            //#endif
-            return VideoSystem.createOpenglVideoSystem( this, aGameSystem );
-            }
-        else
-            {
-            //#if DEBUG
-            Log.debug( "creating CANVAS video system" );
-            //#endif
-            return VideoSystem.createCanvasVideoSystem( this, aGameSystem );
-            }
+        //#if OPENGL
+        return VideoSystem.createOpenglVideoSystem( this, aGameSystem );
+        //#else
+        //# return VideoSystem.createCanvasVideoSystem( this, aGameSystem );
+        //#endif
         }
 
 
