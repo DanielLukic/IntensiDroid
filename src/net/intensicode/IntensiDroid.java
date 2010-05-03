@@ -194,12 +194,12 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     public void onDebugTriggered()
         {
-        IntensiGameHelper.toggleDebugScreen( myGameSystem );
+        myHelper.toggleDebugScreen();
         }
 
     public void onCheatTriggered()
         {
-        IntensiGameHelper.toggleCheatScreen( myGameSystem );
+        myHelper.toggleCheatScreen();
         }
 
     public void onPauseApplication()
@@ -279,8 +279,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         createGameViewAndGameSystem();
 
-        final IntensiGameHelper helper = new IntensiGameHelper( myGameSystem );
-        helper.initGameSystemFromConfigurationFile();
+        myHelper = new IntensiGameHelper( myGameSystem );
+        myHelper.initGameSystemFromConfigurationFile();
 
         setContentView( myGameView );
         }
@@ -413,6 +413,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     private GameSystem myGameSystem;
 
     private AndroidGameView myGameView;
+
+    private IntensiGameHelper myHelper;
 
     private OptionsMenuHandler myOptionsMenuHandler;
 
