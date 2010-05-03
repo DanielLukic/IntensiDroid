@@ -11,6 +11,8 @@ import net.intensicode.droid.*;
 import net.intensicode.droid.opengl.OpenglGraphics;
 import net.intensicode.util.*;
 
+import java.io.*;
+
 public abstract class IntensiDroid extends DebugLifeCycleActivity implements PlatformContext, SystemContext
     {
     protected IntensiDroid()
@@ -87,6 +89,23 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
             {
             return "AndroidCanvasGraphics";
             }
+        }
+
+    public final String getExtendedExceptionData( final Throwable aException )
+        {
+        final StringWriter stringWriter = new StringWriter();
+        final PrintWriter writer = new PrintWriter( stringWriter );
+        writer.print( "MESSAGE: " );
+        writer.println( String.valueOf( aException.getMessage() ) );
+        writer.print( "STACK: " );
+        aException.printStackTrace( writer );
+        writer.println();
+        if ( aException.getCause() != null )
+            {
+            writer.print( "CAUSE: " );
+            writer.println( String.valueOf( aException.getCause() ) );
+            }
+        return stringWriter.toString();
         }
 
     // From SystemContext
