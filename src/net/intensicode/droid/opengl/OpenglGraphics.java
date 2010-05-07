@@ -68,12 +68,12 @@ public final class OpenglGraphics extends DirectGraphics
         myTextureStateManager.gl = aGL10;
         }
 
-    void onSurfaceChanged( final int aWidth, final int aHeight, final float aDisplayWidth, final float aDisplayHeight )
+    void onSurfaceChanged( final int aWidth, final int aHeight, final float aScaleFactor )
         {
         myWidth = aWidth;
         myHeight = aHeight;
-        myScaleX = aDisplayWidth / (float) myWidth;
-        myScaleY = aDisplayHeight / (float) myHeight;
+        myScaleX = aScaleFactor;
+        myScaleY = aScaleFactor;
         //#if DEBUG_OPENGL
         Log.info( "OpenglGraphics surface scale: {} {}", myScaleX, myScaleY );
         //#endif

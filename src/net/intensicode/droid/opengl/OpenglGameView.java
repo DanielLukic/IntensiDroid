@@ -178,7 +178,7 @@ public final class OpenglGameView extends AndroidGameView
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
 
         graphics.fixDrawTextureExtensionOffset( xDelta / 2f, yDelta / 2f );
-        graphics.onSurfaceChanged( virtualWidth, virtualHeight, targetWidth, targetHeight );
+        graphics.onSurfaceChanged( virtualWidth, virtualHeight, factor );
 
         myTargetOffset.x = (int) xOffset;
         myTargetOffset.y = (int) yOffset;
