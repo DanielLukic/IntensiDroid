@@ -1,4 +1,4 @@
-//#condition TOUCH
+//#condition TRACKBALL
 
 package net.intensicode.droid;
 
