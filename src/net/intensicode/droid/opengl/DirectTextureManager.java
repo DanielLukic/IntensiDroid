@@ -88,5 +88,5 @@ public final class DirectTextureManager implements TexturePurger
 
     private static final int MAX_TEXTURE_SIZE_SHIFT_BITS = 10;
 
-    private static final int MAX_TEXTURE_SIZE_IN_PIXELS = 512;
+    private static final int MAX_TEXTURE_SIZE_IN_PIXELS = 1024;
     }
