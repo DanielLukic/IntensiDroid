@@ -109,7 +109,7 @@ public final class OpenglGameView extends AndroidGameView
 
         myEglHelper.start( getEglConfiguration() );
         myGL = (GL10) myEglHelper.createOrUpdateSurface( mySurfaceHolder );
-        //#if DEBUG_OPENGL
+        //#if TRACK_OPENGL
         myGL = new TrackingGL( myGL );
         //#endif
         onSurfaceCreated();
