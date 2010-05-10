@@ -102,6 +102,8 @@ public final class OpenglGameView extends AndroidGameView
 
     public final void initialize()
         {
+        Assert.isTrue( "AndroidGameView initialized", isInitialized() );
+
         Log.info( "Target screen size: {}x{}", width(), height() );
         Log.info( "Device screen size: {}x{}", getWidth(), getHeight() );
 
