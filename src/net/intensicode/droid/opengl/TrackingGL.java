@@ -992,7 +992,7 @@ public class TrackingGL implements GL11, GL11Ext
 
     public void glLoadMatrixf( final float[] aFloats, final int i )
         {
-        throw new RuntimeException( "nyi" );
+        myGL10.glLoadMatrixf(aFloats, i );
         }
 
     public void glLoadMatrixf( final FloatBuffer aFloatBuffer )
