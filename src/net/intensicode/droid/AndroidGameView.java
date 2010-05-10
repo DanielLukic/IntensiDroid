@@ -95,6 +95,11 @@ public abstract class AndroidGameView extends SurfaceView implements DirectScree
         {
         Log.debug( "surfaceChanged" );
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
+
+        // Fix for Nexus One switching the screen size from portrait to landscape mode when in landscape mode.
+        // I guess this is actually the desired behavior for IntensiGame: Whenever the surface changes, restart.
+        if ( isInitialized() ) system.stop();
+
         myInitialized = true;
         system.start();
         }
