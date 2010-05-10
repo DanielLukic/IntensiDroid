@@ -1,6 +1,6 @@
 package net.intensicode;
 
-import android.content.Intent;
+import android.content.*;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.*;
@@ -106,6 +106,41 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
             writer.println( String.valueOf( aException.getCause() ) );
             }
         return stringWriter.toString();
+        }
+
+    public void showError( final String aMessage, final Throwable aOptionalThrowable )
+        {
+        postDialog( aMessage, aOptionalThrowable, false );
+        }
+
+    public void showCriticalError( final String aMessage, final Throwable aOptionalThrowable )
+        {
+        postDialog( aMessage, aOptionalThrowable, true );
+        }
+
+    private void postDialog( final String aMessage, final Throwable aOptionalThrowable, final boolean aCritical )
+        {
+        final Context context = this;
+
+        myHandler.post( new Runnable()
+        {
+        public final void run()
+            {
+            final ErrorDialogBuilder dialogBuilder = new ErrorDialogBuilder( context, myGameSystem );
+            dialogBuilder.setTitle( "IntensiGame Error Report" );
+            dialogBuilder.setMessage( aMessage );
+            if ( aCritical )
+                {
+                dialogBuilder.setCritical( aCritical );
+                }
+            if ( aOptionalThrowable != null )
+                {
+                final String exceptionText = getExtendedExceptionData( aOptionalThrowable );
+                dialogBuilder.setCause( exceptionText );
+                }
+            dialogBuilder.createDialog();
+            }
+        } );
         }
 
     // From SystemContext
