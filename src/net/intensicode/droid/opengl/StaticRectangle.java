@@ -99,7 +99,6 @@ class StaticRectangle
     public void draw( GL10 gl, int aX, int aY, int aWidth, int aHeight )
         {
         gl.glPushMatrix();
-        gl.glLoadIdentity();
         gl.glTranslatef( aX, aY, 0 );
         gl.glScalef( aWidth, aHeight, 1 );
         drawDirect( gl );
