@@ -392,9 +392,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         setContentView( myGameView );
 
-        myGameSystem.touch.removeAllControls();
-        myGameSystem.stack.onOrientationChanged();
-
         onOrientationChanged();
         }
 
