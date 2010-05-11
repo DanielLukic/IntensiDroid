@@ -366,7 +366,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     protected void onDestroy()
         {
-        myGameSystem.stop();
         myGameSystem.destroy();
         super.onDestroy();
 
