@@ -2,11 +2,10 @@
 
 package net.intensicode.droid;
 
-import android.os.Build;
 import android.view.*;
 import net.intensicode.core.*;
-import net.intensicode.util.Log;
 import net.intensicode.touch.TouchHandler;
+import net.intensicode.util.Log;
 
 public final class AndroidTouchHandler extends TouchHandler implements View.OnTouchListener
     {
@@ -14,22 +13,6 @@ public final class AndroidTouchHandler extends TouchHandler implements View.OnTo
         {
         super( aGameSystem );
         myTouchEventWrapper = new AndroidTouchEventWrapper( aDirectScreen );
-        }
-
-    public final boolean supportsMultiTouch()
-        {
-        try
-            {
-            final int version = Integer.parseInt( Build.VERSION.SDK );
-            if ( version <= SDK_VERSION_DONUT ) return false;
-            }
-        catch ( final Throwable t )
-            {
-            // Let's be safe in this case..
-            return false;
-            }
-        // Let's assume we can..
-        return true;
         }
 
     // From OnTouchListener
@@ -67,10 +50,10 @@ public final class AndroidTouchHandler extends TouchHandler implements View.OnTo
         buffer.append( ",xprec=" ).append( aMotionEvent.getXPrecision() );
         buffer.append( ",y=" ).append( aMotionEvent.getY() );
         buffer.append( ",yprec=" ).append( aMotionEvent.getXPrecision() );
-        if ( aMotionEvent.getAction() == MotionEvent.ACTION_DOWN ) Log.info( "MOTIONEVENT DOWN");
+        if ( aMotionEvent.getAction() == MotionEvent.ACTION_DOWN ) Log.info( "MOTIONEVENT DOWN" );
         Log.info( buffer.toString() );
-        if ( aMotionEvent.getAction() == MotionEvent.ACTION_UP ) Log.info( "MOTIONEVENT UP");
-        if ( aMotionEvent.getAction() == MotionEvent.ACTION_CANCEL ) Log.info( "MOTIONEVENT CANCEL");
+        if ( aMotionEvent.getAction() == MotionEvent.ACTION_UP ) Log.info( "MOTIONEVENT UP" );
+        if ( aMotionEvent.getAction() == MotionEvent.ACTION_CANCEL ) Log.info( "MOTIONEVENT CANCEL" );
         myPreviousTimestamp = aMotionEvent.getEventTime();
         }
 
@@ -79,6 +62,4 @@ public final class AndroidTouchHandler extends TouchHandler implements View.OnTo
     //#endif
 
     private final AndroidTouchEventWrapper myTouchEventWrapper;
-
-    private static final int SDK_VERSION_DONUT = 4;
     }
