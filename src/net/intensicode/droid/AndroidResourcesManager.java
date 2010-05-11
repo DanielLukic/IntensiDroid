@@ -18,6 +18,11 @@ public final class AndroidResourcesManager extends ResourcesManager
         mySubFolderOrNull = aSubFolderOrNull;
         }
 
+    public void switchSubFolder( final String aSubFolderOrNull )
+        {
+        mySubFolderOrNull = aSubFolderOrNull;
+        }
+
     // From ResourcesManager
 
     public final FontGenerator getSmallDefaultFont()
@@ -78,7 +83,7 @@ public final class AndroidResourcesManager extends ResourcesManager
         }
 
 
-    private final String mySubFolderOrNull;
+    private String mySubFolderOrNull;
 
     private final AssetManager myAssetManager;
     }

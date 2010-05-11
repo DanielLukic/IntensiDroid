@@ -1,10 +1,13 @@
 package net.intensicode;
 
 import android.content.*;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.*;
 import android.view.*;
+import android.widget.*;
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
@@ -247,6 +250,15 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         // Default implementation does nothing..
         }
 
+    //#if ORIENTATION_DYNAMIC
+
+    public void onOrientationChanged()
+        {
+        // Default implementation does nothing..
+        }
+
+    //#endif
+
     public final void triggerConfigurationMenu()
         {
         myHandler.post( new Runnable()
@@ -301,6 +313,13 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         {
         super.onCreate( savedInstanceState );
 
+        //#if ORIENTATION_LANDSCAPE
+        //# setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE );
+        //#endif
+        //#if ORIENTATION_PORTRAIT
+        //# setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_PORTRAIT );
+        //#endif
+
         //#if DEBUG
         Assert.isFalse( "game system already initialized", isGameSystemCreated() );
         //#endif
@@ -354,6 +373,32 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         AndroidImageResource.purgeAll();
         System.gc();
         }
+
+    //#if ORIENTATION_DYNAMIC
+
+    public void onConfigurationChanged( final Configuration aConfiguration )
+        {
+        Log.info( "onConfigurationChanged {}", aConfiguration );
+        super.onConfigurationChanged( aConfiguration );
+
+        final TextView view = new TextView( this );
+        view.setText( "Updating view" );
+        setContentView( view );
+
+        final String resourcesSubFolder = AndroidUtilities.determineResourcesSubFolder( this );
+        myResources.switchSubFolder( resourcesSubFolder );
+
+        myHelper.initGameSystemFromConfigurationFile();
+
+        setContentView( myGameView );
+
+        myGameSystem.touch.removeAllControls();
+        myGameSystem.stack.onOrientationChanged();
+
+        onOrientationChanged();
+        }
+
+    //#endif
 
     // Implementation
 
@@ -427,6 +472,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         myGameView = view;
         myGameSystem = system;
+        myResources = resources;
         //#if TRACKBALL
         myTrackballHandler = trackball;
         //#endif
@@ -452,6 +498,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     private IntensiGameHelper myHelper;
 
     private OptionsMenuHandler myOptionsMenuHandler;
+
+    private AndroidResourcesManager myResources;
 
     //#if TRACKBALL
     private AndroidTrackballHandler myTrackballHandler;
