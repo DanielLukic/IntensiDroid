@@ -392,7 +392,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         setContentView( myGameView );
 
-        onOrientationChanged();
+        myGameSystem.engine.orientationChanged = true;
         }
 
     //#endif
