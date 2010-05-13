@@ -1,7 +1,6 @@
 package net.intensicode;
 
 import android.content.*;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -123,25 +122,22 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     private void postDialog( final String aMessage, final Throwable aOptionalThrowable, final boolean aCritical )
         {
-        final Context context = this;
-
         myHandler.post( new Runnable()
         {
         public final void run()
             {
-            final ErrorDialogBuilder dialogBuilder = new ErrorDialogBuilder( context, myGameSystem );
-            dialogBuilder.setTitle( "IntensiGame Error Report" );
-            dialogBuilder.setMessage( aMessage );
+            myErrorDialogBuilder.setTitle( "IntensiGame Error Report" );
+            myErrorDialogBuilder.setMessage( aMessage );
             if ( aCritical )
                 {
-                dialogBuilder.setCritical( aCritical );
+                myErrorDialogBuilder.setCritical( aCritical );
                 }
             if ( aOptionalThrowable != null )
                 {
                 final String exceptionText = getExtendedExceptionData( aOptionalThrowable );
-                dialogBuilder.setCause( exceptionText );
+                myErrorDialogBuilder.setCause( exceptionText );
                 }
-            dialogBuilder.createDialog();
+            myErrorDialogBuilder.createDialog();
             }
         } );
         }
@@ -473,6 +469,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         myTrackballHandler = trackball;
         //#endif
         myOptionsMenuHandler = new OptionsMenuHandler( this, myGameSystem );
+
+        myErrorDialogBuilder = new ErrorDialogBuilder( this, myGameSystem );
         }
 
     private VideoSystem createVideoSystem( final GameSystem aGameSystem )
@@ -500,4 +498,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     //#if TRACKBALL
     private AndroidTrackballHandler myTrackballHandler;
     //#endif
+
+    private ErrorDialogBuilder myErrorDialogBuilder;
     }

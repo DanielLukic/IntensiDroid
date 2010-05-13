@@ -37,6 +37,12 @@ public final class ErrorDialogBuilder implements DialogInterface.OnClickListener
 
     public final void createDialog()
         {
+        if ( myDialog != null && myDialog.isShowing() ) return;
+
+        final Button feedbackButton = new Button( myContext );
+        feedbackButton.setText( "Send Feedback" );
+        feedbackButton.setOnClickListener( this );
+
         final TextView message = new TextView( myContext );
         if ( myMessageOrNull != null ) message.setText( myMessageOrNull );
         else message.setTag( I18n._( "no description" ) );
@@ -45,16 +51,16 @@ public final class ErrorDialogBuilder implements DialogInterface.OnClickListener
         if ( myExceptionTextOrNull != null ) exception.setText( myExceptionTextOrNull );
         else exception.setTag( I18n._( "no exception data" ) );
 
-        final Button feedbackButton = new Button( myContext );
-        feedbackButton.setText( "Send Feedback" );
-        feedbackButton.setOnClickListener( this );
+        final ScrollView scrollView = new ScrollView( myContext );
+        scrollView.setLayoutParams( LAYOUT_PARAMS );
+        scrollView.addView( exception );
 
         final LinearLayout view = new LinearLayout( myContext );
         view.setOrientation( LinearLayout.VERTICAL );
         view.setLayoutParams( LAYOUT_PARAMS );
-        view.addView( message, LAYOUT_PARAMS );
-        view.addView( exception, LAYOUT_PARAMS );
         view.addView( feedbackButton, LAYOUT_PARAMS );
+        view.addView( message, LAYOUT_PARAMS );
+        view.addView( scrollView, LAYOUT_PARAMS );
 
         final AlertDialog.Builder builder = new AlertDialog.Builder( myContext );
         if ( myTitleOrNull != null ) builder.setTitle( myTitleOrNull );
@@ -63,8 +69,8 @@ public final class ErrorDialogBuilder implements DialogInterface.OnClickListener
         builder.setNegativeButton( "EXIT", this );
         if ( !myCriticalErrorFlag ) builder.setPositiveButton( "CONTINUE", this );
 
-        final AlertDialog dialog = builder.create();
-        dialog.show();
+        myDialog = builder.create();
+        myDialog.show();
         }
 
     // From DialogInterface.OnClickListener
@@ -105,6 +111,8 @@ public final class ErrorDialogBuilder implements DialogInterface.OnClickListener
     private String myExceptionTextOrNull;
 
     private boolean myCriticalErrorFlag;
+
+    private AlertDialog myDialog;
 
     private final Context myContext;
 
