@@ -3,21 +3,14 @@ package net.intensicode.droid;
 import android.app.Activity;
 import android.os.Build;
 import android.view.Display;
+import net.intensicode.PlatformContext;
 import net.intensicode.util.Log;
 
 public final class AndroidUtilities
     {
-    public static final int ORIENTATION_PORTRAIT = 0;
+    public static final int ANDROID_ORIENTATION_PORTRAIT_ID = 0;
 
-    public static final int ORIENTATION_LANDSCAPE = 1;
-
-    public static final String SUB_FOLDER_SQUARE = "s";
-
-    public static final String SUB_FOLDER_PORTRAIT = "p";
-
-    public static final String SUB_FOLDER_LANDSCAPE = "l";
-
-    public static final String NO_SUB_FOLDER = null;
+    public static final int ANDROID_ORIENTATION_LANDSCAPE_ID = 1;
 
 
     public static void showDeviceSpecs()
@@ -32,16 +25,25 @@ public final class AndroidUtilities
         Log.info( "Type: " + android.os.Build.TYPE );
         }
 
-    public static String determineResourcesSubFolder( final Activity aActivity )
+    public static String determineScreenOrientationId( final Activity aActivity )
         {
         final Display display = aActivity.getWindowManager().getDefaultDisplay();
+
         final int orientation = display.getOrientation();
-        if ( orientation == ORIENTATION_PORTRAIT && looksLikePortrait( aActivity ) ) return SUB_FOLDER_PORTRAIT;
-        if ( orientation == ORIENTATION_LANDSCAPE && looksLikeLandscape( aActivity ) ) return SUB_FOLDER_LANDSCAPE;
-        if ( looksLikePortrait( aActivity ) ) return SUB_FOLDER_PORTRAIT;
-        if ( looksLikeLandscape( aActivity ) ) return SUB_FOLDER_LANDSCAPE;
-        if ( looksLikeSquare( aActivity ) ) return SUB_FOLDER_SQUARE;
-        return NO_SUB_FOLDER;
+        if ( orientation == ANDROID_ORIENTATION_PORTRAIT_ID && looksLikePortrait( aActivity ) )
+            {
+            return PlatformContext.SCREEN_ORIENTATION_PORTRAIT;
+            }
+        if ( orientation == ANDROID_ORIENTATION_LANDSCAPE_ID && looksLikeLandscape( aActivity ) )
+            {
+            return PlatformContext.SCREEN_ORIENTATION_LANDSCAPE;
+            }
+
+        if ( looksLikePortrait( aActivity ) ) return PlatformContext.SCREEN_ORIENTATION_PORTRAIT;
+        if ( looksLikeLandscape( aActivity ) ) return PlatformContext.SCREEN_ORIENTATION_LANDSCAPE;
+        if ( looksLikeSquare( aActivity ) ) return PlatformContext.SCREEN_ORIENTATION_SQUARE;
+
+        return PlatformContext.SCREEN_ORIENTATION_PORTRAIT;
         }
 
     public static boolean looksLikePortrait( final Activity aActivity )
