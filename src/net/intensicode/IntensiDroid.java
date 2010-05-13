@@ -1,12 +1,12 @@
 package net.intensicode;
 
-import android.content.*;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.*;
 import android.view.*;
-import android.widget.*;
+import android.widget.TextView;
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
@@ -42,6 +42,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         emailIntent.putExtra( Intent.EXTRA_SUBJECT, aEmailData.subject );
         emailIntent.putExtra( Intent.EXTRA_TEXT, aEmailData.text );
         startActivity( Intent.createChooser( emailIntent, "Send mail" ) );
+        }
+
+    public String screenOrientationId()
+        {
+        return AndroidUtilities.determineScreenOrientationId( this );
         }
 
     public final String getPlatformSpecString()
@@ -143,6 +148,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         }
 
     // From SystemContext
+
+    public String determineResourcesFolder( final int aWidth, final int aHeight, final String aScreenOrientationId )
+        {
+        return myHelper.determineResourcesFolder( aWidth, aHeight, aScreenOrientationId );
+        }
 
     public final GameSystem system()
         {
@@ -329,7 +339,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         createGameViewAndGameSystem();
 
-        myHelper = new IntensiGameHelper( myGameSystem );
+        updateResourcesSubfolder();
         myHelper.initGameSystemFromConfigurationFile();
 
         setContentView( myGameView );
@@ -380,9 +390,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         view.setText( "Updating view" );
         setContentView( view );
 
-        final String resourcesSubFolder = AndroidUtilities.determineResourcesSubFolder( this );
-        myResources.switchSubFolder( resourcesSubFolder );
-
+        updateResourcesSubfolder();
         myHelper.initGameSystemFromConfigurationFile();
 
         setContentView( myGameView );
@@ -414,8 +422,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     private synchronized void createGameViewAndGameSystem()
         {
-        final String resourcesSubFolder = AndroidUtilities.determineResourcesSubFolder( this );
-
         final AndroidGameSystem system = new AndroidGameSystem( this, this );
         final AndroidGameEngine engine = new AndroidGameEngine( system );
 
@@ -424,7 +430,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         final DirectScreen screen = videoSystem.screen;
         final DirectGraphics graphics = videoSystem.graphics;
 
-        final AndroidResourcesManager resources = new AndroidResourcesManager( getAssets(), resourcesSubFolder );
+        final AndroidResourcesManager resources = new AndroidResourcesManager( getAssets() );
         //#ifdef TOUCH
         final AndroidTouchHandler touch = new AndroidTouchHandler( system, screen );
         //#endif
@@ -464,13 +470,23 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         myGameView = view;
         myGameSystem = system;
-        myResources = resources;
         //#if TRACKBALL
         myTrackballHandler = trackball;
         //#endif
         myOptionsMenuHandler = new OptionsMenuHandler( this, myGameSystem );
 
         myErrorDialogBuilder = new ErrorDialogBuilder( this, myGameSystem );
+
+        myHelper = new IntensiGameHelper( myGameSystem );
+        }
+
+    private void updateResourcesSubfolder()
+        {
+        final WindowManager manager = getWindowManager();
+        final Display display = manager.getDefaultDisplay();
+        final int width = display.getWidth();
+        final int height = display.getHeight();
+        myHelper.updateResourcesSubfolder( width, height );
         }
 
     private VideoSystem createVideoSystem( final GameSystem aGameSystem )
@@ -492,8 +508,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     private IntensiGameHelper myHelper;
 
     private OptionsMenuHandler myOptionsMenuHandler;
-
-    private AndroidResourcesManager myResources;
 
     //#if TRACKBALL
     private AndroidTrackballHandler myTrackballHandler;
