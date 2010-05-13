@@ -52,8 +52,8 @@ public final class DirectTextureManager implements TexturePurger
         {
         final int originalWidth = aOriginalBitmap.getWidth();
         final int originalHeight = aOriginalBitmap.getHeight();
-        if ( originalWidth > MAX_TEXTURE_SIZE_IN_PIXELS ) throw new IllegalArgumentException();
-        if ( originalHeight > MAX_TEXTURE_SIZE_IN_PIXELS ) throw new IllegalArgumentException();
+        if ( originalWidth > TextureUtilities.maximumTextureSize ) throw new IllegalArgumentException();
+        if ( originalHeight > TextureUtilities.maximumTextureSize ) throw new IllegalArgumentException();
 
         final int properWidth = findNextPowerOfTwo( originalWidth );
         final int properHeight = findNextPowerOfTwo( originalHeight );
@@ -87,6 +87,4 @@ public final class DirectTextureManager implements TexturePurger
     private final ArrayList<AndroidImageResource> myTexturizedImageResources = new ArrayList<AndroidImageResource>();
 
     private static final int MAX_TEXTURE_SIZE_SHIFT_BITS = 10;
-
-    private static final int MAX_TEXTURE_SIZE_IN_PIXELS = 1024;
     }

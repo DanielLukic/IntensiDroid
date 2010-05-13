@@ -33,6 +33,8 @@ public final class OpenglGraphics extends DirectGraphics
     public final void lateInitialize()
         {
         final Configuration configuration = myGameSystem.resources.loadConfigurationOrUseDefaults( "opengl.properties" );
+        TextureUtilities.maximumTextureSize = configuration.readInt( "max_texture_size", TextureUtilities.MAX_SAFE_TEXTURE_SIZE );
+        Log.info( "TextureUtilities.maximumTextureSize = {}", TextureUtilities.maximumTextureSize );
         textureManager.setConfiguration( configuration );
         }
 

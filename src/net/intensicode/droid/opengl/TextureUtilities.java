@@ -11,8 +11,6 @@ public final class TextureUtilities
     {
     public static final int NO_TEXTURE_ID_SET = -1;
 
-    public static final int MAX_TEXTURE_SIZE = 1024;
-
     // Note: Galaxy and G1 do not like 1024.. terrible slow downs.. assuming others have problems, too..
 
     public static final int MAX_SAFE_TEXTURE_SIZE = 512;
