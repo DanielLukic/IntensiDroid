@@ -9,11 +9,12 @@ public final class AtlasTextureManager
     {
     public final void addTexture( final AndroidImageResource aImageResource, final AtlasHints aAtlasHints )
         {
+        final TextureAtlas atlas = getAtlasFor( aImageResource, aAtlasHints );
+
         //#if DEBUG_OPENGL
-        Log.debug( "inserting texture for {} into atlas", aImageResource.resourcePath );
+        Log.info( "inserting texture for {} into atlas {}", aImageResource.resourcePath, atlas.toString() );
         //#endif
 
-        final TextureAtlas atlas = getAtlasFor( aImageResource, aAtlasHints );
         if ( aAtlasHints.position != null )
             {
             atlas.add( aImageResource, aAtlasHints.position );
@@ -50,7 +51,7 @@ public final class AtlasTextureManager
     public final void purgeAllTextures()
         {
         //#if DEBUG_OPENGL
-        Log.debug( "purging {} texture atlases", myTextureAtlases.size() );
+        Log.info( "purging {} texture atlases", myTextureAtlases.size() );
         //#endif
         while ( myTextureAtlases.size() > 0 )
             {
@@ -80,7 +81,7 @@ public final class AtlasTextureManager
         myTextureAtlases.add( newAtlas );
 
         //#if DEBUG_OPENGL
-        Log.debug( "new texture atlas created: {}", newAtlas );
+        Log.info( "new texture atlas created: {}", newAtlas );
         //#endif
 
         return newAtlas;
