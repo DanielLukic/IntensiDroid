@@ -10,7 +10,7 @@ import android.widget.TextView;
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
-import net.intensicode.droid.opengl.OpenglGraphics;
+import net.intensicode.droid.opengl.*;
 import net.intensicode.util.*;
 
 import java.io.*;
@@ -90,6 +90,17 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
             buffer.append( opengl.renderer );
             buffer.append( " * " );
             buffer.append( opengl.version );
+
+            final DynamicArray strings = new DynamicArray();
+            final OpenglGameView view = (OpenglGameView) myGameSystem.screen;
+            view.addOpenglStrings( strings );
+
+            for ( int idx = 0; idx < strings.size; idx++ )
+                {
+                buffer.append( "\n" );
+                buffer.append( strings );
+                }
+
             return buffer.toString();
             }
         else
