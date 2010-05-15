@@ -85,6 +85,9 @@ public final class OpenglGraphics extends DirectGraphics
         {
         myOffsetX = aOffsetX;
         myOffsetY = aOffsetY;
+        //#if DEBUG_OPENGL
+        Log.info( "OpenglGraphics DTE offset: {} {}", myOffsetX, myOffsetY );
+        //#endif
         }
 
     final void releaseGL()
