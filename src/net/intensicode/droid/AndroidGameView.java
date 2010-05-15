@@ -40,7 +40,7 @@ public abstract class AndroidGameView extends SurfaceView implements DirectScree
 
     public final int height()
         {
-        if ( myTargetSize.width == 0 ) return getHeight();
+        if ( myTargetSize.height == 0 ) return getHeight();
         return myTargetSize.height;
         }
 
@@ -118,7 +118,7 @@ public abstract class AndroidGameView extends SurfaceView implements DirectScree
 
     private boolean myInitialized;
 
-    private final Size myTargetSize = new Size();
+    protected final Size myTargetSize = new Size();
 
     protected final Position myTargetOffset = new Position();
 
