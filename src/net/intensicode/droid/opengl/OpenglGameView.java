@@ -70,7 +70,9 @@ public final class OpenglGameView extends AndroidGameView
         //#endif
 
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
+
         myGL.glLoadIdentity();
+        if ( myIsEmulatorFlag ) myGL.glTranslatef( 0, myTargetSize.height, 0 );
 
         TextureUtilities.setAtlasTextureUnit();
         TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
@@ -103,9 +105,6 @@ public final class OpenglGameView extends AndroidGameView
     public final void initialize()
         {
         Assert.isTrue( "AndroidGameView initialized", isInitialized() );
-
-        Log.info( "Target screen size: {}x{}", width(), height() );
-        Log.info( "Device screen size: {}x{}", getWidth(), getHeight() );
 
         myEglHelper.start( getEglConfiguration() );
         myGL = (GL10) myEglHelper.createOrUpdateSurface( mySurfaceHolder );
@@ -157,6 +156,9 @@ public final class OpenglGameView extends AndroidGameView
         final int virtualWidth = width();
         final int virtualHeight = height();
 
+        Log.info( "Target screen size: {}x{}", virtualWidth, virtualHeight );
+        Log.info( "Device screen size: {}x{}", aWidth, aHeight );
+
         final float hFactor = aWidth / (float) virtualWidth;
         final float vFactor = aHeight / (float) virtualHeight;
         final float factor = Math.min( hFactor, vFactor );
@@ -184,10 +186,14 @@ public final class OpenglGameView extends AndroidGameView
 
         myTargetOffset.x = (int) xOffset;
         myTargetOffset.y = (int) yOffset;
+
+        myIsEmulatorFlag = AndroidUtilities.isEmulator();
         }
 
 
     private GL10 myGL;
+
+    private boolean myIsEmulatorFlag;
 
     private final EglHelper myEglHelper = new EglHelper();
 
