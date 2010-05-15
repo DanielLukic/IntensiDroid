@@ -40,14 +40,14 @@ final class EglHelper
         myEgl.eglGetConfigs( myDisplay, configurations, configurations.length, numberOfConfigurations );
 
         //#if DEBUG_OPENGL
-        Log.debug( "EGL configurations found: " + numberOfConfigurations[ 0 ] );
+        Log.info( "EGL configurations found: " + numberOfConfigurations[ 0 ] );
         //#endif
         for ( int idx = 0; idx < numberOfConfigurations[ 0 ]; idx++ )
             {
             final String configurationString = makeConfigurationString( configurations[ idx ] );
             availableConfigurations.add( configurationString );
             //#if DEBUG_OPENGL
-            Log.debug( "EGL configuration: " + configurationString );
+            Log.info( "EGL configuration: " + configurationString );
             //#endif
             }
 
@@ -64,25 +64,32 @@ final class EglHelper
             }
 
         choosenConfiguration = makeConfigurationString( myConfiguration );
-        //#if DEBUG_OPENGL
-        Log.debug( "EGL configuration choosen: " + choosenConfiguration );
-        //#endif
+
+        Log.info( "EGL configuration choosen: " + choosenConfiguration );
 
         myContext = myEgl.eglCreateContext( myDisplay, myConfiguration, EGL10.EGL_NO_CONTEXT, null );
         }
 
     private String makeConfigurationString( final EGLConfig aConfiguration )
         {
-        final StringBuffer buffer = new StringBuffer();
-        dumpAttribute( buffer, aConfiguration, EGL10.EGL_RED_SIZE, "R" );
-        dumpAttribute( buffer, aConfiguration, EGL10.EGL_GREEN_SIZE, "G" );
-        dumpAttribute( buffer, aConfiguration, EGL10.EGL_BLUE_SIZE, "B" );
-        dumpAttribute( buffer, aConfiguration, EGL10.EGL_ALPHA_SIZE, "A" );
-        dumpAttribute( buffer, aConfiguration, EGL10.EGL_DEPTH_SIZE, "D" );
-        dumpAttribute( buffer, aConfiguration, EGL10.EGL_STENCIL_SIZE, "S" );
-        dumpAttribute( buffer, aConfiguration, EGL10.EGL_CONFIG_CAVEAT, "CFG" );
-        dumpAttribute( buffer, aConfiguration, EGL10.EGL_NATIVE_RENDERABLE, "NATIVE" );
-        return buffer.toString();
+        try
+            {
+            final StringBuffer buffer = new StringBuffer();
+            dumpAttribute( buffer, aConfiguration, EGL10.EGL_RED_SIZE, "R" );
+            dumpAttribute( buffer, aConfiguration, EGL10.EGL_GREEN_SIZE, "G" );
+            dumpAttribute( buffer, aConfiguration, EGL10.EGL_BLUE_SIZE, "B" );
+            dumpAttribute( buffer, aConfiguration, EGL10.EGL_ALPHA_SIZE, "A" );
+            dumpAttribute( buffer, aConfiguration, EGL10.EGL_DEPTH_SIZE, "D" );
+            dumpAttribute( buffer, aConfiguration, EGL10.EGL_STENCIL_SIZE, "S" );
+            dumpAttribute( buffer, aConfiguration, EGL10.EGL_CONFIG_CAVEAT, "CFG" );
+            dumpAttribute( buffer, aConfiguration, EGL10.EGL_NATIVE_RENDERABLE, "NATIVE" );
+            return buffer.toString();
+            }
+        catch ( final Exception e )
+            {
+            Log.error( "failed creating EGL configuration string. ignored.", e );
+            return "(failure reading configuration)";
+            }
         }
 
     private void dumpAttribute( final StringBuffer aBuffer, final EGLConfig aConfiguration, final int aId, final String aName )
