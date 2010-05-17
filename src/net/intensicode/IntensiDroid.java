@@ -348,7 +348,14 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         setWindowFeatures();
         setAudioFeatures();
 
-        createGameViewAndGameSystem();
+        try
+            {
+            createGameViewAndGameSystem();
+            }
+        catch ( final Exception e )
+            {
+            showCriticalError( "failed initializing game system", e );
+            }
 
         updateResourcesSubfolder();
         myHelper.initGameSystemFromConfigurationFile();
@@ -431,7 +438,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         return myGameSystem != null;
         }
 
-    private synchronized void createGameViewAndGameSystem()
+    private synchronized void createGameViewAndGameSystem() throws Exception
         {
         final AndroidGameSystem system = new AndroidGameSystem( this, this );
         final AndroidGameEngine engine = new AndroidGameEngine( system );

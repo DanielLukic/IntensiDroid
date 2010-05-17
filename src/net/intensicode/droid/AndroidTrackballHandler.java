@@ -8,6 +8,10 @@ import net.intensicode.util.*;
 
 public final class AndroidTrackballHandler extends TrackballHandler
     {
+    public AndroidTrackballHandler() throws Exception
+        {
+        }
+
     public final boolean onTrackballEvent( final MotionEvent aMotionEvent )
         {
         // collect system events until some 'silence in ms' has passed.

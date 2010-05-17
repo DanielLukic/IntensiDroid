@@ -9,7 +9,7 @@ import net.intensicode.util.Log;
 
 public final class AndroidTouchHandler extends TouchHandler implements View.OnTouchListener
     {
-    public AndroidTouchHandler( final GameSystem aGameSystem, final DirectScreen aDirectScreen )
+    public AndroidTouchHandler( final GameSystem aGameSystem, final DirectScreen aDirectScreen ) throws Exception
         {
         super( aGameSystem );
         myTouchEventWrapper = new AndroidTouchEventWrapper( aDirectScreen );
