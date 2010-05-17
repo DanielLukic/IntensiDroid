@@ -331,10 +331,10 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         super.onCreate( savedInstanceState );
 
         //#if ORIENTATION_LANDSCAPE
-        //# setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE );
+        //# setRequestedOrientation( android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE );
         //#endif
         //#if ORIENTATION_PORTRAIT
-        //# setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_PORTRAIT );
+        //# setRequestedOrientation( android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT );
         //#endif
 
         //#if DEBUG
