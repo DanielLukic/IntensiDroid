@@ -91,14 +91,21 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
             buffer.append( " * " );
             buffer.append( opengl.version );
 
-            final DynamicArray strings = new DynamicArray();
-            final OpenglGameView view = (OpenglGameView) myGameSystem.screen;
-            view.addOpenglStrings( strings );
-
-            for ( int idx = 0; idx < strings.size; idx++ )
+            try
                 {
-                buffer.append( "\n" );
-                buffer.append( strings );
+                final DynamicArray strings = new DynamicArray();
+                final OpenglGameView view = (OpenglGameView) myGameSystem.screen;
+                view.addOpenglStrings( strings );
+
+                for ( int idx = 0; idx < strings.size; idx++ )
+                    {
+                    buffer.append( "\n" );
+                    buffer.append( strings );
+                    }
+                }
+            catch ( final Throwable t )
+                {
+                Log.error( t );
                 }
 
             return buffer.toString();
