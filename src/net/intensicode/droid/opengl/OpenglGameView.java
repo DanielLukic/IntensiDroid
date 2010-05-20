@@ -51,6 +51,7 @@ public final class OpenglGameView extends AndroidGameView
     private int getBitDepth( final int aIdentifier )
         {
         final int[] buffer = new int[1];
+        if ( myGL == null ) return 0;
         myGL.glGetIntegerv( aIdentifier, buffer, 0 );
         return buffer[ 0 ];
         }
