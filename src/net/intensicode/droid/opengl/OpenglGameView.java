@@ -73,7 +73,7 @@ public final class OpenglGameView extends AndroidGameView
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
 
         myGL.glLoadIdentity();
-        if ( myIsEmulatorFlag ) myGL.glTranslatef( 0, myTargetSize.height, 0 );
+        if ( myIsSoftwareRenderer ) myGL.glTranslatef( 0, myTargetSize.height, 0 );
 
         TextureUtilities.setAtlasTextureUnit();
         TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
@@ -115,6 +115,8 @@ public final class OpenglGameView extends AndroidGameView
         onSurfaceCreated();
         onSurfaceChanged( getWidth(), getHeight() );
         graphics.lateInitialize();
+
+        myIsSoftwareRenderer = graphics.renderer.toLowerCase().contains( "pixelflinger" );
         }
 
     public final void cleanup()
@@ -187,14 +189,12 @@ public final class OpenglGameView extends AndroidGameView
 
         myTargetOffset.x = (int) xOffset;
         myTargetOffset.y = (int) yOffset;
-
-        myIsEmulatorFlag = AndroidUtilities.isEmulator();
         }
 
 
     private GL10 myGL;
 
-    private boolean myIsEmulatorFlag;
+    private boolean myIsSoftwareRenderer;
 
     private final EglHelper myEglHelper = new EglHelper();
 
