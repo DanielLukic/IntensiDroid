@@ -100,6 +100,12 @@ public final class CanvasGraphics extends DirectGraphics
 
     public final void blendImage( final ImageResource aImage, final int aX, final int aY, final int aAlpha256 )
         {
+        //#if DEBUG
+        if ( aImage == NullImageResource.NULL ) throw new IllegalArgumentException();
+        //#else
+        //# if ( aImage == NullImageResource.NULL ) return;
+        //#endif
+
         if ( aAlpha256 == FULLY_TRANSPARENT )
             {
             // Nothing to do..
@@ -119,6 +125,12 @@ public final class CanvasGraphics extends DirectGraphics
 
     public final void blendImage( final ImageResource aImage, final Rectangle aSourceRect, final int aX, final int aY, final int aAlpha256 )
         {
+        //#if DEBUG
+        if ( aImage == NullImageResource.NULL ) throw new IllegalArgumentException();
+        //#else
+        //# if ( aImage == NullImageResource.NULL ) return;
+        //#endif
+
         if ( aAlpha256 == FULLY_TRANSPARENT )
             {
             // Nothing to do..
@@ -146,12 +158,24 @@ public final class CanvasGraphics extends DirectGraphics
 
     public final void drawImage( final ImageResource aImage, final int aX, final int aY )
         {
+        //#if DEBUG
+        if ( aImage == NullImageResource.NULL ) throw new IllegalArgumentException();
+        //#else
+        //# if ( aImage == NullImageResource.NULL ) return;
+        //#endif
+
         final AndroidImageResource imageResource = (AndroidImageResource) aImage;
         canvas.drawBitmap( imageResource.bitmap, aX, aY, myImagePaint );
         }
 
     public final void drawImage( final ImageResource aImage, final int aX, final int aY, final int aAlignment )
         {
+        //#if DEBUG
+        if ( aImage == NullImageResource.NULL ) throw new IllegalArgumentException();
+        //#else
+        //# if ( aImage == NullImageResource.NULL ) return;
+        //#endif
+
         final AndroidImageResource imageResource = (AndroidImageResource) aImage;
         final int width = imageResource.getWidth();
         final int height = imageResource.getHeight();
@@ -161,6 +185,12 @@ public final class CanvasGraphics extends DirectGraphics
 
     public final void drawImage( final ImageResource aImage, final Rectangle aSourceRect, final int aTargetX, final int aTargetY )
         {
+        //#if DEBUG
+        if ( aImage == NullImageResource.NULL ) throw new IllegalArgumentException();
+        //#else
+        //# if ( aImage == NullImageResource.NULL ) return;
+        //#endif
+
         mySourceRect.left = aSourceRect.x;
         mySourceRect.top = aSourceRect.y;
         mySourceRect.right = aSourceRect.x + aSourceRect.width;
