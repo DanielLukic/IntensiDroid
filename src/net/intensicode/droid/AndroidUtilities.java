@@ -85,4 +85,9 @@ public final class AndroidUtilities
         final boolean isMilestone = Build.MODEL.toLowerCase().indexOf( "milestone" ) != -1;
         return isMotorola && ( isDroid || isMilestone );
         }
+
+    public static boolean isHtcTattoo()
+        {
+        return Build.MODEL.toLowerCase().indexOf( "htc_tattoo" ) != -1;
+        }
     }
