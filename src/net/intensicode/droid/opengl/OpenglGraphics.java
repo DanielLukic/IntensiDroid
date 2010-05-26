@@ -177,6 +177,12 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void blendImage( final ImageResource aImage, final int aX, final int aY, final int aAlpha256 )
         {
+        //#if DEBUG
+        if ( aImage == NullImageResource.NULL ) throw new IllegalArgumentException();
+        //#else
+        //# if ( aImage == NullImageResource.NULL ) return;
+        //#endif
+
         myFullRect.width = aImage.getWidth();
         myFullRect.height = aImage.getHeight();
         blendImage( aImage, myFullRect, aX, aY, aAlpha256 );
@@ -184,6 +190,12 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void blendImage( final ImageResource aImage, final Rectangle aSourceRect, final int aX, final int aY, final int aAlpha256 )
         {
+        //#if DEBUG
+        if ( aImage == NullImageResource.NULL ) throw new IllegalArgumentException();
+        //#else
+        //# if ( aImage == NullImageResource.NULL ) return;
+        //#endif
+
         if ( aAlpha256 == FULLY_TRANSPARENT ) return;
         if ( aAlpha256 == FULLY_OPAQUE ) drawImage( aImage, aSourceRect, aX, aY );
 
@@ -194,6 +206,12 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void drawImage( final ImageResource aImage, final int aX, final int aY )
         {
+        //#if DEBUG
+        if ( aImage == NullImageResource.NULL ) throw new IllegalArgumentException();
+        //#else
+        //# if ( aImage == NullImageResource.NULL ) return;
+        //#endif
+
         myFullRect.width = aImage.getWidth();
         myFullRect.height = aImage.getHeight();
         drawImage( aImage, myFullRect, aX, aY );
@@ -201,12 +219,24 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void drawImage( final ImageResource aImage, final int aX, final int aY, final int aAlignment )
         {
+        //#if DEBUG
+        if ( aImage == NullImageResource.NULL ) throw new IllegalArgumentException();
+        //#else
+        //# if ( aImage == NullImageResource.NULL ) return;
+        //#endif
+
         final Position aligned = getAlignedPosition( aX, aY, aImage.getWidth(), aImage.getHeight(), aAlignment );
         drawImage( aImage, aligned.x, aligned.y );
         }
 
     public final void drawImage( final ImageResource aImage, final Rectangle aSourceRect, final int aTargetX, final int aTargetY )
         {
+        //#if DEBUG
+        if ( aImage == NullImageResource.NULL ) throw new IllegalArgumentException();
+        //#else
+        //# if ( aImage == NullImageResource.NULL ) return;
+        //#endif
+
         myTextureStateManager.enableTexturingIfNecessary();
 
         final AndroidImageResource imageResource = (AndroidImageResource) aImage;
