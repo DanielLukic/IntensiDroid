@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.*;
 import android.view.*;
 import android.widget.*;
-import net.intensicode.configuration.SendFeedback;
 import net.intensicode.core.*;
 
 public final class ErrorDialogBuilder implements DialogInterface.OnClickListener, View.OnClickListener
@@ -39,9 +38,11 @@ public final class ErrorDialogBuilder implements DialogInterface.OnClickListener
         {
         if ( myDialog != null && myDialog.isShowing() ) return;
 
+        //#if FEEDBACK
         final Button feedbackButton = new Button( myContext );
         feedbackButton.setText( "Send Feedback" );
         feedbackButton.setOnClickListener( this );
+        //#endif
 
         final TextView message = new TextView( myContext );
         if ( myMessageOrNull != null ) message.setText( myMessageOrNull );
@@ -58,7 +59,9 @@ public final class ErrorDialogBuilder implements DialogInterface.OnClickListener
         final LinearLayout view = new LinearLayout( myContext );
         view.setOrientation( LinearLayout.VERTICAL );
         view.setLayoutParams( LAYOUT_PARAMS );
+        //#if FEEDBACK
         view.addView( feedbackButton, LAYOUT_PARAMS );
+        //#endif
         view.addView( message, LAYOUT_PARAMS );
         view.addView( scrollView, LAYOUT_PARAMS );
 
@@ -97,10 +100,12 @@ public final class ErrorDialogBuilder implements DialogInterface.OnClickListener
             buffer.append( "\n" );
             }
 
-        final SendFeedback feedback = new SendFeedback( myGameSystem );
+        //#if FEEDBACK
+        final net.intensicode.configuration.SendFeedback feedback = new net.intensicode.configuration.SendFeedback( myGameSystem );
         feedback.optionalMessageAddon = buffer.toString();
 
         feedback.trigger();
+        //#endif
         }
 
 
