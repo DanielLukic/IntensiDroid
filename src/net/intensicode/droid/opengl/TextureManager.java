@@ -89,7 +89,7 @@ public final class TextureManager
 
     private Configuration myConfiguration = Configuration.NULL_CONFIGURATION;
 
-    private static final boolean DEFAULT_DIRECT_TEXTURE_CONFIGURATION = false;
+    private static final boolean DEFAULT_DIRECT_TEXTURE_CONFIGURATION = true;
 
     private static final AtlasHints NO_ATLAS_HINTS = new AtlasHints();
     }
