@@ -38,11 +38,11 @@ public final class OpenglGameView extends AndroidGameView
         buffer.append( blueBits );
         aDynamicArray.add( buffer.toString() );
 
-        aDynamicArray.add( "EGL Configurations Available:" );
-        for ( int idx = 0; idx < myEglHelper.availableConfigurations.size; idx++ )
-            {
-            aDynamicArray.add( myEglHelper.availableConfigurations.get( idx ) );
-            }
+//        aDynamicArray.add( "EGL Configurations Available:" );
+//        for ( int idx = 0; idx < myEglHelper.availableConfigurations.size; idx++ )
+//            {
+//            aDynamicArray.add( myEglHelper.availableConfigurations.get( idx ) );
+//            }
 
         aDynamicArray.add( "EGL Configuration Active:" );
         aDynamicArray.add( myEglHelper.choosenConfiguration );
