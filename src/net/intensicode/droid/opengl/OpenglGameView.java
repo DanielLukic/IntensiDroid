@@ -19,6 +19,18 @@ public final class OpenglGameView extends AndroidGameView
         super( aContext, SurfaceHolder.SURFACE_TYPE_GPU );
         }
 
+    public final boolean isSofwareRenderer()
+        {
+        final GL10 gl = myEglHelper.start( getEglConfiguration() );
+        final String renderer = gl.glGetString( GL10.GL_RENDERER ).toLowerCase();
+        return renderer.contains( "pixelflinger" );
+        }
+
+    public final void cleanupEarly()
+        {
+        myEglHelper.finish();
+        }
+
     public final void addOpenglStrings( final DynamicArray aDynamicArray )
         {
         final int alphaBits = getBitDepth( GL10.GL_ALPHA_BITS );
@@ -107,7 +119,8 @@ public final class OpenglGameView extends AndroidGameView
         {
         Assert.isTrue( "AndroidGameView initialized", isInitialized() );
 
-        myEglHelper.start( getEglConfiguration() );
+        if ( !myEglHelper.isStarted() ) myEglHelper.start( getEglConfiguration() );
+
         myGL = (GL10) myEglHelper.createOrUpdateSurface( mySurfaceHolder );
         //#if TRACK_OPENGL
         myGL = new TrackingGL( myGL );

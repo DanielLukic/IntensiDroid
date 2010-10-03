@@ -517,10 +517,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     private VideoSystem createVideoSystem( final GameSystem aGameSystem )
         {
         //#if OPENGL
-        return VideoSystem.createOpenglVideoSystem( this, aGameSystem );
-        //#else
-        //# return VideoSystem.createCanvasVideoSystem( this, aGameSystem );
+        final VideoSystem videoSystem = VideoSystem.createOpenglVideoSystem( this, aGameSystem );
+        if ( !videoSystem.isSoftwareRenderer() ) return videoSystem;
+        videoSystem.cleanupEarly();
         //#endif
+        return VideoSystem.createCanvasVideoSystem( this, aGameSystem );
         }
 
 
