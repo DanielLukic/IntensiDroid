@@ -43,20 +43,4 @@ public final class VideoSystem
         videoSystem.view = screen;
         return videoSystem;
         }
-
-    public final boolean isSoftwareRenderer()
-        {
-        if ( view instanceof CanvasGameView ) return true;
-
-        final OpenglGameView openglGameView = (OpenglGameView) view;
-        return openglGameView.isSofwareRenderer();
-        }
-
-    public final void cleanupEarly()
-        {
-        if ( view instanceof CanvasGameView ) return;
-
-        final OpenglGameView openglGameView = (OpenglGameView) view;
-        openglGameView.cleanupEarly();
-        }
     }

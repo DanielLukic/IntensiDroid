@@ -4,7 +4,7 @@ import android.view.SurfaceHolder;
 import net.intensicode.util.*;
 
 import javax.microedition.khronos.egl.*;
-import javax.microedition.khronos.opengles.*;
+import javax.microedition.khronos.opengles.GL;
 
 final class EglHelper
     {
@@ -24,7 +24,7 @@ final class EglHelper
         return myContext != null;
         }
 
-    final GL10 start( final int[] aConfigurationSpec )
+    final void start( final int[] aConfigurationSpec )
         {
         if ( isStarted() ) finish();
 
@@ -68,8 +68,6 @@ final class EglHelper
         Log.info( "EGL configuration choosen: " + choosenConfiguration );
 
         myContext = myEgl.eglCreateContext( myDisplay, myConfiguration, EGL10.EGL_NO_CONTEXT, null );
-
-        return (GL10) myContext.getGL();
         }
 
     private String makeConfigurationString( final EGLConfig aConfiguration )
