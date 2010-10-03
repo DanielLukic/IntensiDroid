@@ -4,6 +4,7 @@ import android.content.Context;
 import net.intensicode.core.*;
 import net.intensicode.droid.canvas.*;
 import net.intensicode.droid.opengl.*;
+import net.intensicode.PlatformContext;
 
 public final class VideoSystem
     {
@@ -14,9 +15,9 @@ public final class VideoSystem
     public DirectGraphics graphics;
 
 
-    public static VideoSystem createOpenglVideoSystem( final Context aContext, final GameSystem aGameSystem )
+    public static VideoSystem createOpenglVideoSystem( final Context aContext, final GameSystem aGameSystem, final PlatformContext aPlatformContext )
         {
-        final OpenglGameView screen = new OpenglGameView( aContext );
+        final OpenglGameView screen = new OpenglGameView( aContext, aPlatformContext );
         final OpenglGraphics graphics = new OpenglGraphics( aGameSystem );
 
         screen.graphics = graphics;

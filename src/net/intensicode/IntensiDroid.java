@@ -1,6 +1,6 @@
 package net.intensicode;
 
-import android.content.Intent;
+import android.content.*;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -517,10 +517,28 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     private VideoSystem createVideoSystem( final GameSystem aGameSystem )
         {
         //#if OPENGL
-        return VideoSystem.createOpenglVideoSystem( this, aGameSystem );
+        if ( shouldUseCanvas() )
+            {
+            Log.info( "using canvas renderer in OPENGL build" );
+            return VideoSystem.createCanvasVideoSystem( this, aGameSystem );
+            }
+        return VideoSystem.createOpenglVideoSystem( this, aGameSystem, this );
         //#else
         //# return VideoSystem.createCanvasVideoSystem( this, aGameSystem );
         //#endif
+        }
+
+    private final boolean shouldUseCanvas()
+        {
+        try
+            {
+            final SharedPreferences preferences = getSharedPreferences( "renderer", Context.MODE_PRIVATE );
+            return preferences.getBoolean( "software renderer", false );
+            }
+        catch ( final Exception e )
+            {
+            return false;
+            }
         }
 
 

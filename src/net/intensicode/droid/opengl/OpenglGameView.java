@@ -1,7 +1,8 @@
 package net.intensicode.droid.opengl;
 
-import android.content.Context;
+import android.content.*;
 import android.view.SurfaceHolder;
+import net.intensicode.PlatformContext;
 import net.intensicode.droid.*;
 import net.intensicode.util.*;
 
@@ -14,9 +15,10 @@ public final class OpenglGameView extends AndroidGameView
     public OpenglGraphics graphics;
 
 
-    public OpenglGameView( final Context aContext )
+    public OpenglGameView( final Context aContext, final PlatformContext aPlatformContext )
         {
         super( aContext, SurfaceHolder.SURFACE_TYPE_GPU );
+        myPlatformContext = aPlatformContext;
         }
 
     public final void addOpenglStrings( final DynamicArray aDynamicArray )
@@ -117,6 +119,13 @@ public final class OpenglGameView extends AndroidGameView
         graphics.lateInitialize();
 
         myIsSoftwareRenderer = graphics.renderer.toLowerCase().contains( "pixelflinger" );
+
+        if ( !myIsSoftwareRenderer ) return;
+
+        final SharedPreferences preferences = getContext().getSharedPreferences( "renderer", Context.MODE_PRIVATE );
+        preferences.edit().putBoolean( "software renderer", true ).commit();
+
+        myPlatformContext.showCriticalError( "Wrong version for your device! Switched to non-opengl mode. Please restart the application!", null );
         }
 
     public final void cleanup()
@@ -201,4 +210,6 @@ public final class OpenglGameView extends AndroidGameView
     private static final int SAMSUNG_GALAXY_DEPTH_BITS = 16;
 
     private static final int DROID_RECOMMENDED_DEPTH_BITS = 24;
+
+    private final PlatformContext myPlatformContext;
     }
