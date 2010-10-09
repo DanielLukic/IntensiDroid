@@ -1,10 +1,13 @@
 package net.intensicode.droid;
 
 import android.os.Build;
-import net.intensicode.*;
+import net.intensicode.PlatformContext;
+import net.intensicode.SystemContext;
 import net.intensicode.core.GameSystem;
-import net.intensicode.droid.opengl.*;
-import net.intensicode.util.*;
+import net.intensicode.droid.opengl.OpenglGameView;
+import net.intensicode.droid.opengl.OpenglGraphics;
+import net.intensicode.util.DynamicArray;
+import net.intensicode.util.StringUtils;
 
 public final class AndroidGameSystem extends GameSystem
     {
@@ -32,7 +35,7 @@ public final class AndroidGameSystem extends GameSystem
         if ( screen instanceof OpenglGameView )
             {
             final OpenglGameView view = (OpenglGameView) screen;
-            view.addOpenglStrings( myInformationStrings );
+            view.openglGraphics.addOpenglStrings( myInformationStrings );
             }
 
         if ( graphics instanceof OpenglGraphics )

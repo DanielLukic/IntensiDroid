@@ -1,15 +1,14 @@
 package net.intensicode.droid.canvas;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 import net.intensicode.droid.AndroidGameView;
-import net.intensicode.util.*;
+import net.intensicode.util.Log;
 
 
 public final class CanvasGameView extends AndroidGameView
     {
-    public CanvasGraphics graphics;
+    public CanvasGraphics canvasGraphics;
 
 
     public CanvasGameView( final Context aContext )
@@ -21,29 +20,26 @@ public final class CanvasGameView extends AndroidGameView
 
     public final void beginFrame()
         {
-        Assert.isNotNull( "surface holder should be initialized", mySurfaceHolder );
+        canvasGraphics.setScreenSize( getWidth(), getHeight() );
+        canvasGraphics.setTargetSize( width(), height() );
+        system.graphics.beginFrame();
 
-        final Canvas canvas = graphics.canvas = mySurfaceHolder.lockCanvas();
-        if ( canvas != null )
-            {
-            final float scaleX = getWidth() / (float) width();
-            final float scaleY = getHeight() / (float) height();
-            canvas.scale( scaleX, scaleY );
-            }
-        else Log.error( "lockCanvas failed with null object", null );
+        myTargetOffset.x = canvasGraphics.offsetX;
+        myTargetOffset.y = canvasGraphics.offsetY;
+        myTargetScale.x = canvasGraphics.scale;
+        myTargetScale.y = canvasGraphics.scale;
         }
 
     public final void endFrame()
         {
-        Assert.isNotNull( "surface holder should be initialized", mySurfaceHolder );
-
-        mySurfaceHolder.unlockCanvasAndPost( graphics.canvas );
+        system.graphics.endFrame();
         }
 
     public final void initialize()
         {
         Log.info( "Target screen size: {}x{}", width(), height() );
         Log.info( "Device screen size: {}x{}", getWidth(), getHeight() );
+        canvasGraphics.surfaceHolder = mySurfaceHolder;
         }
 
     public final void cleanup()

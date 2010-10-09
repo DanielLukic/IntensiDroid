@@ -1,10 +1,12 @@
 package net.intensicode.droid;
 
 import android.content.Context;
-import net.intensicode.core.*;
-import net.intensicode.droid.canvas.*;
-import net.intensicode.droid.opengl.*;
 import net.intensicode.PlatformContext;
+import net.intensicode.core.*;
+import net.intensicode.droid.canvas.CanvasGameView;
+import net.intensicode.droid.canvas.CanvasGraphics;
+import net.intensicode.droid.opengl.OpenglGameView;
+import net.intensicode.droid.opengl.OpenglGraphics;
 
 public final class VideoSystem
     {
@@ -17,10 +19,10 @@ public final class VideoSystem
 
     public static VideoSystem createOpenglVideoSystem( final Context aContext, final GameSystem aGameSystem, final PlatformContext aPlatformContext )
         {
-        final OpenglGameView screen = new OpenglGameView( aContext, aPlatformContext );
-        final OpenglGraphics graphics = new OpenglGraphics( aGameSystem );
+        final OpenglGameView screen = new OpenglGameView( aContext );
+        final OpenglGraphics graphics = new OpenglGraphics( aGameSystem, aPlatformContext );
 
-        screen.graphics = graphics;
+        screen.openglGraphics = graphics;
         screen.system = aGameSystem;
 
         final VideoSystem videoSystem = new VideoSystem();
@@ -35,7 +37,7 @@ public final class VideoSystem
         final CanvasGameView screen = new CanvasGameView( aContext );
         final CanvasGraphics graphics = new CanvasGraphics();
 
-        screen.graphics = graphics;
+        screen.canvasGraphics = graphics;
         screen.system = aGameSystem;
 
         final VideoSystem videoSystem = new VideoSystem();

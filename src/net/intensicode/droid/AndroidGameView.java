@@ -78,8 +78,8 @@ public abstract class AndroidGameView extends SurfaceView implements DirectScree
 
     public Position toTarget( final int aNativeX, final int aNativeY )
         {
-        myTransformedPosition.x = aNativeX * ( width() + myTargetOffset.x * 2 ) / getWidth() - myTargetOffset.x;
-        myTransformedPosition.y = aNativeY * ( height() + myTargetOffset.y * 2 ) / getHeight() - myTargetOffset.y;
+        myTransformedPosition.x = (int) (( aNativeX - myTargetOffset.x ) / myTargetScale.x);
+        myTransformedPosition.y = (int) (( aNativeY - myTargetOffset.y ) / myTargetScale.y);
         return myTransformedPosition;
         }
 
@@ -121,6 +121,8 @@ public abstract class AndroidGameView extends SurfaceView implements DirectScree
     protected final Size myTargetSize = new Size();
 
     protected final Position myTargetOffset = new Position();
+
+    protected final PositionF myTargetScale = new PositionF( 1f, 1f );
 
     private final Position myTransformedPosition = new Position();
     }

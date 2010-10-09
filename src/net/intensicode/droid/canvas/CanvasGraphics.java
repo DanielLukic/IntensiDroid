@@ -1,14 +1,37 @@
 package net.intensicode.droid.canvas;
 
 import android.graphics.*;
+import android.view.SurfaceHolder;
 import net.intensicode.core.*;
-import net.intensicode.util.*;
 import net.intensicode.droid.*;
+import net.intensicode.util.*;
 
 
 public final class CanvasGraphics extends DirectGraphics
     {
-    public Canvas canvas;
+    public float scale;
+
+    public int offsetX;
+
+    public int offsetY;
+
+    private final Size myScreenSize = new Size();
+
+    private final Size myTargetSize = new Size();
+
+    public final void setScreenSize( final int aWidth, final int aHeight )
+        {
+        myScreenSize.width = aWidth;
+        myScreenSize.height = aHeight;
+        }
+
+    public final void setTargetSize( final int aWidth, final int aHeight )
+        {
+        myTargetSize.width = aWidth;
+        myTargetSize.height = aHeight;
+        }
+
+    public SurfaceHolder surfaceHolder;
 
 
     public CanvasGraphics()
@@ -19,7 +42,9 @@ public final class CanvasGraphics extends DirectGraphics
     public CanvasGraphics( final Bitmap aBitmap )
         {
         this();
-        canvas = new Canvas( aBitmap );
+        myCanvas = new Canvas( aBitmap );
+        myClearPaint.setARGB( 255, 0, 0, 0 );
+        myClearPaint.setStyle( Paint.Style.FILL );
         }
 
     // From DirectGraphics
@@ -54,36 +79,36 @@ public final class CanvasGraphics extends DirectGraphics
 
     public void clearRGB24( final int aRGB24 )
         {
-        canvas.drawColor( 0xFF000000 | ( aRGB24 & 0x00FFFFFF ) );
+        myCanvas.drawColor( 0xFF000000 | ( aRGB24 & 0x00FFFFFF ) );
         }
 
     public void clearARGB32( final int aARGB32 )
         {
-        canvas.drawColor( aARGB32 );
+        myCanvas.drawColor( aARGB32 );
         }
 
     public final void drawLine( final int aX1, final int aY1, final int aX2, final int aY2 )
         {
         myActivePaint.setStyle( Paint.Style.STROKE );
-        if ( aX1 == aX2 && aY1 == aY1 ) canvas.drawPoint( aX1, aY1, myActivePaint );
-        else canvas.drawLine( aX1, aY1, aX2, aY2, myActivePaint );
+        if ( aX1 == aX2 && aY1 == aY1 ) myCanvas.drawPoint( aX1, aY1, myActivePaint );
+        else myCanvas.drawLine( aX1, aY1, aX2, aY2, myActivePaint );
         }
 
     public final void drawRect( final int aX, final int aY, final int aWidth, final int aHeight )
         {
         myActivePaint.setStyle( Paint.Style.STROKE );
-        canvas.drawRect( aX, aY, aX + aWidth, aY + aHeight, myActivePaint );
+        myCanvas.drawRect( aX, aY, aX + aWidth, aY + aHeight, myActivePaint );
         }
 
     public final void drawRGB( final int[] aARGB32, final int aOffsetX, final int aScanlineSize, final int aX, final int aY, final int aWidth, final int aHeight, final boolean aUseAlpha )
         {
-        canvas.drawBitmap( aARGB32, aOffsetX, aScanlineSize, aX, aY, aWidth, aHeight, aUseAlpha, myImagePaint );
+        myCanvas.drawBitmap( aARGB32, aOffsetX, aScanlineSize, aX, aY, aWidth, aHeight, aUseAlpha, myImagePaint );
         }
 
     public final void fillRect( final int aX, final int aY, final int aWidth, final int aHeight )
         {
         myActivePaint.setStyle( Paint.Style.FILL );
-        canvas.drawRect( aX, aY, aX + aWidth, aY + aHeight, myActivePaint );
+        myCanvas.drawRect( aX, aY, aX + aWidth, aY + aHeight, myActivePaint );
         }
 
     public final void fillTriangle( final int aX1, final int aY1, final int aX2, final int aY2, final int aX3, final int aY3 )
@@ -95,7 +120,7 @@ public final class CanvasGraphics extends DirectGraphics
         myTrianglePath.lineTo( aX1, aY1 );
         myTrianglePath.close();
         myActivePaint.setStyle( Paint.Style.FILL );
-        canvas.drawPath( myTrianglePath, myActivePaint );
+        myCanvas.drawPath( myTrianglePath, myActivePaint );
         }
 
     public final void blendImage( final ImageResource aImage, final int aX, final int aY, final int aAlpha256 )
@@ -118,7 +143,7 @@ public final class CanvasGraphics extends DirectGraphics
             {
             final AndroidImageResource imageResource = (AndroidImageResource) aImage;
             myImagePaint.setAlpha( aAlpha256 );
-            canvas.drawBitmap( imageResource.bitmap, aX, aY, myImagePaint );
+            myCanvas.drawBitmap( imageResource.bitmap, aX, aY, myImagePaint );
             myImagePaint.setAlpha( 255 );
             }
         }
@@ -151,7 +176,7 @@ public final class CanvasGraphics extends DirectGraphics
             myTargetRect.top = aY;
             myTargetRect.right = aX + aSourceRect.width;
             myTargetRect.bottom = aY + aSourceRect.height;
-            canvas.drawBitmap( imageResource.bitmap, mySourceRect, myTargetRect, myImagePaint );
+            myCanvas.drawBitmap( imageResource.bitmap, mySourceRect, myTargetRect, myImagePaint );
             myImagePaint.setAlpha( 255 );
             }
         }
@@ -165,7 +190,7 @@ public final class CanvasGraphics extends DirectGraphics
         //#endif
 
         final AndroidImageResource imageResource = (AndroidImageResource) aImage;
-        canvas.drawBitmap( imageResource.bitmap, aX, aY, myImagePaint );
+        myCanvas.drawBitmap( imageResource.bitmap, aX, aY, myImagePaint );
         }
 
     public final void drawImage( final ImageResource aImage, final int aX, final int aY, final int aAlignment )
@@ -180,7 +205,7 @@ public final class CanvasGraphics extends DirectGraphics
         final int width = imageResource.getWidth();
         final int height = imageResource.getHeight();
         final Position aligned = DirectGraphics.getAlignedPosition( aX, aY, width, height, aAlignment );
-        canvas.drawBitmap( imageResource.bitmap, aligned.x, aligned.y, myImagePaint );
+        myCanvas.drawBitmap( imageResource.bitmap, aligned.x, aligned.y, myImagePaint );
         }
 
     public final void drawImage( final ImageResource aImage, final Rectangle aSourceRect, final int aTargetX, final int aTargetY )
@@ -201,21 +226,56 @@ public final class CanvasGraphics extends DirectGraphics
         myTargetRect.bottom = aTargetY + aSourceRect.height;
 
         final AndroidImageResource imageResource = (AndroidImageResource) aImage;
-        canvas.drawBitmap( imageResource.bitmap, mySourceRect, myTargetRect, myImagePaint );
+        myCanvas.drawBitmap( imageResource.bitmap, mySourceRect, myTargetRect, myImagePaint );
         }
 
     public final void drawSubstring( final String aText, final int aStart, final int aEnd, final int aX, final int aY )
         {
-        canvas.drawText( aText, aStart, aEnd, aX, aY - myFontMetrics.ascent, myActivePaint );
+        myCanvas.drawText( aText, aStart, aEnd, aX, aY - myFontMetrics.ascent, myActivePaint );
         }
 
-    public void drawChar( final char aCharCode, final int aX, final int aY )
+    public final void drawChar( final char aCharCode, final int aX, final int aY )
         {
         myCharSequence.delete( 0, myCharSequence.length() );
         myCharSequence.append( aCharCode );
-        canvas.drawText( myCharSequence, 0, 1, aX, aY - myFontMetrics.ascent, myActivePaint );
+        myCanvas.drawText( myCharSequence, 0, 1, aX, aY - myFontMetrics.ascent, myActivePaint );
         }
 
+    public final void beginFrame()
+        {
+        myCanvas = surfaceHolder.lockCanvas();
+
+        final float scaleX = myScreenSize.width / (float) myTargetSize.width;
+        final float scaleY = myScreenSize.height / (float) myTargetSize.height;
+
+        scale = Math.min( scaleX, scaleY );
+
+        offsetX = (int) (( myScreenSize.width - myTargetSize.width * scale ) / 2);
+        offsetY = (int) (( myScreenSize.height - myTargetSize.height * scale ) / 2);
+
+        myCanvas.save();
+        myCanvas.translate( offsetX, offsetY );
+        myCanvas.scale( scale, scale );
+        }
+
+    public final void endFrame()
+        {
+        myCanvas.restore();
+        if ( offsetY > 0 )
+            {
+            myCanvas.drawRect( 0, 0, myScreenSize.width, offsetY, myClearPaint );
+            myCanvas.drawRect( 0, myScreenSize.height - offsetY, myScreenSize.width, myScreenSize.height, myClearPaint );
+            }
+        if ( offsetX > 0 )
+            {
+            myCanvas.drawRect( 0, 0, offsetX, myScreenSize.height, myClearPaint );
+            myCanvas.drawRect( myScreenSize.width - offsetX, 0, myScreenSize.width, myScreenSize.height, myClearPaint );
+            }
+        surfaceHolder.unlockCanvasAndPost( myCanvas );
+        }
+
+
+    private Canvas myCanvas;
 
     private Path myTrianglePath = new Path();
 
@@ -226,6 +286,8 @@ public final class CanvasGraphics extends DirectGraphics
     private final Paint myImagePaint = new Paint();
 
     private final Paint myActivePaint = new Paint();
+
+    private final Paint myClearPaint = new Paint();
 
     private final StringBuilder myCharSequence = new StringBuilder();
 

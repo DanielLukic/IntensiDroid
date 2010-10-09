@@ -98,7 +98,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
                 {
                 final DynamicArray strings = new DynamicArray();
                 final OpenglGameView view = (OpenglGameView) myGameSystem.screen;
-                view.addOpenglStrings( strings );
+                view.openglGraphics.addOpenglStrings( strings );
 
                 for ( int idx = 0; idx < strings.size; idx++ )
                     {
