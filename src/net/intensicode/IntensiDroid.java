@@ -490,6 +490,23 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         final AndroidStorageManager storage = new AndroidStorageManager( this );
         final AndroidAudioManager audio = new AndroidAudioManager( this );
 
+        myEngineConfiguration = resources.loadConfigurationOrUseDefaults( "engine.properties" );
+        if ( myEngineConfiguration.readBoolean( "DirectGraphics.async", false ) )
+            {
+            final DynamicArray renderQueue = new DynamicArray();
+            final AsyncRenderThread renderThread = new AsyncRenderThread( renderQueue, graphics );
+            final AsyncDirectGraphics asyncGraphics = new AsyncDirectGraphics( renderQueue );
+
+            // TODO: Manage life cycle through GameSystem/GameEngine somehow.
+            renderThread.start();
+
+            system.graphics = asyncGraphics;
+            }
+        else
+            {
+            system.graphics = graphics;
+            }
+
         //#if SENSORS
         final AndroidSensorsManager sensors = new AndroidSensorsManager( this );
         //#endif
@@ -507,7 +524,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         system.trackball = trackball;
         //#endif
         system.resources = resources;
-        system.graphics = graphics;
+
         system.storage = storage;
         //#if SENSORS
         system.sensors = sensors;
