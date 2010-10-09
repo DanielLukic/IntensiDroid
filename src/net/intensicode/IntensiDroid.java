@@ -10,10 +10,14 @@ import android.widget.TextView;
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
-import net.intensicode.droid.opengl.*;
+import net.intensicode.droid.opengl.OpenglGameView;
+import net.intensicode.droid.opengl.OpenglGraphics;
+import net.intensicode.graphics.AsyncDirectGraphics;
+import net.intensicode.graphics.AsyncRenderThread;
 import net.intensicode.util.*;
 
-import java.io.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public abstract class IntensiDroid extends DebugLifeCycleActivity implements PlatformContext, SystemContext
     {
@@ -163,6 +167,12 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
             myErrorDialogBuilder.createDialog();
             }
         } );
+        }
+
+    public final void storePreferences( final String aPreferencesId, final String aPropertyKey, final boolean aValue )
+        {
+        final SharedPreferences preferences = getSharedPreferences( aPreferencesId, Context.MODE_PRIVATE );
+        preferences.edit().putBoolean( aPropertyKey, true ).commit();
         }
 
     // From SystemContext
