@@ -14,6 +14,7 @@ public final class TextureManager
     public final void setConfiguration( final Configuration aConfiguration )
         {
         myConfiguration = aConfiguration;
+        myDefaultDirectTextureFlag = myConfiguration.readBoolean( "direct_by_default", true );
         }
 
     public final void addTexture( final AndroidImageResource aImageResource )
@@ -83,13 +84,15 @@ public final class TextureManager
         //#if DEBUG
         net.intensicode.util.Log.debug( "TextureManager looking up configuration for {}", aImageId );
         //#endif
-        return myConfiguration.readBoolean( aImageId, "direct", DEFAULT_DIRECT_TEXTURE_CONFIGURATION );
+        final boolean isDirect = myConfiguration.readBoolean( aImageId, "direct", myDefaultDirectTextureFlag );
+        Log.info( "texture {} direct? " + isDirect );
+        return isDirect;
         }
 
 
-    private Configuration myConfiguration = Configuration.NULL_CONFIGURATION;
+    private boolean myDefaultDirectTextureFlag = true;
 
-    private static final boolean DEFAULT_DIRECT_TEXTURE_CONFIGURATION = true;
+    private Configuration myConfiguration = Configuration.NULL_CONFIGURATION;
 
     private static final AtlasHints NO_ATLAS_HINTS = new AtlasHints();
     }
