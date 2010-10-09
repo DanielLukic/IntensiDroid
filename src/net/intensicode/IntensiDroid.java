@@ -1,7 +1,6 @@
 package net.intensicode;
 
 import android.content.*;
-import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.*;
@@ -397,12 +396,30 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         onPauseApplication();
         myGameSystem.stop(); // this is really the only one that has an effect..
         super.onPause();
+
+        finishIfPauseShouldStop();
+        }
+
+    private void finishIfPauseShouldStop()
+        {
+        loadEngineConfigurationIfNecessary();
+        if ( !myEngineConfiguration.readBoolean( "IntensiDroid.pauseShouldStop", false ) ) return;
+        Log.info( "finishing activity because of IntensiDroid.pauseShouldStop = true" );
+        finish();
+        }
+
+    private void loadEngineConfigurationIfNecessary()
+        {
+        if ( myEngineConfiguration != null ) return;
+        myEngineConfiguration = system().resources.loadConfigurationOrUseDefaults( "engine.properties" );
         }
 
     protected void onStop()
         {
         myGameSystem.stop();
         super.onStop();
+
+        finishIfPauseShouldStop();
         }
 
     protected void onDestroy()
@@ -416,7 +433,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     //#if ORIENTATION_DYNAMIC
 
-    public void onConfigurationChanged( final Configuration aConfiguration )
+    public void onConfigurationChanged( final android.content.res.Configuration aConfiguration )
         {
         Log.info( "onConfigurationChanged {}", aConfiguration );
         super.onConfigurationChanged( aConfiguration );
@@ -559,6 +576,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     private AndroidGameView myGameView;
 
     private IntensiGameHelper myHelper;
+
+    private Configuration myEngineConfiguration;
 
     private OptionsMenuHandler myOptionsMenuHandler;
 
