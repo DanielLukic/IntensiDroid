@@ -1,7 +1,8 @@
 package net.intensicode.droid.opengl;
 
 import android.view.SurfaceHolder;
-import net.intensicode.util.*;
+import net.intensicode.util.DynamicArray;
+import net.intensicode.util.Log;
 
 import javax.microedition.khronos.egl.*;
 import javax.microedition.khronos.opengles.GL;
@@ -114,7 +115,14 @@ final class EglHelper
 
     final int swapAndReturnContextState()
         {
-        myEgl.eglSwapBuffers( myDisplay, mySurface );
+        try
+            {
+            myEgl.eglSwapBuffers( myDisplay, mySurface );
+            }
+        catch ( final IllegalArgumentException e )
+            {
+            return CONTEXT_LOST;
+            }
 
         final boolean contextLost = myEgl.eglGetError() == EGL11.EGL_CONTEXT_LOST;
         return contextLost ? CONTEXT_LOST : CONTEXT_OK;
