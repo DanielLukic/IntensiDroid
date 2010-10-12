@@ -1,6 +1,7 @@
 package net.intensicode.droid.audio;
 
-import android.content.res.*;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.media.MediaPlayer;
 import net.intensicode.ReleaseProperties;
 import net.intensicode.core.AudioResourceEx;

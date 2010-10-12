@@ -21,48 +21,48 @@ package org.muforge.musound.muxm;
  * ================================================================
  */
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 /**
  * Factory to get Module from an input stream.
- * 
+ *
  * @author Martin Cameron
  */
-public class Loader {
-    
+public class Loader
+    {
+
     /**
      * Returns true if the InputStream contains a valid module.
      */
-    public static boolean identify(InputStream i) throws IOException {
-        DataInputStream dis = new DataInputStream(i);
+    public static boolean identify( InputStream i ) throws IOException
+        {
+        DataInputStream dis = new DataInputStream( i );
         byte[] buf = new byte[1084];
-        dis.readFully(buf, 0, 60);
-        if (check(buf) > 0)
+        dis.readFully( buf, 0, 60 );
+        if ( check( buf ) > 0 )
             return true;
-        dis.readFully(buf, 60, 1024);
-        if (check(buf) > 0)
+        dis.readFully( buf, 60, 1024 );
+        if ( check( buf ) > 0 )
             return true;
         return false;
-    }
+        }
 
     /**
      * Identify and load a module file from the InputStream.
      */
-    public static Module load(InputStream i) throws IOException {
-        DataInputStream dis = new DataInputStream(i);
+    public static Module load( InputStream i ) throws IOException
+        {
+        DataInputStream dis = new DataInputStream( i );
         byte[] buf = new byte[1084];
-        dis.readFully(buf, 0, 60);
-        if (check(buf) == 1)
-            return XMLoader.loadXM(buf, dis);
-        dis.readFully(buf, 60, 1024);
-        if (check(buf) >= 3)
-            return ModLoader.loadMOD(buf, dis);
+        dis.readFully( buf, 0, 60 );
+        if ( check( buf ) == 1 )
+            return XMLoader.loadXM( buf, dis );
+        dis.readFully( buf, 60, 1024 );
+        if ( check( buf ) >= 3 )
+            return ModLoader.loadMOD( buf, dis );
         return null;
-        
-    }
+
+        }
 
     /*
     Check the module id.
@@ -73,51 +73,61 @@ public class Loader {
     3  - Amiga 4 Channel MOD.
     4+ - PC MOD with n channels.
     */
-    protected static int check(byte[] buf) throws IOException {
-        String type = ascii2String(buf, 0, 17);
-        if (type.equals("Extended Module: "))
+    protected static int check( byte[] buf ) throws IOException
+        {
+        String type = ascii2String( buf, 0, 17 );
+        if ( type.equals( "Extended Module: " ) )
             return 1;
-        type = ascii2String(buf, 44, 4);
-        if (type.equals("SCRM"))
+        type = ascii2String( buf, 44, 4 );
+        if ( type.equals( "SCRM" ) )
             return 2;
-        type = ascii2String(buf, 1080, 4);
-        if (type.equals("M.K."))
+        type = ascii2String( buf, 1080, 4 );
+        if ( type.equals( "M.K." ) )
             return 3;
-        if (type.equals("M!K!"))
+        if ( type.equals( "M!K!" ) )
             return 3;
-        if (type.equals("FLT4"))
+        if ( type.equals( "FLT4" ) )
             return 3;
-        type = ascii2String(buf, 1081, 3);
-        if (type.equals("CHN"))
-            return buf[1080] - 48;
-        type = ascii2String(buf, 1082, 2);
-        if (type.equals("CH"))
-            return ((buf[1080] - 48) * 10) + (buf[1081] - 48);
+        type = ascii2String( buf, 1081, 3 );
+        if ( type.equals( "CHN" ) )
+            return buf[ 1080 ] - 48;
+        type = ascii2String( buf, 1082, 2 );
+        if ( type.equals( "CH" ) )
+            return ( ( buf[ 1080 ] - 48 ) * 10 ) + ( buf[ 1081 ] - 48 );
         return 0;
-    }
+        }
 
-    protected static String ascii2String(byte[] buf, int offset, int len) throws IOException {
-        
+    protected static String ascii2String( byte[] buf, int offset, int len ) throws IOException
+        {
+
         byte[] str = new byte[len];
-        System.arraycopy(buf, offset, str, 0, len);
-        for (int n = 0; n < len; n++)
-            if (str[n] < 32)
-                str[n] = 32;
+        System.arraycopy( buf, offset, str, 0, len );
+        for ( int n = 0; n < len; n++ )
+            {
+            if ( str[ n ] < 32 )
+                str[ n ] = 32;
+            }
 
         // Force to 8859_1 (Latin1) encoding
         String s = null;
-        try {
-            s = new String(str, 0, len, "ISO8859_1");
-        } catch (UnsupportedEncodingException e) {
-            try {
-                s = new String(str, 0, len, "ISO8859-1");
-            } catch (UnsupportedEncodingException e2) {
-                s = new String(str, 0, len, "8859-1");
+        try
+            {
+            s = new String( str, 0, len, "ISO8859_1" );
             }
-        }
+        catch ( UnsupportedEncodingException e )
+            {
+            try
+                {
+                s = new String( str, 0, len, "ISO8859-1" );
+                }
+            catch ( UnsupportedEncodingException e2 )
+                {
+                s = new String( str, 0, len, "8859-1" );
+                }
+            }
 
         return s;
-    }
+        }
 
-}
+    }
 

@@ -22,10 +22,11 @@ package org.muforge.musound.muxm;
  */
 
 /**
- *	A FastTracker 2 Note.
+ * A FastTracker 2 Note.
  *
- *  @author Martin Cameron
+ * @author Martin Cameron
  */
-public class Note {
-	public int key, inst, vol, fx, fp;
-}
+public class Note
+    {
+    public int key, inst, vol, fx, fp;
+    }

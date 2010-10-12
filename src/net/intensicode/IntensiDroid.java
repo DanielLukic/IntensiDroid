@@ -488,7 +488,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#endif
         final AndroidKeysHandler keys = new AndroidKeysHandler();
         final AndroidStorageManager storage = new AndroidStorageManager( this );
-        final AndroidAudioManager audio = new AndroidAudioManager( this );
+        final AndroidAudioManager audio = new AndroidAudioManager( this, resources );
 
         myEngineConfiguration = resources.loadConfigurationOrUseDefaults( "engine.properties" );
         if ( myEngineConfiguration.readBoolean( "DirectGraphics.async", false ) )

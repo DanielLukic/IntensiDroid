@@ -7,13 +7,13 @@ import net.intensicode.droid.audio.*;
 
 public final class AndroidAudioManager extends AudioManager
     {
-    public AndroidAudioManager( final Context aContext )
+    public AndroidAudioManager( final Context aContext, final ResourcesManager aResourcesManager )
         {
         mySoundBackend = new SoundPoolBackend( aContext.getAssets() );
 
         if ( ReleaseProperties.MUSIC_FORMAT_SUFFIX.equals( ".mod" ) )
             {
-            myMusicBackend = new MuxmPlayerBackend( aContext.getAssets() );
+            myMusicBackend = new ModuleEngineAudioBackend( aResourcesManager );
             }
         else
             {

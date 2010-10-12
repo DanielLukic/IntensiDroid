@@ -23,11 +23,12 @@ package org.muforge.musound.muxm;
 
 /**
  * Channel processor.
- * 
+ *
  * @author Martin Cameron
  */
-class Channel {
-    
+class Channel
+    {
+
     public static final int FX_ARPEGGIO = 0x00, FX_PORTA_UP = 0x01, FX_PORTA_DOWN = 0x02, FX_TONE_PORTA = 0x03,
             FX_VIBRATO = 0x04, FX_TONE_PORTA_VOL = 0x05, FX_VIBRATO_VOL = 0x06, FX_TREMOLO = 0x07,
             FX_SET_PANNING = 0x08, FX_SET_SAMPLEPOS = 0x09, FX_VOLUME_SLIDE = 0x0A, FX_PAT_JUMP = 0x0B,
@@ -45,30 +46,44 @@ class Channel {
             VC_PAN_SLIDE_L = 0xD0, VC_PAN_SLIDE_R = 0xE0, VC_TONE_PORTA = 0xF0;
 
     public Sample sample;
+
     public int samplePos, sampleFrac;
+
     public int ampl, pann, step;
+
     public int chID, loopMark;
 
     private Instrument instrument;
+
     private Envelope volenv, panenv;
+
     private int samplingRate, midc;
+
     private boolean amiga, xm, linear;
+
     private Note gvol;
 
     private int period, finetune, volume, panning;
+
     private int porta, arpeggio, vibrato, tremolo;
 
     // Current fx
     private Instrument ins;
+
     private int key, vc, fx, fp;
+
     private int[] fxstore, efxstore;
+
     private int fxCounter, vtCounter, avCounter, tkCounter;
+
     private int venvpos, penvpos;
+
     private int vfadeout;
+
     private boolean keyon;
 
-    private final int[] sinTable = new int[]{0, 24, 49, 74, 97, 120, 141, 161, 180, 197, 212, 224, 235, 244, 250, 253,
-            255, 253, 250, 244, 235, 224, 212, 197, 180, 161, 141, 120, 97, 74, 49, 24};
+    private final int[] sinTable = new int[]{ 0, 24, 49, 74, 97, 120, 141, 161, 180, 197, 212, 224, 235, 244, 250, 253,
+                                              255, 253, 250, 244, 235, 224, 212, 197, 180, 161, 141, 120, 97, 74, 49, 24 };
 
     /*
      num - channel id, used to set panning for amiga mods.
@@ -77,7 +92,8 @@ class Channel {
      amiga - use amiga trigger quirks and PAL tuning.
      linear - use linear periods.
      */
-    public Channel(int num, int samplingRate, Note gvol, boolean amiga, boolean xm, boolean linear) {
+    public Channel( int num, int samplingRate, Note gvol, boolean amiga, boolean xm, boolean linear )
+        {
         this.chID = num;
         this.samplingRate = samplingRate;
         this.gvol = gvol;
@@ -86,32 +102,34 @@ class Channel {
         this.linear = linear;
         midc = amiga ? 8287 : 8363;
         panning = 128;
-        if (!xm)
-            switch (chID & 0x3) {
-                case 0 :
+        if ( !xm )
+            switch ( chID & 0x3 )
+                {
+                case 0:
                     panning = 64;
                     break;
-                case 1 :
+                case 1:
                     panning = 192;
                     break;
-                case 2 :
+                case 2:
                     panning = 192;
                     break;
-                case 3 :
+                case 3:
                     panning = 64;
                     break;
-            }
+                }
         fxstore = new int[33];
         efxstore = new int[16];
         instrument = new Instrument();
-        sample = instrument.samples[0];
-        row(48, null, 0, 0, 0);
-    }
+        sample = instrument.samples[ 0 ];
+        row( 48, null, 0, 0, 0 );
+        }
 
     /*
      Called once every row.
      */
-    public void row(int key, Instrument i, int vc, int fx, int fp) {
+    public void row( int key, Instrument i, int vc, int fx, int fp )
+        {
         fxCounter = 0;
 
         // Store current fx
@@ -120,459 +138,487 @@ class Channel {
         this.vc = vc;
         this.fx = fx;
         this.fp = fp;
-        if (fx < fxstore.length && fp != 0)
-            fxstore[fx] = fp;
-        if (fx == FX_EXTENDED && (fp & 0x0F) != 0)
-            efxstore[(fp & 0xF0) >> 4] = fp & 0x0F;
+        if ( fx < fxstore.length && fp != 0 )
+            fxstore[ fx ] = fp;
+        if ( fx == FX_EXTENDED && ( fp & 0x0F ) != 0 )
+            efxstore[ ( fp & 0xF0 ) >> 4 ] = fp & 0x0F;
 
         // Handle note delay.
-        if (fx == FX_EXTENDED && (fp & 0xF0) == EFX_NOTE_DELAY) {
+        if ( fx == FX_EXTENDED && ( fp & 0xF0 ) == EFX_NOTE_DELAY )
+            {
             tick();
             return;
-        }
+            }
 
         // Handle note
-        trigger(i, key);
+        trigger( i, key );
 
         // Handle fx
         arpeggio = vibrato = tremolo = 0;
-        if (vc >= 0x10 && vc <= 0x50)
+        if ( vc >= 0x10 && vc <= 0x50 )
             volume = vc - 0x10;
-        switch (vc & 0xF0) {
-            case VC_FINE_VOL_DOWN :
+        switch ( vc & 0xF0 )
+            {
+            case VC_FINE_VOL_DOWN:
                 volume -= vc & 0x0F;
-                if (volume <= 0)
+                if ( volume <= 0 )
                     volume = 0;
                 break;
-            case VC_FINE_VOL_UP :
+            case VC_FINE_VOL_UP:
                 volume += vc & 0x0F;
-                if (volume >= 64)
+                if ( volume >= 64 )
                     volume = 64;
                 break;
-            case VC_SET_VIBR_SPEED :
-                int vparam = fxstore[FX_VIBRATO] & 0x0F;
-                fxstore[FX_VIBRATO] = vparam | ((vc & 0x0F) << 4);
+            case VC_SET_VIBR_SPEED:
+                int vparam = fxstore[ FX_VIBRATO ] & 0x0F;
+                fxstore[ FX_VIBRATO ] = vparam | ( ( vc & 0x0F ) << 4 );
                 break;
-            case VC_VIBRATO :
-                vparam = fxstore[FX_VIBRATO] & 0xF0;
-                fxstore[FX_VIBRATO] = vparam | (vc & 0x0F);
+            case VC_VIBRATO:
+                vparam = fxstore[ FX_VIBRATO ] & 0xF0;
+                fxstore[ FX_VIBRATO ] = vparam | ( vc & 0x0F );
                 vibrato();
                 break;
-            case VC_SET_PANNING :
-                panning = (vc & 0x0F) << 4;
+            case VC_SET_PANNING:
+                panning = ( vc & 0x0F ) << 4;
                 break;
-            case VC_TONE_PORTA :
-                fxstore[FX_TONE_PORTA] = vc & 0x0F;
+            case VC_TONE_PORTA:
+                fxstore[ FX_TONE_PORTA ] = vc & 0x0F;
                 break;
-        }
-        switch (fx) {
-            case FX_VIBRATO :
+            }
+        switch ( fx )
+            {
+            case FX_VIBRATO:
                 vibrato();
                 break;
-            case FX_VIBRATO_VOL :
+            case FX_VIBRATO_VOL:
                 vibrato();
                 break;
-            case FX_SET_PANNING :
-                if (!amiga)
+            case FX_SET_PANNING:
+                if ( !amiga )
                     panning = fp;
                 break;
-            case FX_SET_SAMPLEPOS :
+            case FX_SET_SAMPLEPOS:
                 samplePos = fp << 8;
                 sampleFrac = 0;
                 break;
-            case FX_SET_VOLUME :
+            case FX_SET_VOLUME:
                 volume = fp;
-                if (volume > 64)
+                if ( volume > 64 )
                     volume = 64;
                 break;
-            case FX_EXTENDED :
-                switch (fp & 0xF0) {
-                    case EFX_FINE_PORTA_UP :
-                        period -= efxstore[EFX_FINE_PORTA_UP >> 4] << 2;
+            case FX_EXTENDED:
+                switch ( fp & 0xF0 )
+                    {
+                    case EFX_FINE_PORTA_UP:
+                        period -= efxstore[ EFX_FINE_PORTA_UP >> 4 ] << 2;
                         break;
-                    case EFX_FINE_PORTA_DN :
-                        period += efxstore[EFX_FINE_PORTA_DN >> 4] << 2;
+                    case EFX_FINE_PORTA_DN:
+                        period += efxstore[ EFX_FINE_PORTA_DN >> 4 ] << 2;
                         break;
-                    case EFX_FINE_VOL_UP :
-                        volume += efxstore[EFX_FINE_VOL_UP >> 4];
-                        if (volume > 64)
+                    case EFX_FINE_VOL_UP:
+                        volume += efxstore[ EFX_FINE_VOL_UP >> 4 ];
+                        if ( volume > 64 )
                             volume = 64;
                         break;
-                    case EFX_FINE_VOL_DN :
-                        volume -= efxstore[EFX_FINE_VOL_DN >> 4];
-                        if (volume < 0)
+                    case EFX_FINE_VOL_DN:
+                        volume -= efxstore[ EFX_FINE_VOL_DN >> 4 ];
+                        if ( volume < 0 )
                             volume = 0;
                         break;
-                }
+                    }
                 break;
-            case FX_SET_GVOL :
+            case FX_SET_GVOL:
                 gvol.vol = fp;
-                if (gvol.vol > 64)
+                if ( gvol.vol > 64 )
                     gvol.vol = 64;
                 break;
-            case FX_KEY_OFF :
+            case FX_KEY_OFF:
                 keyon = false;
                 break;
-            case FX_SET_ENV_POS :
+            case FX_SET_ENV_POS:
                 venvpos = penvpos = fp;
                 break;
-            case FX_MULTI_RETRIG :
+            case FX_MULTI_RETRIG:
                 multiretrig();
                 break;
-            case FX_TREMOR :
+            case FX_TREMOR:
                 break;
-            case FX_EX_FINE_PORTA :
-                switch (fp & 0xF0) {
-                    case 0x10 :
-                        period -= fxstore[FX_EX_FINE_PORTA & 0xF];
+            case FX_EX_FINE_PORTA:
+                switch ( fp & 0xF0 )
+                    {
+                    case 0x10:
+                        period -= fxstore[ FX_EX_FINE_PORTA & 0xF ];
                         break;
-                    case 0x20 :
-                        period += fxstore[FX_EX_FINE_PORTA & 0xF];
+                    case 0x20:
+                        period += fxstore[ FX_EX_FINE_PORTA & 0xF ];
                         break;
-                }
+                    }
                 break;
-        }
+            }
         update();
         fxCounter++;
         tkCounter++;
-    }
+        }
 
     /*
      Called once every tick, between calls to row.
      */
-    public void tick() {
+    public void tick()
+        {
         // Handle note delay.
-        if (fx == FX_EXTENDED && (fp & 0xF0) == EFX_NOTE_DELAY && (fp & 0x0F) == fxCounter) {
-            row(key, ins, vc, 0, 0);
+        if ( fx == FX_EXTENDED && ( fp & 0xF0 ) == EFX_NOTE_DELAY && ( fp & 0x0F ) == fxCounter )
+            {
+            row( key, ins, vc, 0, 0 );
             return;
-        }
+            }
 
         arpeggio = vibrato = tremolo = 0;
-        switch (vc & 0xF0) {
-            case VC_VOL_SLIDE_DOWN :
+        switch ( vc & 0xF0 )
+            {
+            case VC_VOL_SLIDE_DOWN:
                 volume -= vc & 0xF;
-                if (volume < 0)
+                if ( volume < 0 )
                     volume = 0;
                 break;
-            case VC_VOL_SLIDE_UP :
+            case VC_VOL_SLIDE_UP:
                 volume += vc & 0xF;
-                if (volume > 64)
+                if ( volume > 64 )
                     volume = 64;
                 break;
-            case VC_VIBRATO :
+            case VC_VIBRATO:
                 vibrato();
                 break;
-            case VC_PAN_SLIDE_L :
+            case VC_PAN_SLIDE_L:
                 panning -= vc & 0xF;
-                if (panning < 0)
+                if ( panning < 0 )
                     panning = 0;
                 break;
-            case VC_PAN_SLIDE_R :
+            case VC_PAN_SLIDE_R:
                 panning += vc & 0xF;
-                if (panning > 255)
+                if ( panning > 255 )
                     panning = 255;
                 break;
-            case VC_TONE_PORTA :
+            case VC_TONE_PORTA:
                 porta();
                 break;
-        }
-        switch (fx) {
-            case FX_ARPEGGIO :
-                if (fxCounter % 3 == 1)
-                    arpeggio = (fp & 0xF0) >> 4;
-                if (fxCounter % 3 == 2)
+            }
+        switch ( fx )
+            {
+            case FX_ARPEGGIO:
+                if ( fxCounter % 3 == 1 )
+                    arpeggio = ( fp & 0xF0 ) >> 4;
+                if ( fxCounter % 3 == 2 )
                     arpeggio = fp & 0x0F;
                 break;
-            case FX_PORTA_UP :
-                period -= fxstore[FX_PORTA_UP] << 2;
+            case FX_PORTA_UP:
+                period -= fxstore[ FX_PORTA_UP ] << 2;
                 break;
-            case FX_PORTA_DOWN :
-                period += fxstore[FX_PORTA_DOWN] << 2;
+            case FX_PORTA_DOWN:
+                period += fxstore[ FX_PORTA_DOWN ] << 2;
                 break;
-            case FX_TONE_PORTA :
+            case FX_TONE_PORTA:
                 porta();
                 break;
-            case FX_VIBRATO :
+            case FX_VIBRATO:
                 vibrato();
                 break;
-            case FX_TONE_PORTA_VOL :
-                volume += (fxstore[FX_TONE_PORTA_VOL] & 0xF0) >> 4;
-                volume -= fxstore[FX_TONE_PORTA_VOL] & 0x0F;
-                if (volume > 64)
+            case FX_TONE_PORTA_VOL:
+                volume += ( fxstore[ FX_TONE_PORTA_VOL ] & 0xF0 ) >> 4;
+                volume -= fxstore[ FX_TONE_PORTA_VOL ] & 0x0F;
+                if ( volume > 64 )
                     volume = 64;
-                if (volume < 0)
+                if ( volume < 0 )
                     volume = 0;
                 porta();
                 break;
-            case FX_VIBRATO_VOL :
-                volume += (fxstore[FX_VIBRATO_VOL] & 0xF0) >> 4;
-                volume -= fxstore[FX_VIBRATO_VOL] & 0x0F;
-                if (volume > 64)
+            case FX_VIBRATO_VOL:
+                volume += ( fxstore[ FX_VIBRATO_VOL ] & 0xF0 ) >> 4;
+                volume -= fxstore[ FX_VIBRATO_VOL ] & 0x0F;
+                if ( volume > 64 )
                     volume = 64;
-                if (volume < 0)
+                if ( volume < 0 )
                     volume = 0;
                 vibrato();
                 break;
-            case FX_TREMOLO :
-                int tspeed = (fxstore[FX_TREMOLO] & 0xF0) >> 4;
-                int tdepth = fxstore[FX_TREMOLO] & 0x0F;
-                tremolo = waveform(vtCounter * tspeed) * tdepth >> 7;
+            case FX_TREMOLO:
+                int tspeed = ( fxstore[ FX_TREMOLO ] & 0xF0 ) >> 4;
+                int tdepth = fxstore[ FX_TREMOLO ] & 0x0F;
+                tremolo = waveform( vtCounter * tspeed ) * tdepth >> 7;
                 break;
-            case FX_VOLUME_SLIDE :
-                volume += (fxstore[FX_VOLUME_SLIDE] & 0xF0) >> 4;
-                volume -= fxstore[FX_VOLUME_SLIDE] & 0x0F;
-                if (volume > 64)
+            case FX_VOLUME_SLIDE:
+                volume += ( fxstore[ FX_VOLUME_SLIDE ] & 0xF0 ) >> 4;
+                volume -= fxstore[ FX_VOLUME_SLIDE ] & 0x0F;
+                if ( volume > 64 )
                     volume = 64;
-                if (volume < 0)
+                if ( volume < 0 )
                     volume = 0;
                 break;
-            case FX_EXTENDED :
-                switch (fp & 0xF0) {
-                    case EFX_RETRIG :
+            case FX_EXTENDED:
+                switch ( fp & 0xF0 )
+                    {
+                    case EFX_RETRIG:
                         int rtparam = fp & 0x0F;
-                        if (rtparam == 0)
+                        if ( rtparam == 0 )
                             rtparam = 1;
-                        if (fxCounter % rtparam == 0)
+                        if ( fxCounter % rtparam == 0 )
                             samplePos = sampleFrac = 0;
                         break;
-                    case EFX_NOTE_CUT :
-                        if (fxCounter == (fp & 0x0F))
+                    case EFX_NOTE_CUT:
+                        if ( fxCounter == ( fp & 0x0F ) )
                             volume = 0;
                         break;
-                }
+                    }
                 break;
-            case FX_GVOL_SLIDE :
-                gvol.vol += (fxstore[FX_GVOL_SLIDE] & 0xF0) >> 4;
-                gvol.vol -= fxstore[FX_GVOL_SLIDE] & 0x0F;
-                if (gvol.vol < 0)
+            case FX_GVOL_SLIDE:
+                gvol.vol += ( fxstore[ FX_GVOL_SLIDE ] & 0xF0 ) >> 4;
+                gvol.vol -= fxstore[ FX_GVOL_SLIDE ] & 0x0F;
+                if ( gvol.vol < 0 )
                     gvol.vol = 0;
-                if (gvol.vol > 64)
+                if ( gvol.vol > 64 )
                     gvol.vol = 64;
                 break;
-            case FX_PANNING_SLIDE :
-                panning += (fxstore[FX_PANNING_SLIDE] & 0xF0) >> 4;
-                panning -= fxstore[FX_PANNING_SLIDE] & 0x0F;
-                if (panning > 255)
+            case FX_PANNING_SLIDE:
+                panning += ( fxstore[ FX_PANNING_SLIDE ] & 0xF0 ) >> 4;
+                panning -= fxstore[ FX_PANNING_SLIDE ] & 0x0F;
+                if ( panning > 255 )
                     panning = 255;
-                if (panning < 0)
+                if ( panning < 0 )
                     panning = 0;
                 break;
-            case FX_MULTI_RETRIG :
+            case FX_MULTI_RETRIG:
                 multiretrig();
                 break;
-        }
+            }
         update();
         fxCounter++;
         vtCounter++;
         tkCounter++;
-    }
+        }
 
-    private int getStep() {
+    private int getStep()
+        {
         int l2Freq, p = period + vibrato;
-        if (p < 27)
+        if ( p < 27 )
             p = 27; // Limit freq to 0.5mhz :)
-        if (p > 32768)
+        if ( p > 32768 )
             p = 32768;
-        if (linear)
-            l2Freq = LogTable.log2(midc) + (4608 - p) * ModuleEngine.FP_ONE / 768;
+        if ( linear )
+            l2Freq = LogTable.log2( midc ) + ( 4608 - p ) * MuxmModuleEngine.FP_ONE / 768;
         else
-            l2Freq = LogTable.log2(midc * 1712) - LogTable.log2(p);
-        l2Freq += (finetune << ModuleEngine.FP_SHIFT - 7) / 12;
-        l2Freq += (arpeggio << ModuleEngine.FP_SHIFT) / 12;
-        return LogTable.pow2(l2Freq - LogTable.log2(samplingRate));
-    }
+            l2Freq = LogTable.log2( midc * 1712 ) - LogTable.log2( p );
+        l2Freq += ( finetune << MuxmModuleEngine.FP_SHIFT - 7 ) / 12;
+        l2Freq += ( arpeggio << MuxmModuleEngine.FP_SHIFT ) / 12;
+        return LogTable.pow2( l2Freq - LogTable.log2( samplingRate ) );
+        }
 
-    private int getAmpl() {
+    private int getAmpl()
+        {
         int envvol = 64;
-        if (instrument.volEnv.on)
-            envvol = instrument.volEnv.calculate(venvpos);
-        else if (!keyon)
+        if ( instrument.volEnv.on )
+            envvol = instrument.volEnv.calculate( venvpos );
+        else if ( !keyon )
             envvol = 0;
         int vol = volume + tremolo;
-        if (vol > 64)
+        if ( vol > 64 )
             vol = 64;
-        if (vol < 0)
+        if ( vol < 0 )
             vol = 0;
-        int amp = vol << ModuleEngine.FP_SHIFT - 6;
+        int amp = vol << MuxmModuleEngine.FP_SHIFT - 6;
         amp = amp * envvol >> 6;
         amp = amp * gvol.vol >> 6;
-        return amp * (vfadeout >> 1) >> 15;
-    }
+        return amp * ( vfadeout >> 1 ) >> 15;
+        }
 
-    private int getPann() {
-        int pan = panning << ModuleEngine.FP_SHIFT - 8;
+    private int getPann()
+        {
+        int pan = panning << MuxmModuleEngine.FP_SHIFT - 8;
         int envpan = 32;
-        if (instrument.panEnv.on)
-            envpan = instrument.panEnv.calculate(penvpos);
-        int envrange = ModuleEngine.FP_ONE - pan;
-        if (envrange > pan)
+        if ( instrument.panEnv.on )
+            envpan = instrument.panEnv.calculate( penvpos );
+        int envrange = MuxmModuleEngine.FP_ONE - pan;
+        if ( envrange > pan )
             envrange = pan;
-        pan += envrange * (envpan - 32) >> 5;
+        pan += envrange * ( envpan - 32 ) >> 5;
         return pan;
-    }
+        }
 
     /* Calculate amplitute, frequency and update envelopes. */
-    private void update() {
+    private void update()
+        {
         // Calculate autovibrato
         int avdepth = instrument.vibratoDepth & 0xF;
         int avspeed = instrument.vibratoRate & 0x3F;
         int avsweep = instrument.vibratoSweep & 0xFF;
-        if (avCounter < avsweep)
+        if ( avCounter < avsweep )
             avdepth = avdepth * avCounter / avsweep;
-        vibrato += waveform(avCounter * avspeed) * avdepth >> 9;
+        vibrato += waveform( avCounter * avspeed ) * avdepth >> 9;
         // Calculate mix parameters
         step = getStep();
         ampl = getAmpl();
         pann = getPann();
         // Check if sample end reached, if so hint the mixer that it shouldn't bother mixing.
-        if (samplePos > sample.loopEnd && sample.loopEnd - sample.loopStart == 0)
+        if ( samplePos > sample.loopEnd && sample.loopEnd - sample.loopStart == 0 )
             ampl = 0;
         // Update envelopes etc
-        if (keyon)
+        if ( keyon )
             avCounter++;
-        if (instrument.volEnv.on) {
-            if (!keyon) {
+        if ( instrument.volEnv.on )
+            {
+            if ( !keyon )
+                {
                 vfadeout -= instrument.fadeOut << 1;
-                if (vfadeout < 0)
+                if ( vfadeout < 0 )
                     vfadeout = 0;
+                }
+            venvpos = instrument.volEnv.update( venvpos, keyon );
             }
-            venvpos = instrument.volEnv.update(venvpos, keyon);
+        if ( instrument.panEnv.on )
+            penvpos = instrument.panEnv.update( penvpos, keyon );
         }
-        if (instrument.panEnv.on)
-            penvpos = instrument.panEnv.update(penvpos, keyon);
-    }
 
-    private void trigger(Instrument i, int key) {
-        if (i != null) {
+    private void trigger( Instrument i, int key )
+        {
+        if ( i != null )
+            {
             instrument = i;
-            Sample sam = i.samples[0];
-            if (amiga && samplePos > sample.loopStart)
+            Sample sam = i.samples[ 0 ];
+            if ( amiga && samplePos > sample.loopStart )
                 sample = sam;
             volume = sam.volume;
-            if (xm)
+            if ( xm )
                 panning = sam.panning;
             finetune = sam.finetune;
             venvpos = penvpos = 0;
             vfadeout = 65536;
             keyon = true;
-        }
-        if (key <= 0)
+            }
+        if ( key <= 0 )
             return;
-        if (key == 97) {
+        if ( key == 97 )
+            {
             keyon = false;
             return;
-        }
+            }
         int samidx = 0;
-        if (key < 97)
-            samidx = instrument.sampleTable[key - 1];
-        sample = instrument.samples[samidx];
-        porta = toPeriod(key);
+        if ( key < 97 )
+            samidx = instrument.sampleTable[ key - 1 ];
+        sample = instrument.samples[ samidx ];
+        porta = toPeriod( key );
         vtCounter = avCounter = tkCounter = 0;
-        if (fx == FX_TONE_PORTA)
+        if ( fx == FX_TONE_PORTA )
             return;
-        if (fx == FX_TONE_PORTA_VOL)
+        if ( fx == FX_TONE_PORTA_VOL )
             return;
-        if (((vc & 0xF0) >> 4) == VC_TONE_PORTA)
+        if ( ( ( vc & 0xF0 ) >> 4 ) == VC_TONE_PORTA )
             return;
         period = porta;
         samplePos = sampleFrac = 0;
-    }
+        }
 
     /*
      Convert the specified key value into a period.
      */
-    private int toPeriod(int key) {
-        if (!xm)
+    private int toPeriod( int key )
+        {
+        if ( !xm )
             return key << 2;
         key += sample.relativeNote;
-        if (linear)
+        if ( linear )
             return 7744 - key * 64;
-        int l2p = LogTable.log2(29024) - key * ModuleEngine.FP_ONE / 12;
-        return LogTable.pow2(l2p) >> ModuleEngine.FP_SHIFT;
-    }
-
-    private void porta() {
-        if (period > porta) {
-            period -= fxstore[FX_TONE_PORTA] << 2;
-            if (period < porta)
-                period = porta;
+        int l2p = LogTable.log2( 29024 ) - key * MuxmModuleEngine.FP_ONE / 12;
+        return LogTable.pow2( l2p ) >> MuxmModuleEngine.FP_SHIFT;
         }
-        if (period < porta) {
-            period += fxstore[FX_TONE_PORTA] << 2;
-            if (period > porta)
+
+    private void porta()
+        {
+        if ( period > porta )
+            {
+            period -= fxstore[ FX_TONE_PORTA ] << 2;
+            if ( period < porta )
                 period = porta;
+            }
+        if ( period < porta )
+            {
+            period += fxstore[ FX_TONE_PORTA ] << 2;
+            if ( period > porta )
+                period = porta;
+            }
         }
-    }
 
-    private void vibrato() {
-        int vspeed = (fxstore[FX_VIBRATO] & 0xF0) >> 4;
-        int vdepth = fxstore[FX_VIBRATO] & 0x0F;
-        vibrato += waveform(vtCounter * vspeed) * vdepth >> 5;
-    }
+    private void vibrato()
+        {
+        int vspeed = ( fxstore[ FX_VIBRATO ] & 0xF0 ) >> 4;
+        int vdepth = fxstore[ FX_VIBRATO ] & 0x0F;
+        vibrato += waveform( vtCounter * vspeed ) * vdepth >> 5;
+        }
 
-    private int waveform(int x) {
+    private int waveform( int x )
+        {
         int t = x & 0x3F;
-        int out = sinTable[t & 0x1F];
-        if (t > 0x1F)
+        int out = sinTable[ t & 0x1F ];
+        if ( t > 0x1F )
             out = -out;
         return out;
-    }
+        }
 
-    private void multiretrig() {
-        int rtparam = fxstore[FX_MULTI_RETRIG] & 0x0F;
-        if (rtparam == 0)
+    private void multiretrig()
+        {
+        int rtparam = fxstore[ FX_MULTI_RETRIG ] & 0x0F;
+        if ( rtparam == 0 )
             rtparam = 1;
-        if (tkCounter % rtparam == 0) {
+        if ( tkCounter % rtparam == 0 )
+            {
             samplePos = sampleFrac = 0;
-            switch ((fxstore[FX_MULTI_RETRIG] & 0xF0) >> 4) {
-                case 0x1 :
+            switch ( ( fxstore[ FX_MULTI_RETRIG ] & 0xF0 ) >> 4 )
+                {
+                case 0x1:
                     volume -= 1;
                     break;
-                case 0x2 :
+                case 0x2:
                     volume -= 2;
                     break;
-                case 0x3 :
+                case 0x3:
                     volume -= 4;
                     break;
-                case 0x4 :
+                case 0x4:
                     volume -= 8;
                     break;
-                case 0x5 :
+                case 0x5:
                     volume -= 16;
                     break;
-                case 0x6 :
+                case 0x6:
                     volume -= volume / 3;
                     break;
-                case 0x7 :
+                case 0x7:
                     volume /= 2;
                     break;
-                case 0x9 :
+                case 0x9:
                     volume += 1;
                     break;
-                case 0xA :
+                case 0xA:
                     volume += 2;
                     break;
-                case 0xB :
+                case 0xB:
                     volume += 4;
                     break;
-                case 0xC :
+                case 0xC:
                     volume += 8;
                     break;
-                case 0xD :
+                case 0xD:
                     volume += 16;
                     break;
-                case 0xE :
+                case 0xE:
                     volume += volume / 2;
                     break;
-                case 0xF :
+                case 0xF:
                     volume *= 2;
                     break;
-            }
-            if (volume < 0)
+                }
+            if ( volume < 0 )
                 volume = 0;
-            if (volume > 64)
+            if ( volume > 64 )
                 volume = 64;
+            }
         }
     }
-}
 

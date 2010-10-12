@@ -2,9 +2,9 @@ package net.intensicode.droid.audio;
 
 import net.intensicode.core.AudioResourceEx;
 
-public final class MuxmPlayerAudioResource implements AudioResourceEx
+final class ModuleEngineAudioResource implements AudioResourceEx
     {
-    public MuxmPlayerAudioResource( final MuxmPlayer aPlayer )
+    public ModuleEngineAudioResource( final ModuleEnginePlayer aPlayer )
         {
         myPlayer = aPlayer;
         }
@@ -91,5 +91,5 @@ public final class MuxmPlayerAudioResource implements AudioResourceEx
 
     private boolean myEnabledFlag = true;
 
-    private final MuxmPlayer myPlayer;
+    private final ModuleEnginePlayer myPlayer;
     }

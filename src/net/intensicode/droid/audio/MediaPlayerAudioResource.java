@@ -4,7 +4,7 @@ import android.media.MediaPlayer;
 import net.intensicode.core.AudioResourceEx;
 import net.intensicode.util.Log;
 
-public final class MediaPlayerAudioResource implements AudioResourceEx, MediaPlayer.OnErrorListener
+final class MediaPlayerAudioResource implements AudioResourceEx, MediaPlayer.OnErrorListener
     {
     public MediaPlayerAudioResource( final MediaPlayer aPlayer, final String aResourcePath )
         {

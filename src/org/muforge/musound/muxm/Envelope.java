@@ -23,44 +23,54 @@ package org.muforge.musound.muxm;
 
 /**
  * Envelope generator.
- * 
+ *
  * @author Martin Cameron
  */
-class Envelope {
+class Envelope
+    {
     public int[] tick, ampl;
+
     public int susPoint, loopStart, loopEnd;
+
     public boolean on, sustain, loop;
 
-    public Envelope() {
-        this(new int[1], new int[1], false, false, 0, false, 0, 0);
-    }
+    public Envelope()
+        {
+        this( new int[1], new int[1], false, false, 0, false, 0, 0 );
+        }
 
-    public Envelope(int[] tick, int[] ampl, boolean on, boolean sustain, int susPoint, boolean loop, int loopStart,
-            int loopEnd) {
-        if (tick.length != ampl.length || tick.length == 0)
+    public Envelope( int[] tick, int[] ampl, boolean on, boolean sustain, int susPoint, boolean loop, int loopStart,
+                     int loopEnd )
+        {
+        if ( tick.length != ampl.length || tick.length == 0 )
             on = false;
-        for (int n = 1; n < tick.length; n++)
-            if (tick[n] <= tick[n - 1])
+        for ( int n = 1; n < tick.length; n++ )
+            {
+            if ( tick[ n ] <= tick[ n - 1 ] )
                 on = false;
-        for (int n = 0; n < ampl.length; n++)
-            if (ampl[n] < 0 || ampl[n] > 64)
+            }
+        for ( int n = 0; n < ampl.length; n++ )
+            {
+            if ( ampl[ n ] < 0 || ampl[ n ] > 64 )
                 on = false;
-        if (!on) {
+            }
+        if ( !on )
+            {
             tick = new int[1];
             ampl = new int[1];
-        }
-        tick[0] = 0;
-        if (susPoint < 0 || susPoint >= tick.length)
+            }
+        tick[ 0 ] = 0;
+        if ( susPoint < 0 || susPoint >= tick.length )
             sustain = false;
-        if (loopStart < 0 || loopEnd < 0)
+        if ( loopStart < 0 || loopEnd < 0 )
             loop = false;
-        if (loopStart >= tick.length || loopEnd >= tick.length)
+        if ( loopStart >= tick.length || loopEnd >= tick.length )
             loop = false;
-        if (loopEnd < loopStart)
+        if ( loopEnd < loopStart )
             loop = false;
-        if (!sustain)
+        if ( !sustain )
             susPoint = 0;
-        if (!loop)
+        if ( !loop )
             loopStart = loopEnd = 0;
         this.tick = tick;
         this.ampl = ampl;
@@ -70,36 +80,40 @@ class Envelope {
         this.loop = loop;
         this.loopStart = loopStart;
         this.loopEnd = loopEnd;
-    }
+        }
 
     /*
      Updates the envelope position given the previous one.
      */
-    public int update(int t, boolean keyOn) {
+    public int update( int t, boolean keyOn )
+        {
         t++;
-        if (loop && t >= tick[loopEnd])
-            t = tick[loopStart];
-        if (sustain && keyOn && t >= tick[susPoint])
-            t = tick[susPoint];
+        if ( loop && t >= tick[ loopEnd ] )
+            t = tick[ loopStart ];
+        if ( sustain && keyOn && t >= tick[ susPoint ] )
+            t = tick[ susPoint ];
         return t;
-    }
+        }
 
     /*
      Returns the envelope value for the specified tick.
      */
-    public int calculate(int t) {
+    public int calculate( int t )
+        {
         int point = 0;
-        if (!on)
+        if ( !on )
             return 0;
-        if (t >= tick[tick.length - 1])
-            return ampl[tick.length - 1];
-        for (int n = 0; n < tick.length; n++)
-            if (tick[n] <= t)
+        if ( t >= tick[ tick.length - 1 ] )
+            return ampl[ tick.length - 1 ];
+        for ( int n = 0; n < tick.length; n++ )
+            {
+            if ( tick[ n ] <= t )
                 point = n;
-        int da = ampl[point + 1] - ampl[point];
-        int dt = tick[point + 1] - tick[point];
-        int m = (da << ModuleEngine.FP_SHIFT) / dt;
-        return (m * (t - tick[point]) >> ModuleEngine.FP_SHIFT) + ampl[point];
+            }
+        int da = ampl[ point + 1 ] - ampl[ point ];
+        int dt = tick[ point + 1 ] - tick[ point ];
+        int m = ( da << MuxmModuleEngine.FP_SHIFT ) / dt;
+        return ( m * ( t - tick[ point ] ) >> MuxmModuleEngine.FP_SHIFT ) + ampl[ point ];
+        }
     }
-}
 

@@ -4,7 +4,7 @@ import android.media.SoundPool;
 import net.intensicode.core.AudioResourceEx;
 import net.intensicode.util.Log;
 
-public final class SoundPoolAudioResource implements AudioResourceEx
+final class SoundPoolAudioResource implements AudioResourceEx
     {
     public SoundPoolAudioResource( final SoundPool aSoundPool, final int aSoundID, final String aResourcePath )
         {

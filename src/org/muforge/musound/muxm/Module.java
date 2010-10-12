@@ -27,29 +27,36 @@ package org.muforge.musound.muxm;
  *
  * @author Martin Cameron
  */
-public class Module {
-	public String songName, trackerName;
-	public boolean amiga, xm, linear;
-	public int songLength, restart, tempo, bpm;
+public class Module
+    {
+    public String songName, trackerName;
 
-	public int[] patternOrder;
-	public Pattern[] patterns;
-	public Instrument[] instruments;
+    public boolean amiga, xm, linear;
+
+    public int songLength, restart, tempo, bpm;
+
+    public int[] patternOrder;
+
+    public Pattern[] patterns;
+
+    public Instrument[] instruments;
+
     public String type;
 
-	public Module() {
-		songName = "Empty Module";
-		trackerName = "MuXM " + ModuleEngine.VERSION;
-		xm = false;
-		amiga = true;
-		songLength = 1;
-		tempo = 6;
-		bpm = 125;
-		patternOrder = new int[ 1 ];
-		patterns = new Pattern[ 1 ];
-		patterns[ 0 ] = new Pattern( 64, 4 );
-		instruments = new Instrument[ 1 ];
-		instruments[ 0 ] = new Instrument();
-	}
-}
+    public Module()
+        {
+        songName = "Empty Module";
+        trackerName = "MuXM " + MuxmModuleEngine.VERSION;
+        xm = false;
+        amiga = true;
+        songLength = 1;
+        tempo = 6;
+        bpm = 125;
+        patternOrder = new int[1];
+        patterns = new Pattern[1];
+        patterns[ 0 ] = new Pattern( 64, 4 );
+        instruments = new Instrument[1];
+        instruments[ 0 ] = new Instrument();
+        }
+    }
 

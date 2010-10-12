@@ -2,17 +2,16 @@ package net.intensicode.droid.audio;
 
 import android.media.*;
 import net.intensicode.util.Log;
-import org.muforge.musound.muxm.ModuleEngine;
 
-public final class MuxmPlayer
+final class ModuleEnginePlayer
     {
-    public static final int DEFAULT_SAMPLE_RATE = 11025;
-
-    public MuxmPlayer( final ModuleEngine aModuleEngine )
+    public ModuleEnginePlayer( final ModuleEngine aModuleEngine )
         {
         myModuleEngine = aModuleEngine;
 
-        final int minBufferSize = AudioTrack.getMinBufferSize( DEFAULT_SAMPLE_RATE, AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT );
+        final int sampleRate = aModuleEngine.getSampleRate();
+
+        final int minBufferSize = AudioTrack.getMinBufferSize( sampleRate, AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT );
         final int frameCompatibleBuffer = minBufferSize * AudioTrackRefillThread.FRAME_SIZE_IN_BYTES;
 
         //#if DEBUG_AUDIO
@@ -22,14 +21,12 @@ public final class MuxmPlayer
         Log.info( "Choosen BufferSize: {}", frameCompatibleBuffer );
         //#endif
 
-        final AudioTrack audioTrack = new AudioTrack( AudioManager.STREAM_MUSIC, DEFAULT_SAMPLE_RATE, AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT, frameCompatibleBuffer, AudioTrack.MODE_STREAM );
-        audioTrack.setPlaybackRate( DEFAULT_SAMPLE_RATE );
+        final AudioTrack audioTrack = new AudioTrack( AudioManager.STREAM_MUSIC, sampleRate, AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT, frameCompatibleBuffer, AudioTrack.MODE_STREAM );
+        audioTrack.setPlaybackRate( sampleRate );
 
         myAudioTrack = audioTrack;
         myBufferSizeInBytes = frameCompatibleBuffer;
         myAudioBuffer = new byte[myBufferSizeInBytes];
-
-        myModuleEngine.setSampleRate( DEFAULT_SAMPLE_RATE );
 
         myRefillThread = new AudioTrackRefillThread( myAudioTrack, myAudioBuffer, myModuleEngine );
         myRefillThread.setDaemon( true );

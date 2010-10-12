@@ -1,10 +1,13 @@
 package net.intensicode.droid.audio;
 
-import android.content.res.*;
-import android.media.*;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import net.intensicode.ReleaseProperties;
 import net.intensicode.core.AudioResourceEx;
-import net.intensicode.util.*;
+import net.intensicode.util.Assert;
+import net.intensicode.util.Log;
 
 import java.io.IOException;
 

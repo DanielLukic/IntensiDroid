@@ -2,15 +2,10 @@ package net.intensicode.droid.audio;
 
 import android.media.AudioTrack;
 import net.intensicode.util.Log;
-import org.muforge.musound.muxm.ModuleEngine;
-
-import java.util.Hashtable;
 
 final class AudioTrackRefillThread extends Thread implements AudioTrack.OnPlaybackPositionUpdateListener
     {
     public static final int FRAME_SIZE_IN_BYTES = 4;
-
-    public boolean buffer = true;
 
 
     public AudioTrackRefillThread( final AudioTrack aAudioTrack, final byte[] aAudioBuffer, final ModuleEngine aModuleEngine )
@@ -19,18 +14,18 @@ final class AudioTrackRefillThread extends Thread implements AudioTrack.OnPlayba
         myAudioTrack = aAudioTrack;
         myAudioBuffer = aAudioBuffer;
         myModuleEngine = aModuleEngine;
-        mySongDuration = myModuleEngine.getSongLength();
-        myBufferSizeInFrames = aAudioBuffer.length / FRAME_SIZE_IN_BYTES;
         myAudioTrack.setPlaybackPositionUpdateListener( this );
         }
 
     public final void setLooping( final boolean aLoopingFlag )
         {
         myLoopingFlag = aLoopingFlag;
+        myModuleEngine.setLooping( aLoopingFlag );
         }
 
     public final void startAudioTrack()
         {
+        if ( !isAlive() ) start();
         myAudioTrack.play();
         fillAudioTrackBuffer();
         }
@@ -45,13 +40,21 @@ final class AudioTrackRefillThread extends Thread implements AudioTrack.OnPlayba
 
     public void run()
         {
+        //#if DEBUG_AUDIO
+        Log.info( "audiotrack run STARTED in thread: {}", Thread.currentThread() );
+        //#endif
+
         while ( true )
             {
             try
                 {
                 synchronized ( this )
                     {
-                    wait();
+                    //#if DEBUG_AUDIO
+                    Log.info( "AudioTrackRefillThread waiting in thread: {}", Thread.currentThread() );
+                    //#endif
+                    while ( !myNeedDataFlag ) wait();
+                    myNeedDataFlag = false;
                     }
                 fillAudioTrackBuffer();
                 }
@@ -63,6 +66,10 @@ final class AudioTrackRefillThread extends Thread implements AudioTrack.OnPlayba
                 break;
                 }
             }
+
+        //#if DEBUG_AUDIO
+        Log.info( "audiotrack run ENDED in thread: {}", Thread.currentThread() );
+        //#endif
         }
 
     // From AudioTrack.OnPlaybackPositionUpdateListener
@@ -70,10 +77,11 @@ final class AudioTrackRefillThread extends Thread implements AudioTrack.OnPlayba
     public final void onMarkerReached( final AudioTrack aAudioTrack )
         {
         //#if DEBUG_AUDIO
-        Log.debug( "onMarkerReached audiotrack thread: {}", Thread.currentThread() );
+        Log.info( "onMarkerReached audiotrack thread: {}", Thread.currentThread() );
         //#endif
         synchronized ( this )
             {
+            myNeedDataFlag = true;
             notify();
             }
         }
@@ -81,70 +89,54 @@ final class AudioTrackRefillThread extends Thread implements AudioTrack.OnPlayba
     public final void onPeriodicNotification( final AudioTrack aAudioTrack )
         {
         //#if DEBUG_AUDIO
-        Log.debug( "onPeriodicNotification audiotrack thread: {}", Thread.currentThread() );
+        Log.info( "onPeriodicNotification audiotrack thread: {}", Thread.currentThread() );
         //#endif
         }
 
     public final void fillAudioTrackBuffer()
         {
         //#if DEBUG_AUDIO
-        Log.debug( "fillAudioTrackBuffer audiotrack thread: {}", Thread.currentThread() );
+        Log.info( "fillAudioTrackBuffer audiotrack thread: {}", Thread.currentThread() );
         //#endif
 
-        if ( buffer ) playBuffered();
-        else playDirect();
+        final int bytesWritten = myModuleEngine.getStereoAudio( myAudioBuffer );
 
-        myPlayPosition += myBufferSizeInFrames;
-        if ( myPlayPosition >= mySongDuration )
+        final boolean musicStillPlaying = bytesWritten > 0;
+        final boolean musicIsEndingOrHasEnded = bytesWritten < myAudioBuffer.length;
+        final boolean musicHasEnded = bytesWritten == 0;
+
+        int bytesWrittenToTrack = 0;
+
+        if ( musicStillPlaying )
             {
-            myPlayPosition = 0;
-            if ( !myLoopingFlag ) stopAudioTrack();
+            final int writtenToTrack = myAudioTrack.write( myAudioBuffer, 0, bytesWritten );
+            if ( writtenToTrack > 0 ) bytesWrittenToTrack += writtenToTrack;
+
+            if ( !musicIsEndingOrHasEnded ) myAudioTrack.setNotificationMarkerPosition( bytesWritten / FRAME_SIZE_IN_BYTES * 3 / 4 );
             }
 
-        myAudioTrack.setNotificationMarkerPosition( myBufferSizeInFrames * 3 / 4 );
-        }
-
-    // Implementation
-
-    private Hashtable myCachedBuffers = new Hashtable();
-
-    private void playBuffered()
-        {
-        final Integer key = new Integer( myPlayPosition );
-        if ( !myCachedBuffers.containsKey( key ) )
+        if ( musicIsEndingOrHasEnded && myLoopingFlag )
             {
-            final byte[] buffer = new byte[myAudioBuffer.length];
-            myModuleEngine.getAudio( buffer, 0, myBufferSizeInFrames, true );
-            myCachedBuffers.put( key, buffer );
-            //#if DEBUG_AUDIO
-            Log.info( "cached buffers: {}", myCachedBuffers.size() );
-            Log.info( "cached buffers size: {} KB", myCachedBuffers.size() * buffer.length / 1024f );
-            //#endif
+            myModuleEngine.restart();
+
+            final int moreBytesWritten = myModuleEngine.getStereoAudio( myAudioBuffer );
+            final int writtenToTrack = myAudioTrack.write( myAudioBuffer, 0, moreBytesWritten );
+            if ( writtenToTrack > 0 ) bytesWrittenToTrack += writtenToTrack;
+
+            myAudioTrack.setNotificationMarkerPosition( bytesWrittenToTrack / FRAME_SIZE_IN_BYTES * 3 / 4 );
             }
 
-        final byte[] buffer = (byte[]) myCachedBuffers.get( key );
-        myAudioTrack.write( buffer, 0, buffer.length );
-        }
-
-    private void playDirect()
-        {
-        myModuleEngine.getAudio( myAudioBuffer, 0, myBufferSizeInFrames, true );
-        myAudioTrack.write( myAudioBuffer, 0, myAudioBuffer.length );
-        myCachedBuffers.clear();
+        if ( musicHasEnded && !myLoopingFlag ) stopAudioTrack();
         }
 
 
-    private int myPlayPosition;
+    private boolean myNeedDataFlag;
 
     private boolean myLoopingFlag;
-
-    private final int mySongDuration;
 
     private final byte[] myAudioBuffer;
 
     private final AudioTrack myAudioTrack;
-
-    private final int myBufferSizeInFrames;
 
     private final ModuleEngine myModuleEngine;
     }
