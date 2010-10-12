@@ -1,10 +1,12 @@
 package net.intensicode.configuration;
 
-import android.os.*;
+import android.os.Debug;
+import android.os.Environment;
 import net.intensicode.ConfigurableActionValue;
 import net.intensicode.util.Log;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 public final class DumpHprofData implements ConfigurableActionValue
     {
@@ -23,13 +25,16 @@ public final class DumpHprofData implements ConfigurableActionValue
         try
             {
             final File dataDirectory = Environment.getExternalStorageDirectory();
+
             final File intensigameFolder = new File( dataDirectory, "intensigame" );
             intensigameFolder.mkdirs();
+
             final File profilingDataFile = new File( intensigameFolder, "memory" );
             profilingDataFile.createNewFile();
+
             Debug.dumpHprofData( profilingDataFile.getAbsolutePath() );
             }
-        catch ( IOException e )
+        catch ( final IOException e )
             {
             Log.error( "failed dumping hprof data", e );
             }
