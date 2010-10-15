@@ -319,6 +319,8 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void beginFrame()
         {
+        if ( !myEglHelper.isStarted() ) initializeTriggered = true;
+
         if ( initializeTriggered )
             {
             initialize();
@@ -391,7 +393,7 @@ public final class OpenglGraphics extends DirectGraphics
         if ( state == EglHelper.CONTEXT_LOST )
             {
             Log.debug( "graphics context lost" );
-            myEglHelper.finish();
+            cleanupTriggered = true;
             }
 
         if ( cleanupTriggered )
