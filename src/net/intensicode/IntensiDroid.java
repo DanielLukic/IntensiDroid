@@ -11,8 +11,6 @@ import net.intensicode.core.*;
 import net.intensicode.droid.*;
 import net.intensicode.droid.opengl.OpenglGameView;
 import net.intensicode.droid.opengl.OpenglGraphics;
-import net.intensicode.graphics.AsyncDirectGraphics;
-import net.intensicode.graphics.AsyncRenderThread;
 import net.intensicode.util.*;
 
 import java.io.PrintWriter;
@@ -490,22 +488,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         final AndroidStorageManager storage = new AndroidStorageManager( this );
         final AndroidAudioManager audio = new AndroidAudioManager( this, resources );
 
-        myEngineConfiguration = resources.loadConfigurationOrUseDefaults( "engine.properties" );
-        if ( myEngineConfiguration.readBoolean( "DirectGraphics.async", false ) )
-            {
-            final DynamicArray renderQueue = new DynamicArray();
-            final AsyncRenderThread renderThread = new AsyncRenderThread( renderQueue, graphics );
-            final AsyncDirectGraphics asyncGraphics = new AsyncDirectGraphics( renderQueue );
-
-            // TODO: Manage life cycle through GameSystem/GameEngine somehow.
-            renderThread.start();
-
-            system.graphics = asyncGraphics;
-            }
-        else
-            {
-            system.graphics = graphics;
-            }
+        system.graphics = graphics;
 
         //#if SENSORS
         final AndroidSensorsManager sensors = new AndroidSensorsManager( this );
