@@ -20,7 +20,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     {
     protected IntensiDroid()
         {
-        if ( Log.theLog == null || !( Log.theLog instanceof AndroidLog ) ) Log.theLog = new AndroidLog();
+        AndroidLog.activate();
         }
 
     // From PlatformContext

@@ -4,6 +4,11 @@ import net.intensicode.util.Log;
 
 public final class AndroidLog extends Log
     {
+    public static final void activate()
+        {
+        if ( Log.theLog == null || !( Log.theLog instanceof AndroidLog ) ) Log.theLog = new AndroidLog();
+        }
+
     //#if TRACE
 
     protected final void doTrace()
