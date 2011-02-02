@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.*;
 import android.view.*;
 import android.widget.TextView;
+import android.widget.RelativeLayout;
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
@@ -15,6 +16,9 @@ import net.intensicode.util.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
+import com.admob.android.ads.view.AdMobWebView;
+import com.admob.android.ads.AdView;
 
 public abstract class IntensiDroid extends DebugLifeCycleActivity implements PlatformContext, SystemContext
     {
@@ -374,7 +378,30 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         updateResourcesSubfolder();
         myHelper.initGameSystemFromConfigurationFile();
 
-        setContentView( myGameView );
+        //#if ADMOB
+        myGameView.setId( 1 );
+        myGameView.setFocusable( true );
+        myGameView.requestFocus();
+        myGameView.requestFocusFromTouch();
+
+        final AdView adView = new AdView( this );
+        adView.setId( 2 );
+        adView.setFocusable( false );
+        adView.setBackgroundColor( 0x000000 );
+        adView.setPrimaryTextColor( 0xFFFFFFFF );
+        adView.setSecondaryTextColor( 0xFFCCCCCC );
+        adView.setKeywords( "Android Game Tetris Arcade Action Falling Blocks Explosions Bombs Psychocell Berlin" );
+        adView.setRequestInterval( 180 );
+        adView.setEnabled( true );
+
+        final RelativeLayout layout = new RelativeLayout(this);
+        layout.addView( myGameView );
+        layout.addView( adView );
+
+        setContentView( layout );
+        //#else
+        //# setContentView( myGameView );
+        //#endif
         }
 
     protected void onStart()
