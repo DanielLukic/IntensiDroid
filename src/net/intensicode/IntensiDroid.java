@@ -5,8 +5,10 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.*;
 import android.view.*;
-import android.widget.TextView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import com.admob.android.ads.AdView;
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
@@ -17,11 +19,12 @@ import net.intensicode.util.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import com.admob.android.ads.view.AdMobWebView;
-import com.admob.android.ads.AdView;
-
 public abstract class IntensiDroid extends DebugLifeCycleActivity implements PlatformContext, SystemContext
     {
+    //#if ANAL
+    private GoogleAnalyticsTracker myAnalyticsTracker;
+    //#endif
+
     protected IntensiDroid()
         {
         AndroidLog.activate();
@@ -177,6 +180,22 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         }
 
     // From SystemContext
+
+    public final void trackState( final String aNewState )
+        {
+        //#if ANAL
+        Log.info( "tracking state change: {}", aNewState );
+        myAnalyticsTracker.trackEvent( "state", "change", aNewState, 0 );
+        //#endif
+        }
+
+    public final void trackPageView( final String aPageId )
+        {
+        //#if ANAL
+        Log.info( "tracking page view: {}", aPageId );
+        myAnalyticsTracker.trackPageView( aPageId );
+        //#endif
+        }
 
     public String determineResourcesFolder( final int aWidth, final int aHeight, final String aScreenOrientationId )
         {
@@ -348,6 +367,14 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         {
         super.onCreate( savedInstanceState );
 
+        //#if ANAL
+        myAnalyticsTracker = GoogleAnalyticsTracker.getInstance();
+        myAnalyticsTracker.start( "${google_analytics_id}", 20, this );
+        Log.info( "starting analytics tracker for id: ${google_analytics_id}" );
+        //#endif
+
+        trackState( "onCreate" );
+
         //#if ORIENTATION_LANDSCAPE
         //# setRequestedOrientation( android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE );
         //#endif
@@ -394,7 +421,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         adView.setRequestInterval( 180 );
         adView.setEnabled( true );
 
-        final RelativeLayout layout = new RelativeLayout(this);
+        final RelativeLayout layout = new RelativeLayout( this );
         layout.addView( myGameView );
         layout.addView( adView );
 
@@ -413,6 +440,9 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     protected void onResume()
         {
         super.onResume();
+
+        trackState( "onResume" );
+
         if ( myGameView.isInitialized() ) myGameSystem.start();
         }
 
@@ -421,6 +451,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         onPauseApplication();
         myGameSystem.stop(); // this is really the only one that has an effect..
         super.onPause();
+
+        trackState( "onPause" );
 
         finishIfPauseShouldStop();
         }
@@ -451,6 +483,12 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         {
         myGameSystem.destroy();
         super.onDestroy();
+
+        trackState( "onDestroy" );
+
+        //#if ANAL
+        myAnalyticsTracker.stop();
+        //#endif
 
         AndroidImageResource.purgeAll();
         System.gc();
