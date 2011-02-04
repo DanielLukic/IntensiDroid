@@ -406,13 +406,13 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         myHelper.initGameSystemFromConfigurationFile();
 
         //#if ADMOB
-        myGameView.setId( 1 );
+        myGameView.setId( 0x1723CAFE );
         myGameView.setFocusable( true );
         myGameView.requestFocus();
         myGameView.requestFocusFromTouch();
 
         final AdView adView = new AdView( this );
-        adView.setId( 2 );
+        adView.setId( 0x1723BABE );
         adView.setFocusable( false );
         adView.setBackgroundColor( 0x000000 );
         adView.setPrimaryTextColor( 0xFFFFFFFF );
