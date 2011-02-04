@@ -20,7 +20,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../lib/android/libGoogleAnalytics.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/android/obfuscated/libGoogleAnalytics.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
