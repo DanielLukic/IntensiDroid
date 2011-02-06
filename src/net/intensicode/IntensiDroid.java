@@ -466,6 +466,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#endif
 
         //#if ADMOB
+        {
         myGameView.setId( 0x1723CAFE );
         myGameView.setFocusable( true );
         myGameView.requestFocus();
@@ -477,16 +478,24 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         adView.setBackgroundColor( 0x000000 );
         adView.setPrimaryTextColor( 0xFFFFFFFF );
         adView.setSecondaryTextColor( 0xFFCCCCCC );
+        //#if ${admob_keywords}
+        //# adView.setKeywords( "${admob_keywords}" );
+        //#else
         adView.setKeywords( "Android Game Tetris Arcade Action Falling Blocks Explosions Bombs Psychocell Berlin" );
+        //#endif
         adView.setRequestInterval( 180 );
         adView.setEnabled( true );
+        myAdmobBannerAd = adView;
 
         final RelativeLayout layout = new RelativeLayout( this );
         layout.addView( myGameView );
         layout.addView( adView );
 
         setContentView( layout );
-        //#else
+        }
+        //#endif
+
+        //#if !ADMOB && !GREY
         //# setContentView( myGameView );
         //#endif
         }
