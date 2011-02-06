@@ -7,6 +7,7 @@ import android.os.*;
 import android.view.*;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.telephony.TelephonyManager;
 import com.admob.android.ads.AdView;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.greystripe.android.sdk.BannerView;
@@ -393,6 +394,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     public final void onCreate( final Bundle savedInstanceState )
         {
         super.onCreate( savedInstanceState );
+
+        //#if INFO
+        final TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        Log.info( "IMEI/MEID: {}", telephonyManager.getDeviceId() );
+        //#endif
 
         //#if GREY
         GSSDK.initialize( this, "${greystripe_publisher_id}" );
