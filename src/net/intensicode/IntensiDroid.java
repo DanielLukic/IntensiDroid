@@ -9,6 +9,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.admob.android.ads.AdView;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+import com.greystripe.android.sdk.BannerView;
+import com.greystripe.android.sdk.GSSDK;
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
@@ -197,6 +199,31 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#endif
         }
 
+    public final void triggerNewBannerAd()
+        {
+        //#if GREY
+        if ( myGreystripeBannerAd != null ) myGreystripeBannerAd.refresh();
+        //#endif
+        //#if ADMOB
+        if ( myAdmobBannerAd != null ) myAdmobBannerAd.requestFreshAd();
+        //#endif
+        }
+
+    //#if GREY
+    private BannerView myGreystripeBannerAd;
+    //#endif
+
+    //#if ADMOB
+    private AdView myAdmobBannerAd;
+    //#endif
+
+    public final void triggerNewFullscreenAd()
+        {
+        //#if GREY
+        GSSDK.getSharedInstance().displayAd( this );
+        //#endif
+        }
+
     public String determineResourcesFolder( final int aWidth, final int aHeight, final String aScreenOrientationId )
         {
         return myHelper.determineResourcesFolder( aWidth, aHeight, aScreenOrientationId );
@@ -367,6 +394,10 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         {
         super.onCreate( savedInstanceState );
 
+        //#if GREY
+        GSSDK.initialize( this, "${greystripe_publisher_id}" );
+        //#endif
+
         //#if ANAL
         myAnalyticsTracker = GoogleAnalyticsTracker.getInstance();
         myAnalyticsTracker.start( "${google_analytics_id}", 20, this );
@@ -404,6 +435,29 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         updateResourcesSubfolder();
         myHelper.initGameSystemFromConfigurationFile();
+
+        //#if GREY
+        {
+        myGameView.setId( 0x1723CAFE );
+        myGameView.setFocusable( true );
+        myGameView.requestFocus();
+        myGameView.requestFocusFromTouch();
+
+        final BannerView adView = new BannerView( this );
+        adView.setId( 0x1723BABE );
+        adView.setFocusable( false );
+        adView.setBackgroundColor( 0x000000 );
+        adView.setEnabled( true );
+        adView.refresh();
+        myGreystripeBannerAd = adView;
+
+        final RelativeLayout layout = new RelativeLayout( this );
+        layout.addView( myGameView );
+        layout.addView( adView );
+
+        setContentView( layout );
+        }
+        //#endif
 
         //#if ADMOB
         myGameView.setId( 0x1723CAFE );
