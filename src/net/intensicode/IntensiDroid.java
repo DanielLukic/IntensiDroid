@@ -496,6 +496,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#endif
 
         //#if !ADMOB && !GREY
+        //# myGameView.setId( 0x1723CAFE );
         //# setContentView( myGameView );
         //#endif
         }
