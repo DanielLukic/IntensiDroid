@@ -367,6 +367,13 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     public boolean onCreateOptionsMenu( final Menu aMenu )
         {
+        //#if FEINT
+        if (!com.openfeint.api.OpenFeint.isUserLoggedIn())
+            {
+            if (com.openfeint.api.OpenFeint.isNetworkConnected()) com.openfeint.api.OpenFeint.login();
+            }
+        //#endif
+
         if ( myOptionsMenuHandler != null ) myOptionsMenuHandler.onCreateOptionsMenu( aMenu );
         return super.onCreateOptionsMenu( aMenu );
         }

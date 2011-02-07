@@ -46,7 +46,9 @@ public final class IntensiApp extends Application
         public boolean showCustomApprovalFlow( final Context ctx )
             {
             Log.info( "showCustomApprovalFlow" );
-            return super.showCustomApprovalFlow( ctx );
+            // We don't want to login right away *unless* the user has already logged in before.
+//            return super.showCustomApprovalFlow( ctx );
+            return true;
             }
         };
         com.openfeint.api.OpenFeint.initialize( this, settings, delegate );
