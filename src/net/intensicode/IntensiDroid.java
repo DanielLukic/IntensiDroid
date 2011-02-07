@@ -395,7 +395,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         {
         super.onCreate( savedInstanceState );
 
-        //#if INFO
+        //#if INFO && GREY
         final TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         Log.info( "IMEI/MEID: {}", telephonyManager.getDeviceId() );
         //#endif
