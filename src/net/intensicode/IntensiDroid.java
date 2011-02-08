@@ -654,6 +654,10 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#endif
         system.resources = resources;
 
+        //#if ONLINE
+        system.online = IntensiApp.OPEN_FEINT_FACADE;
+        //#endif
+
         system.storage = storage;
         //#if SENSORS
         system.sensors = sensors;
