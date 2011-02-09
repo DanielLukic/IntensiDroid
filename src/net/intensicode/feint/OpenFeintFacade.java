@@ -122,7 +122,8 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
         {
         public final void onSuccess( final boolean newHighScore )
             {
-            aCallback.onScoreSubmitted( newHighScore );
+            final String name = OpenFeint.getCurrentUser().name;
+            aCallback.onScoreSubmitted( aScore, aLevelNumberStartingAt1, name, newHighScore );
             }
 
         public final void onFailure( final String exceptionMessage )
