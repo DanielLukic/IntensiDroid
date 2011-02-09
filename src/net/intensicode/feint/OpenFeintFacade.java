@@ -3,12 +3,15 @@
 package net.intensicode.feint;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import com.openfeint.api.*;
 import com.openfeint.api.resource.*;
 import com.openfeint.api.ui.Dashboard;
 import net.intensicode.core.*;
+import net.intensicode.droid.AndroidImageResource;
 import net.intensicode.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAPI
@@ -139,11 +142,102 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
         return myLeaderboard;
         }
 
+    public final void progressAchievement( final String aAchievementId, final int aProgressInPercent )
+        {
+        final Achievement achievement = findAchievement( aAchievementId );
+        if ( achievement == null ) return;
+
+        if ( achievement.isUnlocked )
+            {
+            Log.info( "achievement {} already unlocked - ignoring progress update", aAchievementId );
+            return;
+            }
+        if ( achievement.percentComplete >= aProgressInPercent )
+            {
+            Log.info( "achievement {} already has higher progress - ignoring progress update", aAchievementId );
+            return;
+            }
+
+        achievement.updateProgression( aProgressInPercent, null );
+        }
+
+    private Achievement findAchievement( final String aAchievementId )
+        {
+        for ( final Achievement achievement : myAchivements )
+            {
+            if ( achievement.title.equals( aAchievementId ) ) return achievement;
+            }
+        return null;
+        }
+
+    public final void unlockAchievement( final String aAchievementId, final AchievementCallback aCallback )
+        {
+        final Achievement achievement = findAchievement( aAchievementId );
+        if ( achievement == null ) return;
+
+        if ( achievement.isUnlocked )
+            {
+            Log.info( "achievement {} already unlocked - ignoring unlock request", aAchievementId );
+            return;
+            }
+
+        achievement.unlock( new Achievement.UnlockCB()
+        {
+        public final void onSuccess( final boolean newUnlock )
+            {
+            Log.info( "new unlock? " + newUnlock );
+            aCallback.onAchievementUnlocked( aAchievementId, achievement.description, newUnlock );
+            }
+
+        public void onFailure( final String exceptionMessage )
+            {
+            Log.error( "failed unlocking achivement {}: {}", aAchievementId, exceptionMessage, null );
+            aCallback.onAchievementUnlockFailed( aAchievementId, new RuntimeException( exceptionMessage ) );
+            }
+        } );
+        }
+
+    public final void loadAchievementIcon( final String aAchievementId, final AchievementIconCallback aCallback )
+        {
+        final Achievement achievement = findAchievement( aAchievementId );
+        if ( achievement == null ) return;
+
+        achievement.downloadIcon( new Achievement.DownloadIconCB()
+        {
+        public final void onSuccess( final Bitmap iconBitmap )
+            {
+            final ImageResource image = AndroidImageResource.createFrom( iconBitmap );
+            aCallback.onAchievementIcon( aAchievementId, image );
+            }
+
+        public void onFailure( final String exceptionMessage )
+            {
+            aCallback.onAchievementIconFailed( aAchievementId, new RuntimeException( exceptionMessage ) );
+            }
+        } );
+        }
     // From OpenFeintDelegate
 
     public final void userLoggedIn( final CurrentUser user )
         {
         Log.info( "userLoggedIn" );
+        Achievement.list( new Achievement.ListCB()
+        {
+        public final void onSuccess( final List<Achievement> achievements )
+            {
+            myAchivements = achievements;
+            for ( final Achievement achievement : achievements )
+                {
+                Log.info( "achievement {}: unlocked? " + achievement.isUnlocked, achievement.title );
+                }
+            }
+
+        public final void onFailure( final String exceptionMessage )
+            {
+            Log.error( "failed loading achievements: " + exceptionMessage, null );
+            myAchivements = new ArrayList<Achievement>();
+            }
+        } );
         }
 
     public final void userLoggedOut( final User user )
@@ -171,4 +265,6 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
         }
 
     private Leaderboard myLeaderboard;
+
+    private List<Achievement> myAchivements;
     }
