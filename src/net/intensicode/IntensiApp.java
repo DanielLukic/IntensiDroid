@@ -1,7 +1,6 @@
 package net.intensicode;
 
 import android.app.Application;
-import net.intensicode.feint.OpenFeintFacade;
 
 //#if ACRA
 @org.acra.annotation.ReportsCrashes( formKey = "${android.acra.form_key}" )
@@ -9,7 +8,7 @@ import net.intensicode.feint.OpenFeintFacade;
 public final class IntensiApp extends Application
     {
     //#if FEINT
-    public static final OpenFeintFacade OPEN_FEINT_FACADE = new OpenFeintFacade();
+    public static final net.intensicode.feint.OpenFeintFacade OPEN_FEINT_FACADE = new net.intensicode.feint.OpenFeintFacade();
     //#endif
 
     @Override
