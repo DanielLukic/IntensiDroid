@@ -85,7 +85,7 @@ public final class TextureManager
         net.intensicode.util.Log.debug( "TextureManager looking up configuration for {}", aImageId );
         //#endif
         final boolean isDirect = myConfiguration.readBoolean( aImageId, "direct", myDefaultDirectTextureFlag );
-        Log.info( "texture {} direct? " + isDirect );
+        Log.info( "texture {} direct? " + isDirect, aImageId );
         return isDirect;
         }
 
