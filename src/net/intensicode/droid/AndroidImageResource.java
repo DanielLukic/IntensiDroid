@@ -36,6 +36,13 @@ public final class AndroidImageResource implements ImageResource
         return resource;
         }
 
+    public static ImageResource createFrom( final Bitmap aBitmap )
+        {
+        final AndroidImageResource resource = new AndroidImageResource( aBitmap );
+        theResources.add( resource );
+        return resource;
+        }
+
     public static void purgeAll()
         {
         Log.debug( "purging {} AndroidImageResource instances", theResources.size() );
