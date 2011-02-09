@@ -113,12 +113,23 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
         } );
         }
 
-    public final void submitScore( final int aScore, final int aLevelNumberStartingAt1 )
+    public final void submitScore( final int aScore, final int aLevelNumberStartingAt1, final ScoreSubmissionCallback aCallback )
         {
         final String text = aScore + " (Level " + aLevelNumberStartingAt1 + ")";
         final Score score = new Score( aScore, text );
         score.customData = String.valueOf( aLevelNumberStartingAt1 );
-        score.submitTo( getLeaderboard(), null );
+        score.submitTo( getLeaderboard(), new Score.SubmitToCB()
+        {
+        public final void onSuccess( final boolean newHighScore )
+            {
+            aCallback.onScoreSubmitted( newHighScore );
+            }
+
+        public final void onFailure( final String exceptionMessage )
+            {
+            aCallback.onScoreSubmissionFailed( new RuntimeException( exceptionMessage ) );
+            }
+        } );
         }
 
     private Leaderboard getLeaderboard()
