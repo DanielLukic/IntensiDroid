@@ -246,7 +246,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         {
         public void run()
             {
-            myBannerAd.setPadding( 0, aVerticalPosition, 0,0 );
+            final RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) myBannerAd.getLayoutParams();
+            params.setMargins( 0, aVerticalPosition, 0, 0 );
             myBannerAd.requestLayout();
             }
         } );
@@ -542,6 +543,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         myGameView.requestFocusFromTouch();
 
         final BannerView adView = new BannerView( this );
+        adView.setLayoutParams( new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT ) );
         adView.setId( 0x1723BABE );
         adView.setFocusable( false );
         adView.setBackgroundColor( 0x000000 );
@@ -566,6 +568,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         myGameView.requestFocusFromTouch();
 
         final AdView adView = new AdView( this );
+        adView.setLayoutParams( new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT ) );
         adView.setId( 0x1723BABE );
         adView.setFocusable( false );
         adView.setBackgroundColor( 0x000000 );
@@ -602,6 +605,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         myGameView.requestFocusFromTouch();
 
         final MobclixMMABannerXLAdView adView = new MobclixMMABannerXLAdView( this );
+        adView.setLayoutParams( new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT ) );
         adView.setId( 0x1723BABE );
         adView.setFocusable( false );
         adView.setBackgroundColor( 0x000000 );
