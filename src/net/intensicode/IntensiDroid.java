@@ -12,6 +12,8 @@ import com.admob.android.ads.AdView;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.greystripe.android.sdk.BannerView;
 import com.greystripe.android.sdk.GSSDK;
+import com.mobclix.android.sdk.MobclixMMABannerXLAdView;
+import com.mobclix.android.sdk.MobclixFullScreenAdView;
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
@@ -208,6 +210,9 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#if ADMOB
         if ( myAdmobBannerAd != null ) myAdmobBannerAd.requestFreshAd();
         //#endif
+        //#if MOBCLIX
+        if ( myMobclixBannerAd != null ) myMobclixBannerAd.getAd();
+        //#endif
         }
 
     //#if GREY
@@ -218,10 +223,17 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     private AdView myAdmobBannerAd;
     //#endif
 
+    //#if MOBCLIX
+    private MobclixMMABannerXLAdView myMobclixBannerAd;
+    //#endif
+
     public final void triggerNewFullscreenAd()
         {
         //#if GREY
         GSSDK.getSharedInstance().displayAd( this );
+        //#endif
+        //#if MOBCLIX
+        new MobclixFullScreenAdView(this).requestAndDisplayAd();
         //#endif
         }
 
@@ -406,11 +418,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         {
         super.onCreate( savedInstanceState );
 
-        //#if INFO && GREY
-        final TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        Log.info( "IMEI/MEID: {}", telephonyManager.getDeviceId() );
-        //#endif
-
         //#if GREY
         GSSDK.initialize( this, "${greystripe_publisher_id}" );
         //#endif
@@ -455,6 +462,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         //#if GREY
         {
+        //#if INFO
+        final TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        Log.info( "IMEI/MEID: {}", telephonyManager.getDeviceId() );
+        //#endif
+
         myGameView.setId( 0x1723CAFE );
         myGameView.setFocusable( true );
         myGameView.requestFocus();
@@ -492,9 +504,9 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#if "${admob_keywords}"
         //# adView.setKeywords( "${admob_keywords}" );
         //#else
-        adView.setKeywords( "Android Game Arcade Action Psychocell Berlin" );
+        adView.setKeywords( "Android Game Arcade Action" );
         //#endif
-        adView.setRequestInterval( 180 );
+        adView.setRequestInterval( 30 );
         adView.setEnabled( true );
         myAdmobBannerAd = adView;
 
@@ -506,7 +518,34 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         }
         //#endif
 
-        //#if !ADMOB && !GREY
+        //#if MOBCLIX
+        {
+        //#if INFO
+        final TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        Log.info( "IMEI/MEID: {}", telephonyManager.getDeviceId() );
+        //#endif
+
+        myGameView.setId( 0x1723CAFE );
+        myGameView.setFocusable( true );
+        myGameView.requestFocus();
+        myGameView.requestFocusFromTouch();
+
+        final MobclixMMABannerXLAdView adView = new MobclixMMABannerXLAdView( this );
+        adView.setId( 0x1723BABE );
+        adView.setFocusable( false );
+        adView.setBackgroundColor( 0x000000 );
+        adView.setEnabled( true );
+        myMobclixBannerAd = adView;
+
+        final RelativeLayout layout = new RelativeLayout( this );
+        layout.addView( myGameView );
+        layout.addView( adView );
+
+        setContentView( layout );
+        }
+        //#endif
+
+        //#if !ADMOB && !GREY && !MOBCLIX
         //# myGameView.setId( 0x1723CAFE );
         //# setContentView( myGameView );
         //#endif
