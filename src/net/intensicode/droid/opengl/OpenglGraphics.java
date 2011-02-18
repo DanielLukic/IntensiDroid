@@ -361,8 +361,9 @@ public final class OpenglGraphics extends DirectGraphics
         onSurfaceChanged( screenSize.width, screenSize.height );
         lateInitialize();
 
+        myIsCrapRenderer = version.contains( "1.0" );
         myIsSoftwareRenderer = renderer.toLowerCase().contains( "pixelflinger" );
-        if ( !myIsSoftwareRenderer ) return;
+        if ( !myIsCrapRenderer && !myIsSoftwareRenderer ) return;
 
         myPlatformContext.storePreferences( "renderer", "software renderer", true );
 
@@ -529,6 +530,8 @@ public final class OpenglGraphics extends DirectGraphics
     private int myColorARGB32;
 
     private FontResource myFont;
+
+    private boolean myIsCrapRenderer;
 
     private boolean myIsSoftwareRenderer;
 
