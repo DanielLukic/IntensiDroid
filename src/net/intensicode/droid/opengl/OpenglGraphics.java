@@ -367,7 +367,7 @@ public final class OpenglGraphics extends DirectGraphics
 
         myPlatformContext.storePreferences( "renderer", "software renderer", true );
 
-        myPlatformContext.showCriticalError( "Wrong version for your device! Switched to non-opengl mode. Please restart the application!", null );
+        myPlatformContext.showError( "Wrong version for your device! Switched to non-opengl mode.\n\nPlease restart the application!\n\nIf you continue you may experience crashes or bad graphics performance!", null );
         }
 
     private void lateInitialize()
