@@ -4,21 +4,22 @@ import android.content.*;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.*;
+import android.telephony.TelephonyManager;
 import android.view.*;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.telephony.TelephonyManager;
 import com.admob.android.ads.AdView;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.greystripe.android.sdk.BannerView;
 import com.greystripe.android.sdk.GSSDK;
-import com.mobclix.android.sdk.MobclixMMABannerXLAdView;
 import com.mobclix.android.sdk.MobclixFullScreenAdView;
+import com.mobclix.android.sdk.MobclixMMABannerXLAdView;
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
 import net.intensicode.droid.opengl.OpenglGameView;
 import net.intensicode.droid.opengl.OpenglGraphics;
+import net.intensicode.screens.ScreenBase;
 import net.intensicode.util.*;
 
 import java.io.PrintWriter;
@@ -202,6 +203,70 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#endif
         }
 
+    public final void showBannerAd()
+        {
+        if ( myBannerAd == null ) return;
+        runOnUiThread( new Runnable()
+        {
+        public void run()
+            {
+            myBannerAd.setEnabled( true );
+            myBannerAd.setVisibility( View.VISIBLE );
+            }
+        } );
+        }
+
+    public final void hideBannerAd()
+        {
+        if ( myBannerAd == null ) return;
+        runOnUiThread( new Runnable()
+        {
+        public void run()
+            {
+            myBannerAd.setVisibility( View.GONE );
+            myBannerAd.setEnabled( false );
+            }
+        } );
+        }
+
+    public final boolean hasBannerAds()
+        {
+        return true;
+        }
+
+    public final int getBannerAdHeight()
+        {
+        return 50;
+        }
+
+    public final void positionAdBanner( final int aVerticalPosition )
+        {
+        if ( myBannerAd == null ) return;
+        runOnUiThread( new Runnable()
+        {
+        public void run()
+            {
+            myBannerAd.setPadding( 0, aVerticalPosition, 0,0 );
+            myBannerAd.requestLayout();
+            }
+        } );
+        }
+
+    public final boolean hasFullscreenAds()
+        {
+        return true;
+        }
+
+    public final void preloadFullscreenAd()
+        {
+        // nop for now..
+        }
+
+    public ScreenBase createMainScreen() throws Exception
+        {
+        throw new RuntimeException( "PLACEHOLDER - PLEASE OVERRIDE" );
+        }
+
     public final void triggerNewBannerAd()
         {
         //#if GREY
@@ -215,15 +280,19 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#endif
         }
 
+    private View myBannerAd;
+
     //#if GREY
     private BannerView myGreystripeBannerAd;
     //#endif
 
     //#if ADMOB
+
     private AdView myAdmobBannerAd;
     //#endif
 
     //#if MOBCLIX
+
     private MobclixMMABannerXLAdView myMobclixBannerAd;
     //#endif
 
@@ -233,7 +302,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         GSSDK.getSharedInstance().displayAd( this );
         //#endif
         //#if MOBCLIX
-        new MobclixFullScreenAdView(this).requestAndDisplayAd();
+        new MobclixFullScreenAdView( this ).requestAndDisplayAd();
         //#endif
         }
 
@@ -388,7 +457,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#if FEINT
         final boolean loggedIn = com.openfeint.api.OpenFeint.isUserLoggedIn();
         Log.info( "logged in? " + loggedIn );
-        if (!loggedIn )
+        if ( !loggedIn )
             {
             final boolean online = com.openfeint.api.OpenFeint.isNetworkConnected();
             Log.info( "online? " + online );
@@ -463,7 +532,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#if GREY
         {
         //#if INFO
-        final TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        final TelephonyManager telephonyManager = (TelephonyManager) getSystemService( Context.TELEPHONY_SERVICE );
         Log.info( "IMEI/MEID: {}", telephonyManager.getDeviceId() );
         //#endif
 
@@ -479,6 +548,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         adView.setEnabled( true );
         adView.refresh();
         myGreystripeBannerAd = adView;
+        myBannerAd = adView;
 
         final RelativeLayout layout = new RelativeLayout( this );
         layout.addView( myGameView );
@@ -506,9 +576,10 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#else
         adView.setKeywords( "Android Game Arcade Action" );
         //#endif
-        adView.setRequestInterval( 30 );
+        adView.setRequestInterval( 60 );
         adView.setEnabled( true );
         myAdmobBannerAd = adView;
+        myBannerAd = adView;
 
         final RelativeLayout layout = new RelativeLayout( this );
         layout.addView( myGameView );
@@ -521,7 +592,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //#if MOBCLIX
         {
         //#if INFO
-        final TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        final TelephonyManager telephonyManager = (TelephonyManager) getSystemService( Context.TELEPHONY_SERVICE );
         Log.info( "IMEI/MEID: {}", telephonyManager.getDeviceId() );
         //#endif
 
@@ -536,6 +607,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         adView.setBackgroundColor( 0x000000 );
         adView.setEnabled( true );
         myMobclixBannerAd = adView;
+        myBannerAd = adView;
 
         final RelativeLayout layout = new RelativeLayout( this );
         layout.addView( myGameView );
