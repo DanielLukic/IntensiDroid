@@ -60,6 +60,12 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
         else Dashboard.openLeaderboard( "${openfeint.leaderboard_id}" );
         }
 
+    public final void showAchievements()
+        {
+        if ( hasNetworking() && !isLoggedIn() ) OpenFeint.userApprovedFeint();
+        else Dashboard.openAchievements();
+        }
+
     public final void retrieveHighscores( final LeaderboardCallback aCallback )
         {
         Log.info( "retrieveHighscores" );
@@ -142,10 +148,18 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
         return myLeaderboard;
         }
 
+    public final boolean isUnlocked( final String aAchievementId )
+        {
+        final Achievement achievement = findAchievement( aAchievementId );
+        if ( achievement == NULL_ACHIEVEMENT ) return false;
+
+        return achievement.isUnlocked;
+        }
+
     public final void progressAchievement( final String aAchievementId, final int aProgressInPercent )
         {
         final Achievement achievement = findAchievement( aAchievementId );
-        if ( achievement == null ) return;
+        if ( achievement == NULL_ACHIEVEMENT ) return;
 
         if ( achievement.isUnlocked )
             {
@@ -167,13 +181,13 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
             {
             if ( achievement.title.equals( aAchievementId ) ) return achievement;
             }
-        return null;
+        return NULL_ACHIEVEMENT;
         }
 
     public final void unlockAchievement( final String aAchievementId, final AchievementCallback aCallback )
         {
         final Achievement achievement = findAchievement( aAchievementId );
-        if ( achievement == null ) return;
+        if ( achievement == NULL_ACHIEVEMENT ) return;
 
         if ( achievement.isUnlocked )
             {
@@ -200,7 +214,7 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
     public final void loadAchievementIcon( final String aAchievementId, final AchievementIconCallback aCallback )
         {
         final Achievement achievement = findAchievement( aAchievementId );
-        if ( achievement == null ) return;
+        if ( achievement == NULL_ACHIEVEMENT ) return;
 
         achievement.downloadIcon( new Achievement.DownloadIconCB()
         {
@@ -267,4 +281,6 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
     private Leaderboard myLeaderboard;
 
     private List<Achievement> myAchivements;
+
+    private static final Achievement NULL_ACHIEVEMENT = new Achievement();
     }
