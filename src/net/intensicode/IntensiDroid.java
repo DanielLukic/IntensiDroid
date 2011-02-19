@@ -1,5 +1,6 @@
 package net.intensicode;
 
+import android.app.Activity;
 import android.content.*;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -12,8 +13,7 @@ import com.admob.android.ads.AdView;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.greystripe.android.sdk.BannerView;
 import com.greystripe.android.sdk.GSSDK;
-import com.mobclix.android.sdk.MobclixFullScreenAdView;
-import com.mobclix.android.sdk.MobclixMMABannerXLAdView;
+import com.mobclix.android.sdk.*;
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
@@ -303,7 +303,49 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         GSSDK.getSharedInstance().displayAd( this );
         //#endif
         //#if MOBCLIX
-        new MobclixFullScreenAdView( this ).requestAndDisplayAd();
+        final Activity activity = this;
+        runOnUiThread( new Runnable()
+        {
+        public void run()
+            {
+            final MobclixFullScreenAdView adView = new MobclixFullScreenAdView( activity );
+            adView.addMobclixAdViewListener( new MobclixFullScreenAdViewListener()
+            {
+            public void onFinishLoad( final MobclixFullScreenAdView aMobclixFullScreenAdView )
+                {
+                Log.info( "onFinishLoad" );
+                }
+
+            public void onFailedLoad( final MobclixFullScreenAdView aMobclixFullScreenAdView, final int i )
+                {
+                Log.info( "onFailedLoad {}", i );
+                }
+
+            public void onPresentAd( final MobclixFullScreenAdView aMobclixFullScreenAdView )
+                {
+                Log.info( "onPresentAd" );
+                }
+
+            public void onDismissAd( final MobclixFullScreenAdView aMobclixFullScreenAdView )
+                {
+                Log.info( "onDismissAd" );
+                }
+
+            public String keywords()
+                {
+                Log.info( "keywords" );
+                return "Android Game Tetris Arcade Action Puzzle Falling Blocks Explosions";
+                }
+
+            public String query()
+                {
+                Log.info( "query" );
+                return null;
+                }
+            } );
+            adView.requestAndDisplayAd();
+            }
+        } );
         //#endif
         }
 
@@ -610,6 +652,51 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         adView.setFocusable( false );
         adView.setBackgroundColor( 0x000000 );
         adView.setEnabled( true );
+        adView.setRefreshTime( 45000 );
+        adView.addMobclixAdViewListener( new MobclixAdViewListener()
+        {
+        public final void onSuccessfulLoad( final MobclixAdView aMobclixAdView )
+            {
+            Log.info( "onSuccessfulLoad" );
+            }
+
+        public final void onFailedLoad( final MobclixAdView aMobclixAdView, final int i )
+            {
+            Log.info( "onFailedLoad {}", i );
+            }
+
+        public final void onAdClick( final MobclixAdView aMobclixAdView )
+            {
+            Log.info( "onAdClick" );
+            }
+
+        public final boolean onOpenAllocationLoad( final MobclixAdView aMobclixAdView, final int i )
+            {
+            Log.info( "onOpenAllocationLoad {}", i );
+            return false;
+            }
+
+        public final void onCustomAdTouchThrough( final MobclixAdView aMobclixAdView, final String s )
+            {
+            Log.info( "onCustomAdTouchThrough {}", s );
+            }
+
+        public final String keywords()
+            {
+            Log.info( "keywords" );
+            //#if "${mobclix_keywords}"
+            //# return "${mobclix_keywords}";
+            //#else
+            return "Android Game Tetris Arcade Action Puzzle Falling Blocks Explosions";
+            //#endif
+            }
+
+        public final String query()
+            {
+            Log.info( "query" );
+            return null;
+            }
+        } );
         myMobclixBannerAd = adView;
         myBannerAd = adView;
 
