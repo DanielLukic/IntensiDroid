@@ -68,6 +68,12 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
 
     public final void retrieveHighscores( final LeaderboardCallback aCallback )
         {
+        if ( hasNetworking() && !isLoggedIn() )
+            {
+            OpenFeint.userApprovedFeint();
+            return;
+            }
+
         Log.info( "retrieveHighscores" );
         getLeaderboard().getScores( new Leaderboard.GetScoresCB()
         {
@@ -177,6 +183,13 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
 
     private Achievement findAchievement( final String aAchievementId )
         {
+        if ( hasNetworking() && !isLoggedIn() )
+            {
+            OpenFeint.userApprovedFeint();
+            return NULL_ACHIEVEMENT;
+            }
+
+        if ( myAchivements == null ) return NULL_ACHIEVEMENT;
         for ( final Achievement achievement : myAchivements )
             {
             if ( achievement.title.equals( aAchievementId ) ) return achievement;
