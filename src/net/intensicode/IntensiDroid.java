@@ -9,11 +9,19 @@ import android.telephony.TelephonyManager;
 import android.view.*;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+//#if ADMOB
 import com.admob.android.ads.AdView;
+//#endif
+//#if ANAL
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+//#endif
+//#if GREY
 import com.greystripe.android.sdk.BannerView;
 import com.greystripe.android.sdk.GSSDK;
+//#endif
+//#if MOBCLIX
 import com.mobclix.android.sdk.*;
+//#endif
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
@@ -672,6 +680,9 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         //#if MOBCLIX
         {
+        Mobclix.onCreate( this );
+        MobclixFeedback.sendComment( this, "startup" );
+
         //#if INFO
         final TelephonyManager telephonyManager = (TelephonyManager) getSystemService( Context.TELEPHONY_SERVICE );
         Log.info( "IMEI/MEID: {}", telephonyManager.getDeviceId() );
