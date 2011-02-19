@@ -258,9 +258,72 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         return true;
         }
 
+    //#if MOBCLIX
+
+    private MobclixFullScreenAdView myMobclixFullScreenAdView;
+
+    private void initMobclixFullscreenAdIfNecessary()
+        {
+        if ( myMobclixFullScreenAdView != null ) return;
+
+        final MobclixFullScreenAdView adView = new MobclixFullScreenAdView( this );
+        adView.addMobclixAdViewListener( new MobclixFullScreenAdViewListener()
+        {
+        public void onFinishLoad( final MobclixFullScreenAdView aMobclixFullScreenAdView )
+            {
+            Log.info( "onFinishLoad" );
+            }
+
+        public void onFailedLoad( final MobclixFullScreenAdView aMobclixFullScreenAdView, final int i )
+            {
+            Log.info( "onFailedLoad {}", i );
+            }
+
+        public void onPresentAd( final MobclixFullScreenAdView aMobclixFullScreenAdView )
+            {
+            Log.info( "onPresentAd" );
+            }
+
+        public void onDismissAd( final MobclixFullScreenAdView aMobclixFullScreenAdView )
+            {
+            Log.info( "onDismissAd" );
+            }
+
+        public String keywords()
+            {
+            Log.info( "keywords ${mobclix_keywords}" );
+            //#if "${mobclix_keywords}"
+            //# return "${mobclix_keywords}";
+            //#else
+            return "Android Game Tetris Arcade Action Puzzle Falling Blocks Explosions";
+            //#endif
+            }
+
+        public String query()
+            {
+            Log.info( "query" );
+            return null;
+            }
+        } );
+        myMobclixFullScreenAdView = adView;
+        }
+
+    //#endif
+
     public final void preloadFullscreenAd()
         {
-        // nop for now..
+        //#if ADS
+        runOnUiThread( new Runnable()
+        {
+        public void run()
+            {
+            //#if MOBCLIX
+            initMobclixFullscreenAdIfNecessary();
+            myMobclixFullScreenAdView.requestAd();
+            //#endif
+            }
+        } );
+        //#endif
         }
 
     public ScreenBase createMainScreen() throws Exception
@@ -284,66 +347,39 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     private View myBannerAd;
 
     //#if GREY
+
     private BannerView myGreystripeBannerAd;
+
     //#endif
 
     //#if ADMOB
 
     private AdView myAdmobBannerAd;
+
     //#endif
 
     //#if MOBCLIX
 
     private MobclixMMABannerXLAdView myMobclixBannerAd;
+
     //#endif
 
     public final void triggerNewFullscreenAd()
         {
-        //#if GREY
-        GSSDK.getSharedInstance().displayAd( this );
-        //#endif
-        //#if MOBCLIX
         final Activity activity = this;
+        //#if ADS
         runOnUiThread( new Runnable()
         {
         public void run()
             {
-            final MobclixFullScreenAdView adView = new MobclixFullScreenAdView( activity );
-            adView.addMobclixAdViewListener( new MobclixFullScreenAdViewListener()
-            {
-            public void onFinishLoad( final MobclixFullScreenAdView aMobclixFullScreenAdView )
-                {
-                Log.info( "onFinishLoad" );
-                }
-
-            public void onFailedLoad( final MobclixFullScreenAdView aMobclixFullScreenAdView, final int i )
-                {
-                Log.info( "onFailedLoad {}", i );
-                }
-
-            public void onPresentAd( final MobclixFullScreenAdView aMobclixFullScreenAdView )
-                {
-                Log.info( "onPresentAd" );
-                }
-
-            public void onDismissAd( final MobclixFullScreenAdView aMobclixFullScreenAdView )
-                {
-                Log.info( "onDismissAd" );
-                }
-
-            public String keywords()
-                {
-                Log.info( "keywords" );
-                return "Android Game Tetris Arcade Action Puzzle Falling Blocks Explosions";
-                }
-
-            public String query()
-                {
-                Log.info( "query" );
-                return null;
-                }
-            } );
-            adView.requestAndDisplayAd();
+            //#if GREY
+            GSSDK.getSharedInstance().displayAd( activity );
+            //#endif
+            //#if MOBCLIX
+            initMobclixFullscreenAdIfNecessary();
+            if ( myMobclixFullScreenAdView.hasAd() ) myMobclixFullScreenAdView.displayRequestedAd();
+            else myMobclixFullScreenAdView.requestAndDisplayAd();
+            //#endif
             }
         } );
         //#endif
@@ -683,7 +719,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         public final String keywords()
             {
-            Log.info( "keywords" );
+            Log.info( "keywords ${mobclix_keywords}" );
             //#if "${mobclix_keywords}"
             //# return "${mobclix_keywords}";
             //#else
