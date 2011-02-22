@@ -9,19 +9,6 @@ import android.telephony.TelephonyManager;
 import android.view.*;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-//#if ADMOB
-import com.admob.android.ads.AdView;
-//#endif
-//#if ANAL
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
-//#endif
-//#if GREY
-import com.greystripe.android.sdk.BannerView;
-import com.greystripe.android.sdk.GSSDK;
-//#endif
-//#if MOBCLIX
-import com.mobclix.android.sdk.*;
-//#endif
 import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
@@ -36,7 +23,7 @@ import java.io.StringWriter;
 public abstract class IntensiDroid extends DebugLifeCycleActivity implements PlatformContext, SystemContext
     {
     //#if ANAL
-    private GoogleAnalyticsTracker myAnalyticsTracker;
+    private com.google.android.apps.analytics.GoogleAnalyticsTracker myAnalyticsTracker;
     //#endif
 
     protected IntensiDroid()
@@ -195,11 +182,11 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     // From SystemContext
 
-    public final void trackState( final String aNewState )
+    public final void trackState( final String aCategory, final String aAction, final String aLabel )
         {
         //#if ANAL
-        Log.info( "tracking state change: {}", aNewState );
-        myAnalyticsTracker.trackEvent( "state", "change", aNewState, 0 );
+        Log.info( "tracking state change: {} {}" + aLabel, aCategory, aAction );
+        myAnalyticsTracker.trackEvent( aCategory, aAction, aLabel, 0 );
         //#endif
         }
 
@@ -268,31 +255,31 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     //#if MOBCLIX
 
-    private MobclixFullScreenAdView myMobclixFullScreenAdView;
+    private com.mobclix.android.sdk.MobclixFullScreenAdView myMobclixFullScreenAdView;
 
     private void initMobclixFullscreenAdIfNecessary()
         {
         if ( myMobclixFullScreenAdView != null ) return;
 
-        final MobclixFullScreenAdView adView = new MobclixFullScreenAdView( this );
-        adView.addMobclixAdViewListener( new MobclixFullScreenAdViewListener()
+        final com.mobclix.android.sdk.MobclixFullScreenAdView adView = new com.mobclix.android.sdk.MobclixFullScreenAdView( this );
+        adView.addMobclixAdViewListener( new com.mobclix.android.sdk.MobclixFullScreenAdViewListener()
         {
-        public void onFinishLoad( final MobclixFullScreenAdView aMobclixFullScreenAdView )
+        public void onFinishLoad( final com.mobclix.android.sdk.MobclixFullScreenAdView aMobclixFullScreenAdView )
             {
             Log.info( "onFinishLoad" );
             }
 
-        public void onFailedLoad( final MobclixFullScreenAdView aMobclixFullScreenAdView, final int i )
+        public void onFailedLoad( final com.mobclix.android.sdk.MobclixFullScreenAdView aMobclixFullScreenAdView, final int i )
             {
             Log.info( "onFailedLoad {}", i );
             }
 
-        public void onPresentAd( final MobclixFullScreenAdView aMobclixFullScreenAdView )
+        public void onPresentAd( final com.mobclix.android.sdk.MobclixFullScreenAdView aMobclixFullScreenAdView )
             {
             Log.info( "onPresentAd" );
             }
 
-        public void onDismissAd( final MobclixFullScreenAdView aMobclixFullScreenAdView )
+        public void onDismissAd( final com.mobclix.android.sdk.MobclixFullScreenAdView aMobclixFullScreenAdView )
             {
             Log.info( "onDismissAd" );
             }
@@ -356,19 +343,19 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     //#if GREY
 
-    private BannerView myGreystripeBannerAd;
+    private com.greystripe.android.sdk.BannerView myGreystripeBannerAd;
 
     //#endif
 
     //#if ADMOB
 
-    private AdView myAdmobBannerAd;
+    private com.admob.android.ads.AdView myAdmobBannerAd;
 
     //#endif
 
     //#if MOBCLIX
 
-    private MobclixMMABannerXLAdView myMobclixBannerAd;
+    private com.mobclix.android.sdk.MobclixMMABannerXLAdView myMobclixBannerAd;
 
     //#endif
 
@@ -381,7 +368,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         public void run()
             {
             //#if GREY
-            GSSDK.getSharedInstance().displayAd( activity );
+            com.greystripe.android.sdk.GSSDK.getSharedInstance().displayAd( activity );
             //#endif
             //#if MOBCLIX
             initMobclixFullscreenAdIfNecessary();
@@ -575,16 +562,16 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         super.onCreate( savedInstanceState );
 
         //#if GREY
-        GSSDK.initialize( this, "${greystripe_publisher_id}" );
+        com.greystripe.android.sdk.GSSDK.initialize( this, "${greystripe_publisher_id}" );
         //#endif
 
         //#if ANAL
-        myAnalyticsTracker = GoogleAnalyticsTracker.getInstance();
+        myAnalyticsTracker = com.google.android.apps.analytics.GoogleAnalyticsTracker.getInstance();
         myAnalyticsTracker.start( "${google_analytics_id}", 20, this );
         Log.info( "starting analytics tracker for id: ${google_analytics_id}" );
         //#endif
 
-        trackState( "onCreate" );
+        trackState( "app", "lifecycle", "create" );
 
         //#if ORIENTATION_LANDSCAPE
         //# setRequestedOrientation( android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE );
@@ -628,7 +615,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         myGameView.requestFocus();
         myGameView.requestFocusFromTouch();
 
-        final BannerView adView = new BannerView( this );
+        final com.greystripe.android.sdk.BannerView adView = new com.greystripe.android.sdk.BannerView( this );
         adView.setLayoutParams( new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT ) );
         adView.setId( 0x1723BABE );
         adView.setFocusable( false );
@@ -653,7 +640,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         myGameView.requestFocus();
         myGameView.requestFocusFromTouch();
 
-        final AdView adView = new AdView( this );
+        final com.admob.android.ads.AdView adView = new com.admob.android.ads.AdView( this );
         adView.setLayoutParams( new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT ) );
         adView.setId( 0x1723BABE );
         adView.setFocusable( false );
@@ -680,8 +667,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         //#if MOBCLIX
         {
-        Mobclix.onCreate( this );
-        MobclixFeedback.sendComment( this, "startup" );
+        com.mobclix.android.sdk.Mobclix.onCreate( this );
+        com.mobclix.android.sdk.MobclixFeedback.sendComment( this, "startup" );
 
         //#if INFO
         final TelephonyManager telephonyManager = (TelephonyManager) getSystemService( Context.TELEPHONY_SERVICE );
@@ -693,37 +680,37 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         myGameView.requestFocus();
         myGameView.requestFocusFromTouch();
 
-        final MobclixMMABannerXLAdView adView = new MobclixMMABannerXLAdView( this );
+        final com.mobclix.android.sdk.MobclixMMABannerXLAdView adView = new com.mobclix.android.sdk.MobclixMMABannerXLAdView( this );
         adView.setLayoutParams( new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT ) );
         adView.setId( 0x1723BABE );
         adView.setFocusable( false );
         adView.setBackgroundColor( 0x000000 );
         adView.setEnabled( true );
         adView.setRefreshTime( 45000 );
-        adView.addMobclixAdViewListener( new MobclixAdViewListener()
+        adView.addMobclixAdViewListener( new com.mobclix.android.sdk.MobclixAdViewListener()
         {
-        public final void onSuccessfulLoad( final MobclixAdView aMobclixAdView )
+        public final void onSuccessfulLoad( final com.mobclix.android.sdk.MobclixAdView aMobclixAdView )
             {
             Log.info( "onSuccessfulLoad" );
             }
 
-        public final void onFailedLoad( final MobclixAdView aMobclixAdView, final int i )
+        public final void onFailedLoad( final com.mobclix.android.sdk.MobclixAdView aMobclixAdView, final int i )
             {
             Log.info( "onFailedLoad {}", i );
             }
 
-        public final void onAdClick( final MobclixAdView aMobclixAdView )
+        public final void onAdClick( final com.mobclix.android.sdk.MobclixAdView aMobclixAdView )
             {
             Log.info( "onAdClick" );
             }
 
-        public final boolean onOpenAllocationLoad( final MobclixAdView aMobclixAdView, final int i )
+        public final boolean onOpenAllocationLoad( final com.mobclix.android.sdk.MobclixAdView aMobclixAdView, final int i )
             {
             Log.info( "onOpenAllocationLoad {}", i );
             return false;
             }
 
-        public final void onCustomAdTouchThrough( final MobclixAdView aMobclixAdView, final String s )
+        public final void onCustomAdTouchThrough( final com.mobclix.android.sdk.MobclixAdView aMobclixAdView, final String s )
             {
             Log.info( "onCustomAdTouchThrough {}", s );
             }
@@ -771,7 +758,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         {
         super.onResume();
 
-        trackState( "onResume" );
+        trackState( "app", "lifecycle", "resume" );
 
         if ( myGameView.isInitialized() ) myGameSystem.start();
         }
@@ -782,7 +769,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         myGameSystem.stop(); // this is really the only one that has an effect..
         super.onPause();
 
-        trackState( "onPause" );
+        trackState( "app", "lifecycle", "pause" );
 
         finishIfPauseShouldStop();
         }
@@ -814,7 +801,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         myGameSystem.destroy();
         super.onDestroy();
 
-        trackState( "onDestroy" );
+        trackState( "app", "lifecycle", "destroy" );
 
         //#if ANAL
         myAnalyticsTracker.stop();
