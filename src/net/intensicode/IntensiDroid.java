@@ -19,6 +19,7 @@ import net.intensicode.util.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
 
 public abstract class IntensiDroid extends DebugLifeCycleActivity implements PlatformContext, SystemContext
     {
@@ -178,6 +179,43 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         {
         final SharedPreferences preferences = getSharedPreferences( aPreferencesId, Context.MODE_PRIVATE );
         preferences.edit().putBoolean( aPropertyKey, true ).commit();
+        }
+
+    public final void register( final String aComponentName, final String aClassName )
+        {
+        Log.info( "registering {} => {}", aComponentName, aClassName );
+        myRegisteredComponents.put( aComponentName, aClassName );
+        }
+
+    private final HashMap myRegisteredComponents = new HashMap();
+
+    public final Object component( final String aComponentName )
+        {
+        final Object classNameOrInstance = myRegisteredComponents.get( aComponentName );
+        Log.info( "component request {} => {}", aComponentName, classNameOrInstance );
+
+        if ( classNameOrInstance == null ) throw new IllegalArgumentException( "component not registered: " + aComponentName );
+
+        if ( classNameOrInstance instanceof String )
+            {
+            try
+                {
+                final Object instance = Class.forName( (String) classNameOrInstance ).newInstance();
+                if ( instance instanceof PlatformComponent )
+                    {
+                    final PlatformComponent component = (PlatformComponent) instance;
+                    component.initialize( this, system().context, system().platform );
+                    }
+                myRegisteredComponents.put( aComponentName, instance );
+                }
+            catch ( final Exception e )
+                {
+                Log.error( e );
+                throw new ChainedException( e );
+                }
+            }
+
+        return myRegisteredComponents.get( aComponentName );
         }
 
     // From SystemContext
