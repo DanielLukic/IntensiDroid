@@ -50,30 +50,21 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
 
     public final void showDashboard()
         {
-        if ( hasNetworking() && !isLoggedIn() ) OpenFeint.userApprovedFeint();
-        else Dashboard.open();
+        Dashboard.open();
         }
 
     public final void showLeaderboard()
         {
-        if ( hasNetworking() && !isLoggedIn() ) OpenFeint.userApprovedFeint();
-        else Dashboard.openLeaderboard( "${openfeint.leaderboard_id}" );
+        Dashboard.openLeaderboard( "${openfeint.leaderboard_id}" );
         }
 
     public final void showAchievements()
         {
-        if ( hasNetworking() && !isLoggedIn() ) OpenFeint.userApprovedFeint();
-        else Dashboard.openAchievements();
+        Dashboard.openAchievements();
         }
 
     public final void retrieveHighscores( final LeaderboardCallback aCallback )
         {
-        if ( hasNetworking() && !isLoggedIn() )
-            {
-            OpenFeint.userApprovedFeint();
-            return;
-            }
-
         Log.info( "retrieveHighscores" );
         getLeaderboard().getScores( new Leaderboard.GetScoresCB()
         {
@@ -158,7 +149,6 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
         {
         final Achievement achievement = findAchievement( aAchievementId );
         if ( achievement == NULL_ACHIEVEMENT ) return false;
-
         return achievement.isUnlocked;
         }
 
@@ -243,6 +233,7 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
             }
         } );
         }
+
     // From OpenFeintDelegate
 
     public final void userLoggedIn( final CurrentUser user )
@@ -288,8 +279,12 @@ public final class OpenFeintFacade extends OpenFeintDelegate implements OnlineAP
         // We don't want to login right away *unless* the user has already logged in before.
         // Therefore we tell feint "true - we will handle approval". But we won't. For now.
         // The user can then later decide to 'Go Online' in the main menu or somewhere else.
+        if ( myCustomApprovalSkipped ) return false;
+        myCustomApprovalSkipped = true;
         return true;
         }
+
+    private boolean myCustomApprovalSkipped;
 
     private Leaderboard myLeaderboard;
 
