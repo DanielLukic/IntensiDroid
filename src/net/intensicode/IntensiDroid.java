@@ -934,6 +934,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         final AndroidStorageManager storage = new AndroidStorageManager( this );
         final AndroidAudioManager audio = new AndroidAudioManager( this, resources );
 
+        final NetworkIO network = new AndroidNetworkIO();
+
         system.graphics = graphics;
 
         //#if SENSORS
@@ -961,6 +963,8 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         //# SOME ONLINE IMPLEMENTATION REQUIRED!
         //#endif
         //#endif
+
+        system.network = network;
 
         system.storage = storage;
         //#if SENSORS
