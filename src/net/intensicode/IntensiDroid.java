@@ -806,7 +806,38 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         }
         //#endif
 
-        //#if !ADMOB && !GREY && !MOBCLIX && !IA
+        // TODO: How to move all these hacks into separate classes in main project and hook them in here?
+
+        //#if AMODA
+        {
+        myGameView.setId( 0x1723CAFE );
+        myGameView.setFocusable( true );
+        myGameView.requestFocus();
+        myGameView.requestFocusFromTouch();
+
+        final com.admoda.AdView adView = new com.admoda.AdView( this );
+        adView.setLayoutParams( new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT ) );
+        adView.setId( 0x1723BABE );
+        adView.setFocusable( false );
+        adView.setBackgroundColor( 0x000000 );
+        adView.setTextColor( 0xFFFFFFFF );
+        Log.info( "AdultModa IDs: ${amoda_banner_id} ${amoda_text_id}");
+        adView.setBannerZoneId(Integer.parseInt("${amoda_banner_id}"));
+        adView.setTextZoneId(Integer.parseInt("${amoda_text_id}"));
+        adView.requestFreshAd();
+        adView.setRefreshInterval( 60 );
+        adView.setEnabled( true );
+        myBannerAd = adView;
+
+        final RelativeLayout layout = new RelativeLayout( this );
+        layout.addView( myGameView );
+        layout.addView( adView, 320, 48 );
+
+        setContentView( layout );
+        }
+        //#endif
+
+        //#if !ADS
         //# myGameView.setId( 0x1723CAFE );
         //# setContentView( myGameView );
         //#endif
