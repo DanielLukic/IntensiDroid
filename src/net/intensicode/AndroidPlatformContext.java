@@ -151,7 +151,7 @@ final class AndroidPlatformContext implements PlatformContext
     private void postDialog( final String aMessage, final Throwable aOptionalThrowable, final boolean aCritical )
         {
         Log.info( "stopping game system while showing error dialog" );
-        myGameSystem.stop();
+        if ( myGameSystem != null ) myGameSystem.stop();
 
         myHandler.post( new Runnable()
         {

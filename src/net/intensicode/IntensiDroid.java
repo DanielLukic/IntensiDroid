@@ -9,8 +9,7 @@ import android.widget.TextView;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
 import net.intensicode.screens.ScreenBase;
-import net.intensicode.util.Assert;
-import net.intensicode.util.Log;
+import net.intensicode.util.*;
 
 public abstract class IntensiDroid extends DebugLifeCycleActivity implements IntensiGameContext
     {
@@ -250,7 +249,13 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Int
 
         final NetworkIO network = new AndroidNetworkIO();
 
-        myGameSystem.graphics = graphics;
+        //#if RENDER_ASYNC
+        final DynamicArray renderQueue = new DynamicArray();
+        myGameSystem.renderThread = new net.intensicode.graphics.AsyncRenderThread( renderQueue, graphics );
+        myGameSystem.graphics = new net.intensicode.graphics.AsyncDirectGraphics( renderQueue );
+        //#else
+        //# myGameSystem.graphics = graphics;
+        //#endif
 
         //#if SENSORS
         final AndroidSensorsManager sensors = new AndroidSensorsManager( this );
