@@ -1,8 +1,6 @@
 package net.intensicode.droid;
 
 import android.os.Build;
-import net.intensicode.PlatformContext;
-import net.intensicode.SystemContext;
 import net.intensicode.core.GameSystem;
 import net.intensicode.droid.opengl.OpenglGameView;
 import net.intensicode.droid.opengl.OpenglGraphics;
@@ -11,13 +9,6 @@ import net.intensicode.util.StringUtils;
 
 public final class AndroidGameSystem extends GameSystem
     {
-    public AndroidGameSystem( final SystemContext aSystemContext, final PlatformContext aPlatformContext )
-        {
-        super( aSystemContext, aPlatformContext );
-        }
-
-    // From GameSystem
-
     protected void throwWrappedExceptionToTellCallingSystemAboutBrokenGameSystem( final Exception aException )
         {
         throw new RuntimeException( "failed showing error screen", aException );

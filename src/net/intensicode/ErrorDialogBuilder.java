@@ -1,6 +1,7 @@
 package net.intensicode;
 
 import android.app.AlertDialog;
+import android.app.Activity;
 import android.content.*;
 import android.view.*;
 import android.widget.*;
@@ -8,9 +9,9 @@ import net.intensicode.core.*;
 
 public final class ErrorDialogBuilder implements DialogInterface.OnClickListener, View.OnClickListener
     {
-    public ErrorDialogBuilder( final Context aContext, final GameSystem aGameSystem )
+    public ErrorDialogBuilder( final Activity aActivity, final GameSystem aGameSystem )
         {
-        myContext = aContext;
+        myActivity = aActivity;
         myGameSystem = aGameSystem;
         }
 
@@ -39,24 +40,24 @@ public final class ErrorDialogBuilder implements DialogInterface.OnClickListener
         if ( myDialog != null && myDialog.isShowing() ) return;
 
         //#if FEEDBACK
-        final Button feedbackButton = new Button( myContext );
+        final Button feedbackButton = new Button( myActivity );
         feedbackButton.setText( "Send Feedback" );
         feedbackButton.setOnClickListener( this );
         //#endif
 
-        final TextView message = new TextView( myContext );
+        final TextView message = new TextView( myActivity );
         if ( myMessageOrNull != null ) message.setText( myMessageOrNull );
         else message.setTag( I18n._( "no description" ) );
 
-        final TextView exception = new TextView( myContext );
+        final TextView exception = new TextView( myActivity );
         if ( myExceptionTextOrNull != null ) exception.setText( myExceptionTextOrNull );
         else exception.setTag( I18n._( "no exception data" ) );
 
-        final ScrollView scrollView = new ScrollView( myContext );
+        final ScrollView scrollView = new ScrollView( myActivity );
         scrollView.setLayoutParams( LAYOUT_PARAMS );
         scrollView.addView( exception );
 
-        final LinearLayout view = new LinearLayout( myContext );
+        final LinearLayout view = new LinearLayout( myActivity );
         view.setOrientation( LinearLayout.VERTICAL );
         view.setLayoutParams( LAYOUT_PARAMS );
         //#if FEEDBACK
@@ -65,7 +66,7 @@ public final class ErrorDialogBuilder implements DialogInterface.OnClickListener
         view.addView( message, LAYOUT_PARAMS );
         view.addView( scrollView, LAYOUT_PARAMS );
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder( myContext );
+        final AlertDialog.Builder builder = new AlertDialog.Builder( myActivity );
         if ( myTitleOrNull != null ) builder.setTitle( myTitleOrNull );
         builder.setCancelable( true );
         builder.setView( view );
@@ -119,7 +120,7 @@ public final class ErrorDialogBuilder implements DialogInterface.OnClickListener
 
     private AlertDialog myDialog;
 
-    private final Context myContext;
+    private final Activity myActivity;
 
     private final GameSystem myGameSystem;
 

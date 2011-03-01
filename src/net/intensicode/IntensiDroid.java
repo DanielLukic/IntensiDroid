@@ -1,554 +1,45 @@
 package net.intensicode;
 
-import android.app.Activity;
-import android.content.*;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
-import android.net.Uri;
-import android.os.*;
-import android.telephony.TelephonyManager;
+import android.os.Bundle;
 import android.view.*;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import net.intensicode.configuration.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
-import net.intensicode.droid.opengl.OpenglGameView;
-import net.intensicode.droid.opengl.OpenglGraphics;
 import net.intensicode.screens.ScreenBase;
-import net.intensicode.util.*;
+import net.intensicode.util.Assert;
+import net.intensicode.util.Log;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.HashMap;
-
-public abstract class IntensiDroid extends DebugLifeCycleActivity implements PlatformContext, SystemContext
+public abstract class IntensiDroid extends DebugLifeCycleActivity implements IntensiGameContext
     {
-    //#if ANAL
-    private com.google.android.apps.analytics.GoogleAnalyticsTracker myAnalyticsTracker;
-    //#endif
-
     protected IntensiDroid()
         {
         AndroidLog.activate();
         }
 
-    // From PlatformContext
-
-    public final long compatibleTimeInMillis()
-        {
-        return SystemClock.uptimeMillis();
-        }
-
-    public final void openWebBrowser( final String aURL )
-        {
-        startActivity( new Intent( Intent.ACTION_VIEW, Uri.parse( aURL ) ) );
-        }
-
-    public final void sendEmail( final EmailData aEmailData )
-        {
-        final Intent emailIntent = new Intent( android.content.Intent.ACTION_SEND );
-        emailIntent.setType( "text/plain" );
-        emailIntent.putExtra( Intent.EXTRA_EMAIL, new String[]{ aEmailData.to } );
-        emailIntent.putExtra( Intent.EXTRA_SUBJECT, aEmailData.subject );
-        emailIntent.putExtra( Intent.EXTRA_TEXT, aEmailData.text );
-        startActivity( Intent.createChooser( emailIntent, "Send mail" ) );
-        }
-
-    public String screenOrientationId()
-        {
-        return AndroidUtilities.determineScreenOrientationId( this );
-        }
-
-    public final String getPlatformSpecString()
-        {
-        final StringBuffer buffer = new StringBuffer();
-        buffer.append( Build.BRAND );
-        buffer.append( " * " );
-        buffer.append( Build.MODEL );
-        buffer.append( " * " );
-        buffer.append( Build.DEVICE );
-        buffer.append( " * " );
-        buffer.append( Build.DISPLAY );
-        buffer.append( " * " );
-        buffer.append( Build.PRODUCT );
-        try
-            {
-            buffer.append( " * " );
-            buffer.append( Build.VERSION.SDK );
-            buffer.append( " * " );
-            buffer.append( Build.VERSION.RELEASE );
-            buffer.append( " * " );
-            buffer.append( Build.VERSION.INCREMENTAL );
-            }
-        catch ( final Exception e )
-            {
-            Log.error( "failed adding version information. ignored.", e );
-            }
-        return buffer.toString();
-        }
-
-    public final String getGraphicsSpecString()
-        {
-        final DirectGraphics graphics = myGameSystem.graphics;
-        if ( graphics instanceof OpenglGraphics )
-            {
-            final OpenglGraphics opengl = (OpenglGraphics) graphics;
-
-            final StringBuffer buffer = new StringBuffer();
-            buffer.append( opengl.vendor );
-            buffer.append( " * " );
-            buffer.append( opengl.renderer );
-            buffer.append( " * " );
-            buffer.append( opengl.version );
-
-            try
-                {
-                final DynamicArray strings = new DynamicArray();
-                final OpenglGameView view = (OpenglGameView) myGameSystem.screen;
-                view.openglGraphics.addOpenglStrings( strings );
-
-                for ( int idx = 0; idx < strings.size; idx++ )
-                    {
-                    buffer.append( "\n" );
-                    buffer.append( strings );
-                    }
-                }
-            catch ( final Throwable t )
-                {
-                Log.error( t );
-                }
-
-            return buffer.toString();
-            }
-        else
-            {
-            return "AndroidCanvasGraphics";
-            }
-        }
-
-    public final String getExtendedExceptionData( final Throwable aException )
-        {
-        final StringWriter stringWriter = new StringWriter();
-        final PrintWriter writer = new PrintWriter( stringWriter );
-        writer.print( "MESSAGE: " );
-        writer.println( String.valueOf( aException.getMessage() ) );
-        writer.print( "STACK: " );
-        aException.printStackTrace( writer );
-        writer.println();
-        if ( aException.getCause() != null )
-            {
-            writer.print( "CAUSE: " );
-            writer.println( String.valueOf( aException.getCause() ) );
-            }
-        return stringWriter.toString();
-        }
-
-    public void showError( final String aMessage, final Throwable aOptionalThrowable )
-        {
-        postDialog( aMessage, aOptionalThrowable, false );
-        }
-
-    public void showCriticalError( final String aMessage, final Throwable aOptionalThrowable )
-        {
-        postDialog( aMessage, aOptionalThrowable, true );
-        }
-
-    private void postDialog( final String aMessage, final Throwable aOptionalThrowable, final boolean aCritical )
-        {
-        myHandler.post( new Runnable()
-        {
-        public final void run()
-            {
-            myErrorDialogBuilder.setTitle( "IntensiGame Error Report" );
-            myErrorDialogBuilder.setMessage( aMessage );
-            if ( aCritical )
-                {
-                myErrorDialogBuilder.setCritical( aCritical );
-                }
-            if ( aOptionalThrowable != null )
-                {
-                final String exceptionText = getExtendedExceptionData( aOptionalThrowable );
-                myErrorDialogBuilder.setCause( exceptionText );
-                }
-            myErrorDialogBuilder.createDialog();
-            }
-        } );
-        }
-
-    public final void storePreferences( final String aPreferencesId, final String aPropertyKey, final boolean aValue )
-        {
-        final SharedPreferences preferences = getSharedPreferences( aPreferencesId, Context.MODE_PRIVATE );
-        preferences.edit().putBoolean( aPropertyKey, true ).commit();
-        }
-
-    public final void register( final String aComponentName, final String aClassName )
-        {
-        Log.info( "registering {} => {}", aComponentName, aClassName );
-        myRegisteredComponents.put( aComponentName, aClassName );
-        }
-
-    private final HashMap myRegisteredComponents = new HashMap();
-
-    public final Object component( final String aComponentName )
-        {
-        final Object classNameOrInstance = myRegisteredComponents.get( aComponentName );
-        Log.info( "component request {} => {}", aComponentName, classNameOrInstance );
-
-        if ( classNameOrInstance == null ) throw new IllegalArgumentException( "component not registered: " + aComponentName );
-
-        if ( classNameOrInstance instanceof String )
-            {
-            try
-                {
-                final Object instance = Class.forName( (String) classNameOrInstance ).newInstance();
-                if ( instance instanceof PlatformComponent )
-                    {
-                    final PlatformComponent component = (PlatformComponent) instance;
-                    component.initialize( this, system().context, system().platform );
-                    }
-                myRegisteredComponents.put( aComponentName, instance );
-                }
-            catch ( final Exception e )
-                {
-                Log.error( e );
-                throw new ChainedException( e );
-                }
-            }
-
-        return myRegisteredComponents.get( aComponentName );
-        }
-
-    // From SystemContext
-
-    public final void trackState( final String aCategory, final String aAction, final String aLabel )
-        {
-        //#if ANAL
-        Log.info( "tracking state change: {} {}" + aLabel, aCategory, aAction );
-        myAnalyticsTracker.trackEvent( aCategory, aAction, aLabel, 0 );
-        //#endif
-        }
-
-    public final void trackPageView( final String aPageId )
-        {
-        //#if ANAL
-        Log.info( "tracking page view: {}", aPageId );
-        myAnalyticsTracker.trackPageView( aPageId );
-        //#endif
-        }
-
-    public final void showBannerAd()
-        {
-        if ( myBannerAd == null ) return;
-        runOnUiThread( new Runnable()
-        {
-        public void run()
-            {
-            myBannerAd.setEnabled( true );
-            myBannerAd.setVisibility( View.VISIBLE );
-            }
-        } );
-        }
-
-    public final void hideBannerAd()
-        {
-        if ( myBannerAd == null ) return;
-        runOnUiThread( new Runnable()
-        {
-        public void run()
-            {
-            myBannerAd.setVisibility( View.GONE );
-            myBannerAd.setEnabled( false );
-            }
-        } );
-        }
-
-    public final boolean hasBannerAds()
-        {
-        return true;
-        }
-
-    public final int getBannerAdHeight()
-        {
-        return 50;
-        }
-
-    public final void positionAdBanner( final int aVerticalPosition )
-        {
-        if ( myBannerAd == null ) return;
-        runOnUiThread( new Runnable()
-        {
-        public void run()
-            {
-            final RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) myBannerAd.getLayoutParams();
-            params.setMargins( 0, aVerticalPosition, 0, 0 );
-            myBannerAd.requestLayout();
-            }
-        } );
-        }
-
-    public final boolean hasFullscreenAds()
-        {
-        return true;
-        }
-
-    //#if MOBCLIX
-
-    private com.mobclix.android.sdk.MobclixFullScreenAdView myMobclixFullScreenAdView;
-
-    private void initMobclixFullscreenAdIfNecessary()
-        {
-        if ( myMobclixFullScreenAdView != null ) return;
-
-        final com.mobclix.android.sdk.MobclixFullScreenAdView adView = new com.mobclix.android.sdk.MobclixFullScreenAdView( this );
-        adView.addMobclixAdViewListener( new com.mobclix.android.sdk.MobclixFullScreenAdViewListener()
-        {
-        public void onFinishLoad( final com.mobclix.android.sdk.MobclixFullScreenAdView aMobclixFullScreenAdView )
-            {
-            Log.info( "onFinishLoad" );
-            }
-
-        public void onFailedLoad( final com.mobclix.android.sdk.MobclixFullScreenAdView aMobclixFullScreenAdView, final int i )
-            {
-            Log.info( "onFailedLoad {}", i );
-            }
-
-        public void onPresentAd( final com.mobclix.android.sdk.MobclixFullScreenAdView aMobclixFullScreenAdView )
-            {
-            Log.info( "onPresentAd" );
-            }
-
-        public void onDismissAd( final com.mobclix.android.sdk.MobclixFullScreenAdView aMobclixFullScreenAdView )
-            {
-            Log.info( "onDismissAd" );
-            }
-
-        public String keywords()
-            {
-            Log.info( "keywords ${mobclix_keywords}" );
-            //#if "${mobclix_keywords}"
-            //# return "${mobclix_keywords}";
-            //#else
-            return "Android Game Tetris Arcade Action Puzzle Falling Blocks Explosions";
-            //#endif
-            }
-
-        public String query()
-            {
-            Log.info( "query" );
-            return null;
-            }
-        } );
-        myMobclixFullScreenAdView = adView;
-        }
-
-    //#endif
-
-    public final void preloadFullscreenAd()
-        {
-        //#if ADS
-        runOnUiThread( new Runnable()
-        {
-        public void run()
-            {
-            //#if MOBCLIX
-            initMobclixFullscreenAdIfNecessary();
-            myMobclixFullScreenAdView.requestAd();
-            //#endif
-            }
-        } );
-        //#endif
-        }
-
-    public ScreenBase createMainScreen() throws Exception
-        {
-        throw new RuntimeException( "PLACEHOLDER - PLEASE OVERRIDE" );
-        }
-
-    public final void triggerNewBannerAd()
-        {
-        //#if GREY
-        if ( myGreystripeBannerAd != null ) myGreystripeBannerAd.refresh();
-        //#endif
-        //#if ADMOB
-        if ( myAdmobBannerAd != null ) myAdmobBannerAd.requestFreshAd();
-        //#endif
-        //#if MOBCLIX
-        if ( myMobclixBannerAd != null ) myMobclixBannerAd.getAd();
-        //#endif
-        }
-
-    private View myBannerAd;
-
-    //#if GREY
-
-    private com.greystripe.android.sdk.BannerView myGreystripeBannerAd;
-
-    //#endif
-
-    //#if ADMOB
-
-    private com.admob.android.ads.AdView myAdmobBannerAd;
-
-    //#endif
-
-    //#if MOBCLIX
-
-    private com.mobclix.android.sdk.MobclixMMABannerXLAdView myMobclixBannerAd;
-
-    //#endif
-
-    public final void triggerNewFullscreenAd()
-        {
-        final Activity activity = this;
-        //#if ADS
-        runOnUiThread( new Runnable()
-        {
-        public void run()
-            {
-            //#if GREY
-            com.greystripe.android.sdk.GSSDK.getSharedInstance().displayAd( activity );
-            //#endif
-            //#if MOBCLIX
-            initMobclixFullscreenAdIfNecessary();
-            if ( myMobclixFullScreenAdView.hasAd() ) myMobclixFullScreenAdView.displayRequestedAd();
-            else myMobclixFullScreenAdView.requestAndDisplayAd();
-            //#endif
-            }
-        } );
-        //#endif
-        }
-
-    public String determineResourcesFolder( final int aWidth, final int aHeight, final String aScreenOrientationId )
-        {
-        return myHelper.determineResourcesFolder( aWidth, aHeight, aScreenOrientationId );
-        }
+    // From IntensiGameContext
 
     public final GameSystem system()
         {
+        if ( myGameSystem == null ) throw new IllegalStateException();
         return myGameSystem;
         }
 
-    public final void fillEmailData( final EmailData aEmailData )
+    public final SystemContext context()
         {
+        if ( system().context == null ) throw new IllegalStateException();
+        return system().context;
         }
 
-    public final ConfigurationElementsTree getPlatformValues()
+    public final IntensiGameHelper helper()
         {
-        final ConfigurationElementsTree platform = new ConfigurationElementsTree( "Platform" );
-
-        try
-            {
-            final ConfigurationElementsTree ui = platform.addSubTree( "UI" );
-            ui.addLeaf( new CaptureBackKey( (AndroidKeysHandler) myGameSystem.keys ) );
-
-            //#if PROFILING
-            final ConfigurationElementsTree profiling = platform.addSubTree( "Profiling" );
-            profiling.addLeaf( new StartProfiling() );
-            profiling.addLeaf( new StopProfiling() );
-            profiling.addLeaf( new DumpHprofData() );
-            //#endif
-
-            //#if !RELEASE
-
-            final DirectGraphics graphics = myGameSystem.graphics;
-            if ( graphics instanceof OpenglGraphics )
-                {
-                final ConfigurationElementsTree opengl = platform.addSubTree( "OpenGL" );
-                opengl.addLeaf( new DumpTextureAtlases( (OpenglGraphics) graphics ) );
-                }
-
-            platform.addLeaf( new DumpMemory() );
-
-            //#endif
-            }
-        catch ( final Exception e )
-            {
-            system().showError( "failed preparing platform values for configuration menu. ignored.", e );
-            }
-
-        return platform;
+        if ( myHelper == null ) throw new IllegalStateException();
+        return myHelper;
         }
 
-    public final ConfigurationElementsTree getSystemValues()
-        {
-        return myGameSystem.getSystemValues();
-        }
-
-    public ConfigurationElementsTree getApplicationValues()
-        {
-        return ConfigurationElementsTree.EMPTY;
-        }
-
-    public final void loadConfigurableValues()
-        {
-        final IntensiGameHelper helper = new IntensiGameHelper( myGameSystem );
-        helper.loadConfiguration( getPlatformValues() );
-        helper.loadConfiguration( getSystemValues() );
-        helper.loadConfiguration( getApplicationValues() );
-        }
-
-    public final void saveConfigurableValues()
-        {
-        final IntensiGameHelper helper = new IntensiGameHelper( myGameSystem );
-        helper.saveConfiguration( getPlatformValues() );
-        helper.saveConfiguration( getSystemValues() );
-        helper.saveConfiguration( getApplicationValues() );
-        }
-
-    public void onFramesDropped()
-        {
-        // Default implementation does nothing..
-        }
-
-    public void onInfoTriggered()
-        {
-        // Default implementation does nothing..
-        }
-
-    public void onDebugTriggered()
-        {
-        myHelper.toggleDebugScreen();
-        }
-
-    public void onCheatTriggered()
-        {
-        myHelper.toggleCheatScreen();
-        }
-
-    public void onPauseApplication()
-        {
-        // Default implementation does nothing..
-        }
-
-    public void onDestroyApplication()
-        {
-        // Default implementation does nothing..
-        }
-
-    //#if ORIENTATION_DYNAMIC
-
-    public void onOrientationChanged()
-        {
-        // Default implementation does nothing..
-        }
-
-    //#endif
-
-    public final void triggerConfigurationMenu()
-        {
-        myHandler.post( new Runnable()
-        {
-        public final void run()
-            {
-            openOptionsMenu();
-            }
-        } );
-        }
-
-    public void terminateApplication()
-        {
-        finish();
-        }
+    public abstract ScreenBase createMainScreen() throws Exception;
 
     // From Activity
 
@@ -566,17 +57,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     public boolean onPrepareOptionsMenu( final Menu aMenu )
         {
-        //#if FEINT
-        final boolean loggedIn = com.openfeint.api.OpenFeint.isUserLoggedIn();
-        Log.info( "logged in? " + loggedIn );
-        if ( !loggedIn )
-            {
-            final boolean online = com.openfeint.api.OpenFeint.isNetworkConnected();
-            Log.info( "online? " + online );
-            if ( online ) com.openfeint.api.OpenFeint.login();
-            }
-        //#endif
-
         aMenu.clear();
         if ( myOptionsMenuHandler != null ) myOptionsMenuHandler.onCreateOptionsMenu( aMenu );
         return super.onPrepareOptionsMenu( aMenu );
@@ -599,17 +79,9 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         {
         super.onCreate( savedInstanceState );
 
-        //#if GREY
-        com.greystripe.android.sdk.GSSDK.initialize( this, "${greystripe_publisher_id}" );
-        //#endif
+        AndroidPlatformHooks.getInstance().onCreate( this );
 
-        //#if ANAL
-        myAnalyticsTracker = com.google.android.apps.analytics.GoogleAnalyticsTracker.getInstance();
-        myAnalyticsTracker.start( "${google_analytics_id}", 20, this );
-        Log.info( "starting analytics tracker for id: ${google_analytics_id}" );
-        //#endif
-
-        trackState( "app", "lifecycle", "create" );
+        hooks().trackState( "app", "lifecycle", "create" );
 
         //#if ORIENTATION_LANDSCAPE
         //# setRequestedOrientation( android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE );
@@ -622,8 +94,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         Assert.isFalse( "game system already initialized", isGameSystemCreated() );
         //#endif
 
-        myHandler = new Handler( getMainLooper() );
-
         AndroidUtilities.showDeviceSpecs();
 
         setWindowFeatures();
@@ -632,239 +102,47 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         try
             {
             createGameViewAndGameSystem();
+
+            updateResourcesSubfolder();
+            myHelper.initGameSystemFromConfigurationFile();
+
+            AndroidPlatformHooks.getInstance().setContentView( this, myGameView );
             }
         catch ( final Exception e )
             {
-            showCriticalError( "failed initializing game system", e );
+            final AndroidPlatformContext platform = new AndroidPlatformContext( this, null );
+            platform.showCriticalError( "failed initializing game system", e );
+            finish();
             }
-
-        updateResourcesSubfolder();
-        myHelper.initGameSystemFromConfigurationFile();
-
-        //#if GREY
-        {
-        //#if INFO
-        final TelephonyManager telephonyManager = (TelephonyManager) getSystemService( Context.TELEPHONY_SERVICE );
-        Log.info( "IMEI/MEID: {}", telephonyManager.getDeviceId() );
-        //#endif
-
-        myGameView.setId( 0x1723CAFE );
-        myGameView.setFocusable( true );
-        myGameView.requestFocus();
-        myGameView.requestFocusFromTouch();
-
-        final com.greystripe.android.sdk.BannerView adView = new com.greystripe.android.sdk.BannerView( this );
-        adView.setLayoutParams( new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT ) );
-        adView.setId( 0x1723BABE );
-        adView.setFocusable( false );
-        adView.setBackgroundColor( 0x000000 );
-        adView.setEnabled( true );
-        adView.refresh();
-        myGreystripeBannerAd = adView;
-        myBannerAd = adView;
-
-        final RelativeLayout layout = new RelativeLayout( this );
-        layout.addView( myGameView );
-        layout.addView( adView );
-
-        setContentView( layout );
-        }
-        //#endif
-
-        //#if ADMOB
-        {
-        myGameView.setId( 0x1723CAFE );
-        myGameView.setFocusable( true );
-        myGameView.requestFocus();
-        myGameView.requestFocusFromTouch();
-
-        final com.admob.android.ads.AdView adView = new com.admob.android.ads.AdView( this );
-        adView.setLayoutParams( new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT ) );
-        adView.setId( 0x1723BABE );
-        adView.setFocusable( false );
-        adView.setBackgroundColor( 0x000000 );
-        adView.setPrimaryTextColor( 0xFFFFFFFF );
-        adView.setSecondaryTextColor( 0xFFCCCCCC );
-        //#if "${admob_keywords}"
-        //# adView.setKeywords( "${admob_keywords}" );
-        //#else
-        adView.setKeywords( "Android Game Arcade Action" );
-        //#endif
-        adView.setRequestInterval( 60 );
-        adView.setEnabled( true );
-        myAdmobBannerAd = adView;
-        myBannerAd = adView;
-
-        final RelativeLayout layout = new RelativeLayout( this );
-        layout.addView( myGameView );
-        layout.addView( adView );
-
-        setContentView( layout );
-        }
-        //#endif
-
-        //#if IA
-        {
-        myGameView.setId( 0x1723CAFE );
-        myGameView.setFocusable( true );
-        myGameView.requestFocus();
-        myGameView.requestFocusFromTouch();
-
-        final com.innerActive.ads.InnerActiveAdView adView = new com.innerActive.ads.InnerActiveAdView( this );
-        adView.setLayoutParams( new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT ) );
-        adView.setId( 0x1723BABE );
-        adView.setFocusable( false );
-        adView.setBgColor( 0x000000 );
-        adView.setTxtColor( 0xFFFFFFFF );
-        adView.refreshAd();
-        adView.setRefreshInterval( 60 );
-        adView.setEnabled( true );
-        myBannerAd = adView;
-
-        final RelativeLayout layout = new RelativeLayout( this );
-        layout.addView( myGameView );
-        layout.addView( adView );
-
-        setContentView( layout );
-        }
-        //#endif
-
-        //#if MOBCLIX
-        {
-        com.mobclix.android.sdk.Mobclix.onCreate( this );
-        com.mobclix.android.sdk.MobclixFeedback.sendComment( this, "startup" );
-
-        //#if INFO
-        final TelephonyManager telephonyManager = (TelephonyManager) getSystemService( Context.TELEPHONY_SERVICE );
-        Log.info( "IMEI/MEID: {}", telephonyManager.getDeviceId() );
-        //#endif
-
-        myGameView.setId( 0x1723CAFE );
-        myGameView.setFocusable( true );
-        myGameView.requestFocus();
-        myGameView.requestFocusFromTouch();
-
-        final com.mobclix.android.sdk.MobclixMMABannerXLAdView adView = new com.mobclix.android.sdk.MobclixMMABannerXLAdView( this );
-        adView.setLayoutParams( new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT ) );
-        adView.setId( 0x1723BABE );
-        adView.setFocusable( false );
-        adView.setBackgroundColor( 0x000000 );
-        adView.setEnabled( true );
-        adView.setRefreshTime( 45000 );
-        adView.addMobclixAdViewListener( new com.mobclix.android.sdk.MobclixAdViewListener()
-        {
-        public final void onSuccessfulLoad( final com.mobclix.android.sdk.MobclixAdView aMobclixAdView )
-            {
-            Log.info( "onSuccessfulLoad" );
-            }
-
-        public final void onFailedLoad( final com.mobclix.android.sdk.MobclixAdView aMobclixAdView, final int i )
-            {
-            Log.info( "onFailedLoad {}", i );
-            }
-
-        public final void onAdClick( final com.mobclix.android.sdk.MobclixAdView aMobclixAdView )
-            {
-            Log.info( "onAdClick" );
-            }
-
-        public final boolean onOpenAllocationLoad( final com.mobclix.android.sdk.MobclixAdView aMobclixAdView, final int i )
-            {
-            Log.info( "onOpenAllocationLoad {}", i );
-            return false;
-            }
-
-        public final void onCustomAdTouchThrough( final com.mobclix.android.sdk.MobclixAdView aMobclixAdView, final String s )
-            {
-            Log.info( "onCustomAdTouchThrough {}", s );
-            }
-
-        public final String keywords()
-            {
-            Log.info( "keywords ${mobclix_keywords}" );
-            //#if "${mobclix_keywords}"
-            //# return "${mobclix_keywords}";
-            //#else
-            return "Android Game Tetris Arcade Action Puzzle Falling Blocks Explosions";
-            //#endif
-            }
-
-        public final String query()
-            {
-            Log.info( "query" );
-            return null;
-            }
-        } );
-        myMobclixBannerAd = adView;
-        myBannerAd = adView;
-
-        final RelativeLayout layout = new RelativeLayout( this );
-        layout.addView( myGameView );
-        layout.addView( adView );
-
-        setContentView( layout );
-        }
-        //#endif
-
-        // TODO: How to move all these hacks into separate classes in main project and hook them in here?
-
-        //#if AMODA
-        {
-        myGameView.setId( 0x1723CAFE );
-        myGameView.setFocusable( true );
-        myGameView.requestFocus();
-        myGameView.requestFocusFromTouch();
-
-        final com.admoda.AdView adView = new com.admoda.AdView( this );
-        adView.setLayoutParams( new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT ) );
-        adView.setId( 0x1723BABE );
-        adView.setFocusable( false );
-        adView.setBackgroundColor( 0x000000 );
-        adView.setTextColor( 0xFFFFFFFF );
-        Log.info( "AdultModa IDs: ${amoda_banner_id} ${amoda_text_id}");
-        adView.setBannerZoneId(Integer.parseInt("${amoda_banner_id}"));
-        adView.setTextZoneId(Integer.parseInt("${amoda_text_id}"));
-        adView.requestFreshAd();
-        adView.setRefreshInterval( 60 );
-        adView.setEnabled( true );
-        myBannerAd = adView;
-
-        final RelativeLayout layout = new RelativeLayout( this );
-        layout.addView( myGameView );
-        layout.addView( adView, 320, 48 );
-
-        setContentView( layout );
-        }
-        //#endif
-
-        //#if !ADS
-        //# myGameView.setId( 0x1723CAFE );
-        //# setContentView( myGameView );
-        //#endif
         }
 
     protected void onStart()
         {
         super.onStart();
-        if ( myGameView.isInitialized() ) myGameSystem.start();
+        if ( myGameSystem != null ) if ( myGameView.isInitialized() ) system().start();
         }
 
     protected void onResume()
         {
         super.onResume();
 
-        trackState( "app", "lifecycle", "resume" );
+        if ( myGameSystem != null ) hooks().trackState( "app", "lifecycle", "resume" );
 
-        if ( myGameView.isInitialized() ) myGameSystem.start();
+        if ( myGameView.isInitialized() ) system().start();
+        }
+
+    private PlatformHooks hooks()
+        {
+        return AndroidPlatformHooks.getInstance();
         }
 
     protected void onPause()
         {
-        onPauseApplication();
-        myGameSystem.stop(); // this is really the only one that has an effect..
+        if ( myGameSystem != null ) context().onPauseApplication();
+        if ( myGameSystem != null ) myGameSystem.stop(); // this is really the only one that has an effect..
         super.onPause();
 
-        trackState( "app", "lifecycle", "pause" );
+        if ( myGameSystem != null ) hooks().trackState( "app", "lifecycle", "pause" );
 
         finishIfPauseShouldStop();
         }
@@ -885,7 +163,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     protected void onStop()
         {
-        myGameSystem.stop();
+        if ( myGameSystem != null ) myGameSystem.stop();
         super.onStop();
 
         finishIfPauseShouldStop();
@@ -893,14 +171,12 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     protected void onDestroy()
         {
-        myGameSystem.destroy();
+        if ( myGameSystem != null ) myGameSystem.destroy();
         super.onDestroy();
 
-        trackState( "app", "lifecycle", "destroy" );
+        if ( myGameSystem != null ) hooks().trackState( "app", "lifecycle", "destroy" );
 
-        //#if ANAL
-        myAnalyticsTracker.stop();
-        //#endif
+        AndroidPlatformHooks.getInstance().onDestroy( this );
 
         AndroidImageResource.purgeAll();
         System.gc();
@@ -922,7 +198,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         setContentView( myGameView );
 
-        myGameSystem.engine.orientationChanged = true;
+        system().engine.orientationChanged = true;
         }
 
     //#endif
@@ -949,17 +225,23 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
     private synchronized void createGameViewAndGameSystem() throws Exception
         {
-        final AndroidGameSystem system = new AndroidGameSystem( this, this );
-        final AndroidGameEngine engine = new AndroidGameEngine( system );
+        myGameSystem = new AndroidGameSystem();
 
-        final VideoSystem videoSystem = createVideoSystem( system );
+        myHelper = new IntensiGameHelper( myGameSystem );
+
+        myGameSystem.platform = new AndroidPlatformContext( this, myGameSystem );
+        myGameSystem.context = new AndroidSystemContext( this, this );
+        final AndroidGameEngine engine = new AndroidGameEngine( myGameSystem );
+
+        final VideoSystem videoSystem = createVideoSystem( myGameSystem, myGameSystem.platform );
         final AndroidGameView view = videoSystem.view;
+        myGameView = view;
         final DirectScreen screen = videoSystem.screen;
         final DirectGraphics graphics = videoSystem.graphics;
 
         final AndroidResourcesManager resources = new AndroidResourcesManager( getAssets() );
         //#ifdef TOUCH
-        final AndroidTouchHandler touch = new AndroidTouchHandler( system, screen );
+        final AndroidTouchHandler touch = new AndroidTouchHandler( myGameSystem, screen );
         //#endif
         final AndroidKeysHandler keys = new AndroidKeysHandler();
         final AndroidStorageManager storage = new AndroidStorageManager( this );
@@ -967,7 +249,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
 
         final NetworkIO network = new AndroidNetworkIO();
 
-        system.graphics = graphics;
+        myGameSystem.graphics = graphics;
 
         //#if SENSORS
         final AndroidSensorsManager sensors = new AndroidSensorsManager( this );
@@ -983,42 +265,30 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         view.setOnKeyListener( keys );
 
         //#if TRACKBALL
-        system.trackball = trackball;
+        myGameSystem.trackball = trackball;
         //#endif
-        system.resources = resources;
+        myGameSystem.resources = resources;
 
-        //#if ONLINE
-        //#if FEINT
-        system.online = IntensiApp.OPEN_FEINT_FACADE;
-        //#else
-        //# SOME ONLINE IMPLEMENTATION REQUIRED!
-        //#endif
-        //#endif
+        myGameSystem.network = network;
 
-        system.network = network;
-
-        system.storage = storage;
+        myGameSystem.storage = storage;
         //#if SENSORS
-        system.sensors = sensors;
+        myGameSystem.sensors = sensors;
         //#endif
-        system.engine = engine;
-        system.screen = screen;
+        myGameSystem.engine = engine;
+        myGameSystem.screen = screen;
         //#ifdef TOUCH
-        system.touch = touch;
+        myGameSystem.touch = touch;
         //#endif
-        system.audio = audio;
-        system.keys = keys;
+        myGameSystem.audio = audio;
+        myGameSystem.keys = keys;
 
-        myGameView = view;
-        myGameSystem = system;
         //#if TRACKBALL
         myTrackballHandler = trackball;
         //#endif
         myOptionsMenuHandler = new OptionsMenuHandler( this, myGameSystem );
 
-        myErrorDialogBuilder = new ErrorDialogBuilder( this, myGameSystem );
-
-        myHelper = new IntensiGameHelper( myGameSystem );
+        AndroidPlatformHooks.getInstance().onCreate( myGameSystem );
         }
 
     private void updateResourcesSubfolder()
@@ -1030,7 +300,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         myHelper.updateResourcesSubfolder( width, height );
         }
 
-    private VideoSystem createVideoSystem( final GameSystem aGameSystem )
+    private VideoSystem createVideoSystem( final GameSystem aGameSystem, final PlatformContext aPlatformContext )
         {
         //#if OPENGL
         if ( shouldUseCanvas() )
@@ -1038,7 +308,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
             Log.info( "using canvas renderer in OPENGL build" );
             return VideoSystem.createCanvasVideoSystem( this, aGameSystem );
             }
-        return VideoSystem.createOpenglVideoSystem( this, aGameSystem, this );
+        return VideoSystem.createOpenglVideoSystem( this, aGameSystem, aPlatformContext );
         //#else
         //# return VideoSystem.createCanvasVideoSystem( this, aGameSystem );
         //#endif
@@ -1058,8 +328,6 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
         }
 
 
-    private Handler myHandler;
-
     private GameSystem myGameSystem;
 
     private AndroidGameView myGameView;
@@ -1073,6 +341,4 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Pla
     //#if TRACKBALL
     private AndroidTrackballHandler myTrackballHandler;
     //#endif
-
-    private ErrorDialogBuilder myErrorDialogBuilder;
     }
