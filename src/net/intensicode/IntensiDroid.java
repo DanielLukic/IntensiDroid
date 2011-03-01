@@ -230,6 +230,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Int
         myHelper = new IntensiGameHelper( myGameSystem );
 
         myGameSystem.platform = new AndroidPlatformContext( this, myGameSystem );
+        myGameSystem.hooks = AndroidPlatformHooks.getInstance();
         myGameSystem.context = new AndroidSystemContext( this, this );
         final AndroidGameEngine engine = new AndroidGameEngine( myGameSystem );
 
