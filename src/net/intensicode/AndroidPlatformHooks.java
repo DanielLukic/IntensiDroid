@@ -16,14 +16,18 @@ public class AndroidPlatformHooks implements PlatformHooks
 
     private static AndroidPlatformHooks createInstance()
         {
+        final String classname = "${android_platform_hooks.classname}";
         try
             {
-            final Class hooksClass = Class.forName( "${android_platform_hooks.classname}" );
-            return (AndroidPlatformHooks) hooksClass.newInstance();
+            final Class hooksClass = Class.forName( classname );
+            final AndroidPlatformHooks instance = (AndroidPlatformHooks) hooksClass.newInstance();
+            Log.info( "created AndroidPlatformHooks instance using {}", hooksClass );
+            return instance;
             }
         catch ( final ClassNotFoundException e )
             {
             // Ignore this..
+            Log.info( "failed creating {} instance", classname );
             }
         catch ( final Exception e )
             {
