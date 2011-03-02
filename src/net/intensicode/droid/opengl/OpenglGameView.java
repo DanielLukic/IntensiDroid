@@ -17,7 +17,7 @@ public final class OpenglGameView extends AndroidGameView
 
     // Internal API (DirectScreen)
 
-    public final void beginFrame()
+    public final void beginFrame() throws InterruptedException
         {
         openglGraphics.targetSize.setTo( myTargetSize );
         openglGraphics.screenSize.setTo( getWidth(), getHeight() );

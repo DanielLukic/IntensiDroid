@@ -18,7 +18,7 @@ public final class CanvasGameView extends AndroidGameView
 
     // Internal API (DirectScreen)
 
-    public final void beginFrame()
+    public final void beginFrame() throws InterruptedException
         {
         canvasGraphics.setScreenSize( getWidth(), getHeight() );
         canvasGraphics.setTargetSize( width(), height() );

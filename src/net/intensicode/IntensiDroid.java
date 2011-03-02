@@ -8,8 +8,10 @@ import android.view.*;
 import android.widget.TextView;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
+import net.intensicode.graphics.AsyncRenderQueue;
 import net.intensicode.screens.ScreenBase;
-import net.intensicode.util.*;
+import net.intensicode.util.Assert;
+import net.intensicode.util.Log;
 
 public abstract class IntensiDroid extends DebugLifeCycleActivity implements IntensiGameContext
     {
@@ -250,7 +252,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Int
         final NetworkIO network = new AndroidNetworkIO();
 
         //#if RENDER_ASYNC
-        final DynamicArray renderQueue = new DynamicArray();
+        final AsyncRenderQueue renderQueue = new AsyncRenderQueue( 2 );
         myGameSystem.renderThread = new net.intensicode.graphics.AsyncRenderThread( renderQueue, graphics, myGameSystem.platform );
         myGameSystem.graphics = new net.intensicode.graphics.AsyncDirectGraphics( renderQueue );
         //#else
