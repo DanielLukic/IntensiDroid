@@ -251,7 +251,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Int
 
         //#if RENDER_ASYNC
         final DynamicArray renderQueue = new DynamicArray();
-        myGameSystem.renderThread = new net.intensicode.graphics.AsyncRenderThread( renderQueue, graphics );
+        myGameSystem.renderThread = new net.intensicode.graphics.AsyncRenderThread( renderQueue, graphics, myGameSystem.platform );
         myGameSystem.graphics = new net.intensicode.graphics.AsyncDirectGraphics( renderQueue );
         //#else
         //# myGameSystem.graphics = graphics;
