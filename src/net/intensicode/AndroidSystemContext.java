@@ -85,7 +85,7 @@ final class AndroidSystemContext implements SystemContext
 
     public ConfigurationElementsTree getApplicationValues()
         {
-        return ConfigurationElementsTree.EMPTY;
+        return myIntensiGameContext.getApplicationValues();
         }
 
     public final void loadConfigurableValues()
@@ -104,12 +104,12 @@ final class AndroidSystemContext implements SystemContext
 
     public void onFramesDropped()
         {
-        // Default implementation does nothing..
+        myIntensiGameContext.onFramesDropped();
         }
 
     public void onInfoTriggered()
         {
-        // Default implementation does nothing..
+        myIntensiGameContext.onInfoTriggered();
         }
 
     public void onDebugTriggered()
@@ -124,19 +124,19 @@ final class AndroidSystemContext implements SystemContext
 
     public void onPauseApplication()
         {
-        // Default implementation does nothing..
+        myIntensiGameContext.onPauseApplication();
         }
 
     public void onDestroyApplication()
         {
-        // Default implementation does nothing..
+        myIntensiGameContext.onDestroyApplication();
         }
 
     //#if ORIENTATION_DYNAMIC
 
     public void onOrientationChanged()
         {
-        // Default implementation does nothing..
+        myIntensiGameContext.onOrientationChanged();
         }
 
     //#endif
