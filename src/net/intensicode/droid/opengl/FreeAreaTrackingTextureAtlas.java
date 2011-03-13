@@ -2,7 +2,8 @@ package net.intensicode.droid.opengl;
 
 import android.graphics.*;
 import net.intensicode.core.ImageResource;
-import net.intensicode.droid.*;
+import net.intensicode.droid.AndroidImageResource;
+import net.intensicode.droid.TexturePurger;
 import net.intensicode.util.*;
 
 import java.util.ArrayList;
@@ -12,14 +13,15 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
     public final String id;
 
 
-    public FreeAreaTrackingTextureAtlas( final String aID )
+    public FreeAreaTrackingTextureAtlas( final TextureUtilities aUtilities, final String aID )
         {
-        this( aID, TextureUtilities.maximumTextureSize, TextureUtilities.maximumTextureSize );
+        this( aUtilities, aID, TextureUtilities.maximumTextureSize, TextureUtilities.maximumTextureSize );
         }
 
-    public FreeAreaTrackingTextureAtlas( final String aID, final int aWidth, final int aHeight )
+    public FreeAreaTrackingTextureAtlas( final TextureUtilities aUtilities, final String aID, final int aWidth, final int aHeight )
         {
         id = aID;
+        myUtilities = aUtilities;
         myWidth = aWidth;
         myHeight = aHeight;
         }
@@ -108,7 +110,7 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
     private void createAtlasTextureIfNecessary()
         {
         if ( myAtlasTexture != null ) return;
-        myAtlasTexture = new TextureAtlasTexture();
+        myAtlasTexture = new TextureAtlasTexture( myUtilities );
         myAtlasTexture.make( myWidth, myHeight );
         }
 
@@ -407,6 +409,8 @@ public final class FreeAreaTrackingTextureAtlas implements TextureAtlas, Texture
     private final int myWidth;
 
     private final int myHeight;
+
+    private final TextureUtilities myUtilities;
 
     private final FreeAreas myFreeAreas = new FreeAreas();
 

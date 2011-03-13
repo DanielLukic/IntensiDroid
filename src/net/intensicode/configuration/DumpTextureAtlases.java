@@ -3,7 +3,8 @@ package net.intensicode.configuration;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import net.intensicode.ConfigurableActionValue;
-import net.intensicode.droid.opengl.*;
+import net.intensicode.droid.opengl.AtlasTextureManager;
+import net.intensicode.droid.opengl.FreeAreaTrackingTextureAtlas;
 import net.intensicode.util.Log;
 
 import java.io.*;
@@ -11,9 +12,9 @@ import java.util.ArrayList;
 
 public final class DumpTextureAtlases implements ConfigurableActionValue
     {
-    public DumpTextureAtlases( final OpenglGraphics aOpenglGraphics )
+    public DumpTextureAtlases( final AtlasTextureManager aTextureManager )
         {
-        myAtlasManager = aOpenglGraphics.textureManager.atlasTextureManager;
+        myTextureManager = aTextureManager;
         }
 
     public final String getTitle()
@@ -34,7 +35,7 @@ public final class DumpTextureAtlases implements ConfigurableActionValue
             final File intensigameFolder = new File( dataDirectory, "intensigame" );
             intensigameFolder.mkdirs();
 
-            final ArrayList<FreeAreaTrackingTextureAtlas> atlases = myAtlasManager.getTextureAtlases();
+            final ArrayList<FreeAreaTrackingTextureAtlas> atlases = myTextureManager.getTextureAtlases();
             for ( final FreeAreaTrackingTextureAtlas atlas : atlases )
                 {
                 final File dumpFile = new File( intensigameFolder, "atlas" + atlas.id + ".png" );
@@ -53,5 +54,5 @@ public final class DumpTextureAtlases implements ConfigurableActionValue
             }
         }
 
-    private final AtlasTextureManager myAtlasManager;
+    private final AtlasTextureManager myTextureManager;
     }

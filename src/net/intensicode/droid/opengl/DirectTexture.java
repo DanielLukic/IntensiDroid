@@ -5,6 +5,11 @@ import net.intensicode.util.*;
 
 public final class DirectTexture implements Texture
     {
+    public DirectTexture(final TextureUtilities aUtilities)
+        {
+        myUtilities = aUtilities;
+        }
+
     public final void makeUsing( final Bitmap aOriginalBitmap, final int aProperWidth, final int aProperHeight )
         {
         final Bitmap bitmap = makeProperBitmap( aOriginalBitmap, aProperWidth, aProperHeight );
@@ -29,7 +34,7 @@ public final class DirectTexture implements Texture
         Assert.isTrue( "still valid", myHasTextureIdFlag );
         //#endif
 
-        TextureUtilities.purge( myOglTextureId );
+        myUtilities.purge( myOglTextureId );
         myHasTextureIdFlag = false;
         }
 
@@ -37,7 +42,7 @@ public final class DirectTexture implements Texture
 
     public final void bind()
         {
-        TextureUtilities.bindTexture( myOglTextureId );
+        myUtilities.bindTexture( myOglTextureId );
         }
 
     public void setMatrix( final float[] aMatrix4x4, final Rectangle aSourceRect )
@@ -51,7 +56,7 @@ public final class DirectTexture implements Texture
     public final void setTextureCrop( final Rectangle aRect )
         {
         if ( myActiveCropRect.equals( aRect ) ) return;
-        TextureUtilities.setTextureCropRect( aRect );
+        myUtilities.setTextureCropRect( aRect );
         myActiveCropRect.setTo( aRect );
         }
 
@@ -62,10 +67,10 @@ public final class DirectTexture implements Texture
         myWidth = aBitmapARGB32.getWidth();
         myHeight = aBitmapARGB32.getHeight();
 
-        myOglTextureId = TextureUtilities.makeNewOpenglTexture();
+        myOglTextureId = myUtilities.makeNewOpenglTexture();
         myHasTextureIdFlag = true;
 
-        TextureUtilities.setTexturePixels( aBitmapARGB32 );
+        myUtilities.setTexturePixels( aBitmapARGB32 );
         }
 
     private Bitmap makeProperBitmap( final Bitmap aBitmap, final int aWidth, final int aHeight )
@@ -91,6 +96,8 @@ public final class DirectTexture implements Texture
     private int myOglTextureId;
 
     private boolean myHasTextureIdFlag;
+
+    private final TextureUtilities myUtilities;
 
     private final Paint myTextureClonePaint = new Paint();
 

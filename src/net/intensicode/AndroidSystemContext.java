@@ -7,6 +7,7 @@ import net.intensicode.core.DirectGraphics;
 import net.intensicode.core.GameSystem;
 import net.intensicode.droid.AndroidKeysHandler;
 import net.intensicode.droid.opengl.OpenglGraphics;
+import net.intensicode.droid.opengl.OpenglRenderer;
 import net.intensicode.screens.ScreenBase;
 
 final class AndroidSystemContext implements SystemContext
@@ -62,8 +63,11 @@ final class AndroidSystemContext implements SystemContext
             final DirectGraphics graphics = myGameSystem.graphics;
             if ( graphics instanceof OpenglGraphics )
                 {
+                final OpenglGraphics openglGraphics = (OpenglGraphics) graphics;
+                final OpenglRenderer openglRenderer = openglGraphics.renderer;
+
                 final ConfigurationElementsTree opengl = platform.addSubTree( "OpenGL" );
-                opengl.addLeaf( new DumpTextureAtlases( (OpenglGraphics) graphics ) );
+                opengl.addLeaf( new DumpTextureAtlases( openglRenderer.getAtlasTextureManager() ) );
                 }
 
             platform.addLeaf( new DumpMemory() );

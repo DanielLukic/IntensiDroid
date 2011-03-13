@@ -5,6 +5,11 @@ import net.intensicode.util.*;
 
 public final class TextureAtlasTexture
     {
+    public TextureAtlasTexture(final TextureUtilities aUtilities)
+        {
+        myUtilities = aUtilities;
+        }
+
     public final void make( final int aWidth, final int aHeight )
         {
         //#if DEBUG
@@ -13,10 +18,10 @@ public final class TextureAtlasTexture
 
         myWidth = aWidth;
         myHeight = aHeight;
-        myOglTextureId = TextureUtilities.makeNewOpenglTexture();
+        myOglTextureId = myUtilities.makeNewOpenglTexture();
         myHasTextureIdFlag = true;
 
-        TextureUtilities.makeEmptyTexture( aWidth, aHeight );
+        myUtilities.makeEmptyTexture( aWidth, aHeight );
         }
 
     public final void add( final Bitmap aBitmap, final int aX, final int aY )
@@ -25,10 +30,10 @@ public final class TextureAtlasTexture
         Assert.isTrue( "made", myHasTextureIdFlag );
         //#endif
 
-        TextureUtilities.setAtlasTextureUnit();
-        TextureUtilities.bindTexture( myOglTextureId );
-        TextureUtilities.setTextureSubPixels( aBitmap, aX, aY );
-        TextureUtilities.setRenderTextureUnit();
+        myUtilities.setAtlasTextureUnit();
+        myUtilities.bindTexture( myOglTextureId );
+        myUtilities.setTextureSubPixels( aBitmap, aX, aY );
+        myUtilities.setRenderTextureUnit();
         }
 
     public final void bind()
@@ -37,7 +42,7 @@ public final class TextureAtlasTexture
         Assert.isTrue( "made", myHasTextureIdFlag );
         //#endif
 
-        TextureUtilities.bindTexture( myOglTextureId );
+        myUtilities.bindTexture( myOglTextureId );
         }
 
     public void setMatrix( final float[] aMatrix4x4, final Rectangle aSourceRect, final Rectangle aAtlasRectangle )
@@ -63,7 +68,7 @@ public final class TextureAtlasTexture
         myCropCheckRectangle.y += aAtlasRectangle.y;
 
         if ( myActiveCropRect.equals( myCropCheckRectangle ) ) return;
-        TextureUtilities.setTextureCropRect( myCropCheckRectangle );
+        myUtilities.setTextureCropRect( myCropCheckRectangle );
         myActiveCropRect.setTo( myCropCheckRectangle );
         }
 
@@ -73,7 +78,7 @@ public final class TextureAtlasTexture
         Assert.isTrue( "made", myHasTextureIdFlag );
         //#endif
 
-        TextureUtilities.purge( myOglTextureId );
+        myUtilities.purge( myOglTextureId );
         myHasTextureIdFlag = false;
         }
 
@@ -85,6 +90,8 @@ public final class TextureAtlasTexture
     private int myOglTextureId;
 
     private boolean myHasTextureIdFlag;
+
+    private final TextureUtilities myUtilities;
 
     private final Rectangle myActiveCropRect = new Rectangle();
 

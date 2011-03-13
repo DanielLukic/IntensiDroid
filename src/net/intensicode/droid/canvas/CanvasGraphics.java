@@ -1,52 +1,15 @@
 package net.intensicode.droid.canvas;
 
 import android.graphics.*;
-import android.view.SurfaceHolder;
 import net.intensicode.core.*;
-import net.intensicode.droid.*;
-import net.intensicode.util.*;
+import net.intensicode.droid.AndroidFontResource;
+import net.intensicode.droid.AndroidImageResource;
+import net.intensicode.util.Position;
+import net.intensicode.util.Rectangle;
 
 
-public final class CanvasGraphics extends DirectGraphics
+public abstract class CanvasGraphics extends DirectGraphics
     {
-    public float scale;
-
-    public int offsetX;
-
-    public int offsetY;
-
-    private final Size myScreenSize = new Size();
-
-    private final Size myTargetSize = new Size();
-
-    public final void setScreenSize( final int aWidth, final int aHeight )
-        {
-        myScreenSize.width = aWidth;
-        myScreenSize.height = aHeight;
-        }
-
-    public final void setTargetSize( final int aWidth, final int aHeight )
-        {
-        myTargetSize.width = aWidth;
-        myTargetSize.height = aHeight;
-        }
-
-    public SurfaceHolder surfaceHolder;
-
-
-    public CanvasGraphics()
-        {
-        myActivePaint.setTextAlign( Paint.Align.LEFT );
-        }
-
-    public CanvasGraphics( final Bitmap aBitmap )
-        {
-        this();
-        myCanvas = new Canvas( aBitmap );
-        myClearPaint.setARGB( 255, 0, 0, 0 );
-        myClearPaint.setStyle( Paint.Style.FILL );
-        }
-
     // From DirectGraphics
 
     public final int getColorRGB24()
@@ -90,7 +53,7 @@ public final class CanvasGraphics extends DirectGraphics
     public final void drawLine( final int aX1, final int aY1, final int aX2, final int aY2 )
         {
         myActivePaint.setStyle( Paint.Style.STROKE );
-        if ( aX1 == aX2 && aY1 == aY1 ) myCanvas.drawPoint( aX1, aY1, myActivePaint );
+        if ( aX1 == aX2 && aY1 == aY2 ) myCanvas.drawPoint( aX1, aY1, myActivePaint );
         else myCanvas.drawLine( aX1, aY1, aX2, aY2, myActivePaint );
         }
 
@@ -241,41 +204,7 @@ public final class CanvasGraphics extends DirectGraphics
         myCanvas.drawText( myCharSequence, 0, 1, aX, aY - myFontMetrics.ascent, myActivePaint );
         }
 
-    public final void beginFrame()
-        {
-        myCanvas = surfaceHolder.lockCanvas();
-
-        final float scaleX = myScreenSize.width / (float) myTargetSize.width;
-        final float scaleY = myScreenSize.height / (float) myTargetSize.height;
-
-        scale = Math.min( scaleX, scaleY );
-
-        offsetX = (int) (( myScreenSize.width - myTargetSize.width * scale ) / 2);
-        offsetY = (int) (( myScreenSize.height - myTargetSize.height * scale ) / 2);
-
-        myCanvas.save();
-        myCanvas.translate( offsetX, offsetY );
-        myCanvas.scale( scale, scale );
-        }
-
-    public final void endFrame()
-        {
-        myCanvas.restore();
-        if ( offsetY > 0 )
-            {
-            myCanvas.drawRect( 0, 0, myScreenSize.width, offsetY, myClearPaint );
-            myCanvas.drawRect( 0, myScreenSize.height - offsetY, myScreenSize.width, myScreenSize.height, myClearPaint );
-            }
-        if ( offsetX > 0 )
-            {
-            myCanvas.drawRect( 0, 0, offsetX, myScreenSize.height, myClearPaint );
-            myCanvas.drawRect( myScreenSize.width - offsetX, 0, myScreenSize.width, myScreenSize.height, myClearPaint );
-            }
-        surfaceHolder.unlockCanvasAndPost( myCanvas );
-        }
-
-
-    private Canvas myCanvas;
+    protected Canvas myCanvas;
 
     private Path myTrianglePath = new Path();
 
@@ -285,9 +214,7 @@ public final class CanvasGraphics extends DirectGraphics
 
     private final Paint myImagePaint = new Paint();
 
-    private final Paint myActivePaint = new Paint();
-
-    private final Paint myClearPaint = new Paint();
+    protected final Paint myActivePaint = new Paint();
 
     private final StringBuilder myCharSequence = new StringBuilder();
 

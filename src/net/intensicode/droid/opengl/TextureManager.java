@@ -6,10 +6,16 @@ import net.intensicode.util.Log;
 
 public final class TextureManager
     {
-    public final AtlasTextureManager atlasTextureManager = new AtlasTextureManager();
+    public final AtlasTextureManager atlasTextureManager;
 
-    public final DirectTextureManager directTextureManager = new DirectTextureManager();
+    public final DirectTextureManager directTextureManager;
 
+    public TextureManager( final TextureUtilities aUtilities )
+        {
+        myUtilities = aUtilities;
+        atlasTextureManager = new AtlasTextureManager( myUtilities );
+        directTextureManager = new DirectTextureManager( myUtilities );
+        }
 
     public final void setConfiguration( final Configuration aConfiguration )
         {
@@ -71,10 +77,10 @@ public final class TextureManager
         atlasTextureManager.purgeAllTextures();
         directTextureManager.purgeAllTextures();
 
-        TextureUtilities.setAtlasTextureUnit();
-        TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
-        TextureUtilities.setRenderTextureUnit();
-        TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
+        myUtilities.setAtlasTextureUnit();
+        myUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
+        myUtilities.setRenderTextureUnit();
+        myUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
         }
 
     // Implementation
@@ -93,6 +99,8 @@ public final class TextureManager
     private boolean myDefaultDirectTextureFlag = true;
 
     private Configuration myConfiguration = Configuration.NULL_CONFIGURATION;
+
+    private final TextureUtilities myUtilities;
 
     private static final AtlasHints NO_ATLAS_HINTS = new AtlasHints();
     }

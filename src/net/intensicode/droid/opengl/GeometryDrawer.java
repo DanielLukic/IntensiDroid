@@ -5,10 +5,11 @@ import javax.microedition.khronos.opengles.GL10;
 
 public final class GeometryDrawer
     {
-    public GL10 gl;
-
-    public boolean enableTextureCoordinates;
-
+    public final void attach( final GL10 aGL )
+        {
+        if ( aGL == null ) throw new NullPointerException( "real GL must not be null" );
+        myGL = aGL;
+        }
 
     public final void reset()
         {
@@ -19,18 +20,18 @@ public final class GeometryDrawer
     public final void updateHardwareBuffers()
         {
         freeHardwareBuffers();
-        myFillRectRectangle.generateHardwareBuffers( gl );
+        myFillRectRectangle.generateHardwareBuffers( myGL );
         }
 
     public final void freeHardwareBuffers()
         {
-        if ( myFillRectRectangle.hasHardwareBuffers() ) myFillRectRectangle.freeHardwareBuffers( gl );
+        if ( myFillRectRectangle.hasHardwareBuffers() ) myFillRectRectangle.freeHardwareBuffers( myGL );
         }
 
     public final void drawPoint( final int aX1, final int aY1 )
         {
         myGeometry.set( 0, aX1, aY1 );
-        myGeometry.drawPoint( gl );
+        myGeometry.drawPoint( myGL );
         myVertexBufferIsUpToDate = false;
         }
 
@@ -38,7 +39,7 @@ public final class GeometryDrawer
         {
         myGeometry.set( 0, aX1, aY1 );
         myGeometry.set( 1, aX2, aY2 );
-        myGeometry.drawLine( gl );
+        myGeometry.drawLine( myGL );
         myVertexBufferIsUpToDate = false;
         }
 
@@ -47,7 +48,7 @@ public final class GeometryDrawer
         myGeometry.set( 0, aX1, aY1 );
         myGeometry.set( 1, aX2, aY2 );
         myGeometry.set( 2, aX3, aY3 );
-        myGeometry.fillTriangle( gl );
+        myGeometry.fillTriangle( myGL );
         myVertexBufferIsUpToDate = false;
         }
 
@@ -57,7 +58,7 @@ public final class GeometryDrawer
         myGeometry.set( 1, aX2, aY2 );
         myGeometry.set( 2, aX3, aY3 );
         myGeometry.set( 3, aX1, aY1 );
-        myGeometry.drawTriangle( gl );
+        myGeometry.drawTriangle( myGL );
         myVertexBufferIsUpToDate = false;
         }
 
@@ -68,7 +69,7 @@ public final class GeometryDrawer
         myGeometry.set( 2, aX + aWidth, aY + aHeight );
         myGeometry.set( 3, aX, aY + aHeight );
         myGeometry.set( 4, aX, aY );
-        myGeometry.drawRectangle( gl );
+        myGeometry.drawRectangle( myGL );
         myVertexBufferIsUpToDate = false;
         }
 
@@ -76,19 +77,21 @@ public final class GeometryDrawer
         {
         if ( !myTextureBufferIsUpToDate )
             {
-            myFillRectRectangle.updateTextureBuffer( gl );
+            myFillRectRectangle.updateTextureBuffer( myGL );
             myTextureBufferIsUpToDate = true;
             }
 
         if ( !myVertexBufferIsUpToDate )
             {
-            myFillRectRectangle.updateVertexBuffer( gl );
+            myFillRectRectangle.updateVertexBuffer( myGL );
             myVertexBufferIsUpToDate = true;
             }
 
-        myFillRectRectangle.draw( gl, aX, aY, aWidth, aHeight );
+        myFillRectRectangle.draw( myGL, aX, aY, aWidth, aHeight );
         }
 
+
+    private GL10 myGL = NoGL.INSTANCE;
 
     private boolean myVertexBufferIsUpToDate;
 

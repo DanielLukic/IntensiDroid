@@ -1,24 +1,31 @@
 package net.intensicode.droid;
 
 import android.content.Context;
-import android.view.*;
-import net.intensicode.core.*;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import net.intensicode.core.DirectScreen;
+import net.intensicode.core.GameSystem;
 import net.intensicode.util.*;
 
-public abstract class AndroidGameView extends SurfaceView implements DirectScreen, SurfaceHolder.Callback
+public final class AndroidGameView extends SurfaceView implements DirectScreen, SurfaceHolder.Callback
     {
-    public GameSystem system;
+    public final boolean isInitialized()
+        {
+        return myInitialized;
+        }
 
-
-    // Protected API
-
-    protected AndroidGameView( final Context aContext, final int aSurfaceType )
+    public AndroidGameView( final Context aContext, final int aSurfaceType, final SurfaceProjection aSurfaceProjection, final GameSystem aGameSystem )
         {
         super( aContext );
+
+        mySurfaceProjection = aSurfaceProjection;
+        myGameSystem = aGameSystem;
 
         mySurfaceHolder = getHolder();
         mySurfaceHolder.addCallback( this );
         mySurfaceHolder.setType( aSurfaceType );
+
+        mySurfaceProjection.holder = mySurfaceHolder;
 
         setClickable( false );
         setFocusable( true );
@@ -34,29 +41,29 @@ public abstract class AndroidGameView extends SurfaceView implements DirectScree
 
     public final int width()
         {
-        if ( myTargetSize.width == 0 ) return getWidth();
-        return myTargetSize.width;
+        if ( mySurfaceProjection.target.width == 0 ) return getWidth();
+        return mySurfaceProjection.target.width;
         }
 
     public final int height()
         {
-        if ( myTargetSize.height == 0 ) return getHeight();
-        return myTargetSize.height;
+        if ( mySurfaceProjection.target.height == 0 ) return getHeight();
+        return mySurfaceProjection.target.height;
         }
 
     public final int getTargetWidth()
         {
-        return myTargetSize.width;
+        return mySurfaceProjection.target.width;
         }
 
     public final int getTargetHeight()
         {
-        return myTargetSize.height;
+        return mySurfaceProjection.target.height;
         }
 
     public final void setTargetSize( final int aWidth, final int aHeight )
         {
-        myTargetSize.setTo( aWidth, aHeight );
+        mySurfaceProjection.setTargetSize( aWidth, aHeight );
         }
 
     // Internal API
@@ -71,22 +78,38 @@ public abstract class AndroidGameView extends SurfaceView implements DirectScree
         return getHeight();
         }
 
-    public final boolean isInitialized()
+    public final void initialize() throws Exception
         {
-        return myInitialized;
+        myGameSystem.graphics.initialize();
+        }
+
+    public final void beginFrame() throws InterruptedException
+        {
+        mySurfaceProjection.setScreenSize( getWidth(), getHeight() );
+        myGameSystem.graphics.beginFrame();
+        }
+
+    public final void endFrame()
+        {
+        myGameSystem.graphics.endFrame();
+        }
+
+    public final void cleanup()
+        {
+        myGameSystem.graphics.cleanup();
         }
 
     public Position toTarget( final int aNativeX, final int aNativeY )
         {
-        myTransformedPosition.x = (int) (( aNativeX - myTargetOffset.x ) / myTargetScale.x);
-        myTransformedPosition.y = (int) (( aNativeY - myTargetOffset.y ) / myTargetScale.y);
+        myTransformedPosition.x = (int) ( ( aNativeX - mySurfaceProjection.offsetX ) / mySurfaceProjection.scaleX );
+        myTransformedPosition.y = (int) ( ( aNativeY - mySurfaceProjection.offsetY ) / mySurfaceProjection.scaleY );
         return myTransformedPosition;
         }
 
     public Position toNative( final int aTargetX, final int aTargetY )
         {
-        myTransformedPosition.x = (int) ( aTargetX * myTargetScale.x + myTargetOffset.x );
-        myTransformedPosition.y = (int) ( aTargetY * myTargetScale.y + myTargetOffset.y );
+        myTransformedPosition.x = (int) ( aTargetX * mySurfaceProjection.scaleX + mySurfaceProjection.offsetX );
+        myTransformedPosition.y = (int) ( aTargetY * mySurfaceProjection.scaleY + mySurfaceProjection.offsetY );
         return myTransformedPosition;
         }
 
@@ -105,31 +128,28 @@ public abstract class AndroidGameView extends SurfaceView implements DirectScree
 
         // Fix for Nexus One switching the screen size from portrait to landscape mode when in landscape mode.
         // I guess this is actually the desired behavior for IntensiGame: Whenever the surface changes, restart.
-        if ( isInitialized() ) system.stop();
+        if ( isInitialized() ) myGameSystem.stop();
 
         myInitialized = true;
-        system.start();
+        myGameSystem.start();
         }
 
     public final void surfaceDestroyed( final SurfaceHolder aSurfaceHolder )
         {
         Log.debug( "surfaceDestroyed" );
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
-        system.stop();
+        myGameSystem.stop();
         myInitialized = false;
         }
 
 
-    protected final SurfaceHolder mySurfaceHolder;
-
-
     private boolean myInitialized;
 
-    protected final Size myTargetSize = new Size();
+    private final GameSystem myGameSystem;
 
-    protected final Position myTargetOffset = new Position();
-
-    protected final PositionF myTargetScale = new PositionF( 1f, 1f );
+    private final SurfaceHolder mySurfaceHolder;
 
     private final Position myTransformedPosition = new Position();
+
+    protected final SurfaceProjection mySurfaceProjection;
     }

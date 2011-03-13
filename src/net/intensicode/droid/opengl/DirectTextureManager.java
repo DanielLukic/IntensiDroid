@@ -8,6 +8,11 @@ import java.util.ArrayList;
 
 public final class DirectTextureManager implements TexturePurger
     {
+    public DirectTextureManager(final TextureUtilities aUtilities )
+        {
+        myUtilities = aUtilities;
+        }
+
     public final void addTexture( final AndroidImageResource aImageResource )
         {
         Log.debug( "making texture for {}", aImageResource.resourcePath );
@@ -60,13 +65,13 @@ public final class DirectTextureManager implements TexturePurger
 
         if ( originalWidth == properWidth && originalHeight == properHeight )
             {
-            final DirectTexture texture = new DirectTexture();
+            final DirectTexture texture = new DirectTexture(myUtilities );
             texture.makeUsing( aOriginalBitmap );
             return texture;
             }
         else
             {
-            final DirectTexture texture = new DirectTexture();
+            final DirectTexture texture = new DirectTexture(myUtilities );
             texture.makeUsing( aOriginalBitmap, properWidth, properHeight );
             return texture;
             }
@@ -83,6 +88,8 @@ public final class DirectTextureManager implements TexturePurger
         return value + 1;
         }
 
+
+    private final TextureUtilities myUtilities;
 
     private final ArrayList<AndroidImageResource> myTexturizedImageResources = new ArrayList<AndroidImageResource>();
 

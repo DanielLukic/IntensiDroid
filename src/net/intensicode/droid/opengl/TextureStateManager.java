@@ -1,13 +1,23 @@
 package net.intensicode.droid.opengl;
 
-import net.intensicode.util.*;
+import net.intensicode.util.Assert;
+import net.intensicode.util.Rectangle;
 
 import javax.microedition.khronos.opengles.GL10;
 
 
 public final class TextureStateManager
     {
-    public GL10 gl;
+    public TextureStateManager( final TextureUtilities aUtilities )
+        {
+        myUtilities = aUtilities;
+        }
+
+    public final void attach( final GL10 aGL )
+        {
+        if ( aGL == null ) throw new NullPointerException( "real GL must not be null" );
+        gl = aGL;
+        }
 
     public final void reset()
         {
@@ -18,7 +28,6 @@ public final class TextureStateManager
         myTextureMatrixPushedFlag = false;
         myTextureEnabled = false;
         myActiveTexture = null;
-        gl = null;
         }
 
     public final void enableTexturingIfNecessary()
@@ -43,23 +52,21 @@ public final class TextureStateManager
         {
         gl.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE );
         gl.glColor4f( 1f, 1f, 1f, aAlpha256 / MASK_COLOR_CHANNEL_AS_FLOAT_VALUE );
+        myAlphaEnabled = true;
         }
 
     public final void disableAlpha()
         {
+        if ( !myAlphaEnabled ) return;
         gl.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE );
         }
 
     public final void bindTexture( final Texture aTexture )
         {
         if ( aTexture != null ) aTexture.bind();
-        else TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
+        else myUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
         myActiveTexture = aTexture;
         }
-
-    private Texture myCurrentlyCroppedTexture;
-
-    private final Rectangle myCurrentlyCroppedRectangle = new Rectangle();
 
     public final void updateCrop( final Rectangle aRectangle )
         {
@@ -114,11 +121,21 @@ public final class TextureStateManager
         }
 
 
+    private GL10 gl = NoGL.INSTANCE;
+
     private Texture myActiveTexture;
+
+    private boolean myAlphaEnabled;
 
     private boolean myTextureEnabled;
 
     private boolean myTextureMatrixPushedFlag;
+
+    private Texture myCurrentlyCroppedTexture;
+
+    private final TextureUtilities myUtilities;
+
+    private final Rectangle myCurrentlyCroppedRectangle = new Rectangle();
 
     private final float[] mMatrix4x4 = new float[]{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 

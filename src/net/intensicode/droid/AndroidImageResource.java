@@ -1,10 +1,14 @@
 package net.intensicode.droid;
 
-import android.graphics.*;
-import net.intensicode.core.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import net.intensicode.core.DirectGraphics;
+import net.intensicode.core.ImageResource;
+import net.intensicode.droid.canvas.BitmapCanvasGraphics;
 import net.intensicode.droid.canvas.CanvasGraphics;
 import net.intensicode.droid.opengl.Texture;
-import net.intensicode.util.*;
+import net.intensicode.util.Assert;
+import net.intensicode.util.Log;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -99,7 +103,7 @@ public final class AndroidImageResource implements ImageResource
 
     public final DirectGraphics getGraphics()
         {
-        if ( myGraphics == null ) myGraphics = new CanvasGraphics( bitmap );
+        if ( myGraphics == null ) myGraphics = new BitmapCanvasGraphics( bitmap );
         return myGraphics;
         }
 

@@ -7,6 +7,11 @@ import java.util.ArrayList;
 
 public final class AtlasTextureManager
     {
+    public AtlasTextureManager( final TextureUtilities aUtilities )
+        {
+        myUtilities = aUtilities;
+        }
+
     public final void addTexture( final AndroidImageResource aImageResource, final AtlasHints aAtlasHints )
         {
         final TextureAtlas atlas = getAtlasFor( aImageResource, aAtlasHints );
@@ -77,7 +82,7 @@ public final class AtlasTextureManager
 
     private FreeAreaTrackingTextureAtlas createNewAtlas( final String aAtlasId )
         {
-        final FreeAreaTrackingTextureAtlas newAtlas = new FreeAreaTrackingTextureAtlas( aAtlasId );
+        final FreeAreaTrackingTextureAtlas newAtlas = new FreeAreaTrackingTextureAtlas( myUtilities, aAtlasId );
         myTextureAtlases.add( newAtlas );
 
         //#if DEBUG_OPENGL
@@ -93,6 +98,7 @@ public final class AtlasTextureManager
         return createNewAtlas( Integer.toString( newAtlasId ) );
         }
 
+    private final TextureUtilities myUtilities;
 
     private final ArrayList<FreeAreaTrackingTextureAtlas> myNamedAtlases = new ArrayList<FreeAreaTrackingTextureAtlas>();
 

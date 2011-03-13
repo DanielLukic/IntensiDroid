@@ -20,12 +20,12 @@ final class EglHelper
     public String choosenConfiguration;
 
 
-    final boolean isStarted()
+    public final boolean isStarted()
         {
-        return myContext != null;
+        return mySurface != null && myContext != null && myDisplay != null;
         }
 
-    final void start( final int[] aConfigurationSpec )
+    public final void start( final int[] aConfigurationSpec )
         {
         if ( isStarted() ) finish();
 
@@ -103,17 +103,21 @@ final class EglHelper
         aBuffer.append( " " );
         }
 
-    final GL createOrUpdateSurface( final SurfaceHolder aSurfaceHolder )
+    public final GL createOrUpdateSurface( final SurfaceHolder aSurfaceHolder )
         {
         if ( mySurface != null ) unbindAndDestroyCurrentSurface();
 
         mySurface = myEgl.eglCreateWindowSurface( myDisplay, myConfiguration, aSurfaceHolder, null );
-        myEgl.eglMakeCurrent( myDisplay, mySurface, mySurface, myContext );
+        final boolean success = myEgl.eglMakeCurrent( myDisplay, mySurface, mySurface, myContext );
+        if ( !success ) return null;
+
+        final boolean contextLost = myEgl.eglGetError() == EGL11.EGL_CONTEXT_LOST;
+        if ( contextLost ) return null;
 
         return myContext.getGL();
         }
 
-    final int swapAndReturnContextState()
+    public final int swapAndReturnContextState()
         {
         try
             {
@@ -128,7 +132,7 @@ final class EglHelper
         return contextLost ? CONTEXT_LOST : CONTEXT_OK;
         }
 
-    public void finish()
+    public final void finish()
         {
         if ( mySurface != null ) unbindAndDestroyCurrentSurface();
         if ( myContext != null ) destroyContext();

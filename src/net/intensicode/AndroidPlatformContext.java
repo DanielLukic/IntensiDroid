@@ -6,8 +6,8 @@ import android.net.Uri;
 import android.os.*;
 import net.intensicode.core.*;
 import net.intensicode.droid.AndroidUtilities;
-import net.intensicode.droid.opengl.OpenglGameView;
 import net.intensicode.droid.opengl.OpenglGraphics;
+import net.intensicode.droid.opengl.OpenglRenderer;
 import net.intensicode.util.DynamicArray;
 import net.intensicode.util.Log;
 
@@ -86,19 +86,15 @@ final class AndroidPlatformContext implements PlatformContext
         if ( graphics instanceof OpenglGraphics )
             {
             final OpenglGraphics opengl = (OpenglGraphics) graphics;
+            final OpenglRenderer renderer = opengl.renderer;
 
             final StringBuffer buffer = new StringBuffer();
-            buffer.append( opengl.vendor );
-            buffer.append( " * " );
-            buffer.append( opengl.renderer );
-            buffer.append( " * " );
-            buffer.append( opengl.version );
+            buffer.append( renderer.getOpenglSpecString() );
 
             try
                 {
                 final DynamicArray strings = new DynamicArray();
-                final OpenglGameView view = (OpenglGameView) myGameSystem.screen;
-                view.openglGraphics.addOpenglStrings( strings );
+                renderer.addOpenglStrings( strings );
 
                 for ( int idx = 0; idx < strings.size; idx++ )
                     {

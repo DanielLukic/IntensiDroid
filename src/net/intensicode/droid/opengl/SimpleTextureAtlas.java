@@ -2,20 +2,22 @@ package net.intensicode.droid.opengl;
 
 import android.graphics.Bitmap;
 import net.intensicode.core.ImageResource;
-import net.intensicode.droid.*;
+import net.intensicode.droid.AndroidImageResource;
+import net.intensicode.droid.TexturePurger;
 import net.intensicode.util.*;
 
 import java.util.ArrayList;
 
 public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
     {
-    public SimpleTextureAtlas()
+    public SimpleTextureAtlas( final TextureUtilities aUtilities )
         {
-        this( TextureUtilities.maximumTextureSize, TextureUtilities.maximumTextureSize );
+        this( aUtilities, TextureUtilities.maximumTextureSize, TextureUtilities.maximumTextureSize );
         }
 
-    public SimpleTextureAtlas( final int aWidth, final int aHeight )
+    public SimpleTextureAtlas( final TextureUtilities aUtilities, final int aWidth, final int aHeight )
         {
+        myUtilities = aUtilities;
         myWidth = aWidth;
         myHeight = aHeight;
         }
@@ -164,7 +166,7 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
     private void createAtlasTextureIfNecessary()
         {
         if ( myAtlasTexture != null ) return;
-        myAtlasTexture = new TextureAtlasTexture();
+        myAtlasTexture = new TextureAtlasTexture( myUtilities );
         myAtlasTexture.make( myWidth, myHeight );
         }
 
@@ -198,6 +200,8 @@ public final class SimpleTextureAtlas implements TextureAtlas, TexturePurger
     private LayoutStrategy myStrategy = HORIZONTAL;
 
     private TextureAtlasTexture myAtlasTexture;
+
+    private final TextureUtilities myUtilities;
 
     private final int myWidth;
 

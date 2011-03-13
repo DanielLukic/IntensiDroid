@@ -2,7 +2,8 @@ package net.intensicode.droid.opengl;
 
 import android.graphics.Bitmap;
 import android.opengl.GLUtils;
-import net.intensicode.util.*;
+import net.intensicode.util.Log;
+import net.intensicode.util.Rectangle;
 
 import javax.microedition.khronos.opengles.*;
 import java.nio.IntBuffer;
@@ -19,42 +20,48 @@ public final class TextureUtilities
 
     public static boolean allowUseOfGlUtils = true;
 
-    public static GL10 gl;
 
+    public final void attach( final GL10 aGL )
+        {
+        if ( aGL == null ) throw new NullPointerException( "real GL must not be null" );
+        myGL = aGL;
+        theActiveTextureUnit = UNKNOWN_TEXTURE_UNIT_ID;
+        for ( int idx = 0; idx < BOUND_TEXTURE_IDS.length; idx++ ) BOUND_TEXTURE_IDS[ idx ] = NO_TEXTURE_ID_SET;
+        }
 
-    public static void setAtlasTextureUnit()
+    public final void setAtlasTextureUnit()
         {
         if ( theActiveTextureUnit == ATLAS_TEXTURE_UNIT_ID ) return;
 
-        gl.glActiveTexture( GL10.GL_TEXTURE1 );
-        gl.glClientActiveTexture( GL10.GL_TEXTURE1 );
+        myGL.glActiveTexture( GL10.GL_TEXTURE1 );
+        myGL.glClientActiveTexture( GL10.GL_TEXTURE1 );
 
         theActiveTextureUnit = ATLAS_TEXTURE_UNIT_ID;
         }
 
-    public static void setRenderTextureUnit()
+    public final void setRenderTextureUnit()
         {
         if ( theActiveTextureUnit == RENDER_TEXTURE_UNIT_ID ) return;
 
-        gl.glActiveTexture( GL10.GL_TEXTURE0 );
-        gl.glClientActiveTexture( GL10.GL_TEXTURE0 );
+        myGL.glActiveTexture( GL10.GL_TEXTURE0 );
+        myGL.glClientActiveTexture( GL10.GL_TEXTURE0 );
 
         theActiveTextureUnit = RENDER_TEXTURE_UNIT_ID;
         }
 
-    public static int makeNewOpenglTexture()
+    public final int makeNewOpenglTexture()
         {
         final int[] workspace = new int[1];
         workspace[ 0 ] = NO_TEXTURE_ID_SET;
-        gl.glGenTextures( 1, workspace, 0 );
+        myGL.glGenTextures( 1, workspace, 0 );
 
         final int id = workspace[ 0 ];
-        gl.glBindTexture( GL10.GL_TEXTURE_2D, id );
-        gl.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE );
-        gl.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST );
-        gl.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST );
-        gl.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_REPEAT );
-        gl.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_REPEAT );
+        myGL.glBindTexture( GL10.GL_TEXTURE_2D, id );
+        myGL.glTexEnvf( GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE );
+        myGL.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST );
+        myGL.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST );
+        myGL.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_REPEAT );
+        myGL.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_REPEAT );
 
         //#if DEBUG
         Log.debug( "new texture id: {}", id );
@@ -82,35 +89,35 @@ public final class TextureUtilities
         return IntBuffer.wrap( data );
         }
 
-    public static void makeEmptyTexture( final int aWidth, final int aHeight )
+    public final void makeEmptyTexture( final int aWidth, final int aHeight )
         {
-        gl.glTexImage2D( GL10.GL_TEXTURE_2D, MIPMAP_LEVEL_ZERO, INTERNAL_TEXTURE_FORMAT_RGBA,
-                         aWidth, aHeight, BORDER_SIZE_ZERO,
-                         BITMAP_FORMAT_RGBA, BITMAP_DATA_FORMAT, null );
+        myGL.glTexImage2D( GL10.GL_TEXTURE_2D, MIPMAP_LEVEL_ZERO, INTERNAL_TEXTURE_FORMAT_RGBA,
+                           aWidth, aHeight, BORDER_SIZE_ZERO,
+                           BITMAP_FORMAT_RGBA, BITMAP_DATA_FORMAT, null );
         }
 
-    public static void makeTexImageFromBitmapARGB32( final Bitmap aBitmap )
-        {
-        final int width = aBitmap.getWidth();
-        final int height = aBitmap.getHeight();
-
-        final IntBuffer dataBuffer = getPixelDataABGR( aBitmap, width, height );
-        gl.glTexImage2D( GL10.GL_TEXTURE_2D, MIPMAP_LEVEL_ZERO, INTERNAL_TEXTURE_FORMAT_RGBA,
-                         width, height, BORDER_SIZE_ZERO,
-                         BITMAP_FORMAT_RGBA, BITMAP_DATA_FORMAT, dataBuffer );
-        }
-
-    public static void makeSubTexImageFromBitmapARGB32( final Bitmap aBitmap, final int aX, final int aY )
+    public final void makeTexImageFromBitmapARGB32( final Bitmap aBitmap )
         {
         final int width = aBitmap.getWidth();
         final int height = aBitmap.getHeight();
 
         final IntBuffer dataBuffer = getPixelDataABGR( aBitmap, width, height );
-        gl.glTexSubImage2D( GL10.GL_TEXTURE_2D, MIPMAP_LEVEL_ZERO, aX, aY, width, height,
-                            BITMAP_FORMAT_RGBA, BITMAP_DATA_FORMAT, dataBuffer );
+        myGL.glTexImage2D( GL10.GL_TEXTURE_2D, MIPMAP_LEVEL_ZERO, INTERNAL_TEXTURE_FORMAT_RGBA,
+                           width, height, BORDER_SIZE_ZERO,
+                           BITMAP_FORMAT_RGBA, BITMAP_DATA_FORMAT, dataBuffer );
         }
 
-    public static void setTexturePixels( final Bitmap aBitmapARGB32 )
+    public final void makeSubTexImageFromBitmapARGB32( final Bitmap aBitmap, final int aX, final int aY )
+        {
+        final int width = aBitmap.getWidth();
+        final int height = aBitmap.getHeight();
+
+        final IntBuffer dataBuffer = getPixelDataABGR( aBitmap, width, height );
+        myGL.glTexSubImage2D( GL10.GL_TEXTURE_2D, MIPMAP_LEVEL_ZERO, aX, aY, width, height,
+                              BITMAP_FORMAT_RGBA, BITMAP_DATA_FORMAT, dataBuffer );
+        }
+
+    public final void setTexturePixels( final Bitmap aBitmapARGB32 )
         {
         if ( allowUseOfGlUtils && aBitmapARGB32.getConfig() != null )
             {
@@ -122,7 +129,7 @@ public final class TextureUtilities
             }
         }
 
-    public static void setTextureSubPixels( final Bitmap aBitmapARGB32, final int aX, final int aY )
+    public final void setTextureSubPixels( final Bitmap aBitmapARGB32, final int aX, final int aY )
         {
         if ( allowUseOfGlUtils && aBitmapARGB32.getConfig() != null )
             {
@@ -134,34 +141,31 @@ public final class TextureUtilities
             }
         }
 
-    public static void bindTexture( final int aId )
+    public final void bindTexture( final int aId )
         {
         if ( BOUND_TEXTURE_IDS[ theActiveTextureUnit ] == aId ) return;
 
-        gl.glBindTexture( GL10.GL_TEXTURE_2D, aId );
+        myGL.glBindTexture( GL10.GL_TEXTURE_2D, aId );
 
         BOUND_TEXTURE_IDS[ theActiveTextureUnit ] = aId;
         }
 
-    public static void setTextureCropRect( final Rectangle aRectangle )
+    public final void setTextureCropRect( final Rectangle aRectangle )
         {
         theCropWorkspace[ 0 ] = aRectangle.x;
         theCropWorkspace[ 1 ] = aRectangle.y + aRectangle.height;
         theCropWorkspace[ 2 ] = aRectangle.width;
         theCropWorkspace[ 3 ] = -aRectangle.height;
 
-        final GL11 gl11 = (GL11) gl;
+        final GL11 gl11 = (GL11) myGL;
         gl11.glTexParameteriv( GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, theCropWorkspace, 0 );
         }
 
-    public static void purge( final int aOglTextureId )
+    public final void purge( final int aOglTextureId )
         {
-        Assert.notNull( "GL context valid", gl );
-        if ( gl == null ) return;
-
         final int[] workspace = new int[1];
         workspace[ 0 ] = aOglTextureId;
-        gl.glDeleteTextures( 1, workspace, 0 );
+        myGL.glDeleteTextures( 1, workspace, 0 );
 
         for ( int idx = 0; idx < BOUND_TEXTURE_IDS.length; idx++ )
             {
@@ -170,6 +174,10 @@ public final class TextureUtilities
             }
         }
 
+
+    private GL10 myGL = NoGL.INSTANCE;
+
+    private static final int UNKNOWN_TEXTURE_UNIT_ID = -1;
 
     private static final int RENDER_TEXTURE_UNIT_ID = 0;
 

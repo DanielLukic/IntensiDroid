@@ -179,6 +179,9 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Int
         AndroidPlatformHooks.getInstance().onDestroy( this );
 
         AndroidImageResource.purgeAll();
+
+        myGameView.cleanup();
+
         System.gc();
         }
 
@@ -236,9 +239,10 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Int
 
         final VideoSystem videoSystem = createVideoSystem( myGameSystem, myGameSystem.platform );
         final AndroidGameView view = videoSystem.view;
-        myGameView = view;
         final DirectScreen screen = videoSystem.screen;
         final DirectGraphics graphics = videoSystem.graphics;
+
+        myGameView = view;
 
         final AndroidResourcesManager resources = new AndroidResourcesManager( getAssets() );
         //#ifdef TOUCH

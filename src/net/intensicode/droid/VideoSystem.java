@@ -1,12 +1,12 @@
 package net.intensicode.droid;
 
 import android.content.Context;
+import android.view.SurfaceHolder;
 import net.intensicode.PlatformContext;
 import net.intensicode.core.*;
-import net.intensicode.droid.canvas.CanvasGameView;
-import net.intensicode.droid.canvas.CanvasGraphics;
-import net.intensicode.droid.opengl.OpenglGameView;
+import net.intensicode.droid.canvas.SurfaceCanvasGraphics;
 import net.intensicode.droid.opengl.OpenglGraphics;
+import net.intensicode.droid.opengl.OpenglRenderer;
 
 public final class VideoSystem
     {
@@ -19,31 +19,26 @@ public final class VideoSystem
 
     public static VideoSystem createOpenglVideoSystem( final Context aContext, final GameSystem aGameSystem, final PlatformContext aPlatformContext )
         {
-        final OpenglGameView screen = new OpenglGameView( aContext );
-        final OpenglGraphics graphics = new OpenglGraphics( aGameSystem, aPlatformContext );
+        final SurfaceProjection surfaceProjection = new SurfaceProjection();
 
-        screen.openglGraphics = graphics;
-        screen.system = aGameSystem;
+        final AndroidGameView view = new AndroidGameView( aContext, SurfaceHolder.SURFACE_TYPE_GPU, surfaceProjection, aGameSystem );
+
+        final OpenglRenderer renderer = new OpenglRenderer( aGameSystem, aPlatformContext, surfaceProjection );
 
         final VideoSystem videoSystem = new VideoSystem();
-        videoSystem.graphics = graphics;
-        videoSystem.screen = screen;
-        videoSystem.view = screen;
+        videoSystem.graphics = new OpenglGraphics( renderer );
+        videoSystem.screen = videoSystem.view = view;
         return videoSystem;
         }
 
     public static VideoSystem createCanvasVideoSystem( final Context aContext, final GameSystem aGameSystem )
         {
-        final CanvasGameView screen = new CanvasGameView( aContext );
-        final CanvasGraphics graphics = new CanvasGraphics();
-
-        screen.canvasGraphics = graphics;
-        screen.system = aGameSystem;
+        final SurfaceProjection surfaceProjection = new SurfaceProjection();
+        final AndroidGameView view = new AndroidGameView( aContext, SurfaceHolder.SURFACE_TYPE_HARDWARE, surfaceProjection, aGameSystem );
 
         final VideoSystem videoSystem = new VideoSystem();
-        videoSystem.graphics = graphics;
-        videoSystem.screen = screen;
-        videoSystem.view = screen;
+        videoSystem.graphics = new SurfaceCanvasGraphics( surfaceProjection );
+        videoSystem.screen = videoSystem.view = view;
         return videoSystem;
         }
     }
