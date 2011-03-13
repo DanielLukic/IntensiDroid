@@ -319,6 +319,8 @@ public final class OpenglGraphics extends DirectGraphics
 
     public final void beginFrame()
         {
+        if (myGL == null ) initializeTriggered = true;
+
         if ( !myEglHelper.isStarted() ) initializeTriggered = true;
 
         if ( initializeTriggered )
@@ -347,6 +349,7 @@ public final class OpenglGraphics extends DirectGraphics
         TextureUtilities.setRenderTextureUnit();
         TextureUtilities.bindTexture( TextureUtilities.NO_TEXTURE_ID_SET );
 
+        if ( targetOffset == null ) targetOffset = new Position();
         if ( targetOffset.validDirection() ) myGL.glClear( GL11.GL_COLOR_BUFFER_BIT );
         }
 
