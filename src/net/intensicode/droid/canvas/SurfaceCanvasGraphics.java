@@ -1,6 +1,5 @@
 package net.intensicode.droid.canvas;
 
-import android.graphics.Canvas;
 import android.graphics.Paint;
 import net.intensicode.droid.SurfaceProjection;
 
@@ -54,8 +53,6 @@ public final class SurfaceCanvasGraphics extends CanvasGraphics
     public final void cleanup()
         {
         }
-
-    private Canvas myCanvas;
 
     private final Paint myClearPaint = new Paint();
 
