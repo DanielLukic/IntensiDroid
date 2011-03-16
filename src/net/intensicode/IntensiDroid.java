@@ -119,7 +119,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Int
     protected void onStart()
         {
         super.onStart();
-        if ( myGameSystem != null ) if ( myGameView.isInitialized() ) system().start();
+        if ( myGameSystem != null ) if ( myGameView.hasSurface() ) system().start();
         }
 
     protected void onResume()
@@ -128,7 +128,7 @@ public abstract class IntensiDroid extends DebugLifeCycleActivity implements Int
 
         if ( myGameSystem != null ) hooks().trackState( "app", "lifecycle", "resume" );
 
-        if ( myGameView.isInitialized() ) system().start();
+        if ( myGameView.hasSurface() ) system().start();
         }
 
     private PlatformHooks hooks()

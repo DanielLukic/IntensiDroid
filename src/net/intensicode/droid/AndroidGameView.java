@@ -9,9 +9,9 @@ import net.intensicode.util.*;
 
 public final class AndroidGameView extends SurfaceView implements DirectScreen, SurfaceHolder.Callback
     {
-    public final boolean isInitialized()
+    public final boolean hasSurface()
         {
-        return myInitialized;
+        return myHasSurfaceFlag;
         }
 
     public AndroidGameView( final Context aContext, final int aSurfaceType, final SurfaceProjection aSurfaceProjection, final GameSystem aGameSystem )
@@ -128,9 +128,9 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
 
         // Fix for Nexus One switching the screen size from portrait to landscape mode when in landscape mode.
         // I guess this is actually the desired behavior for IntensiGame: Whenever the surface changes, restart.
-        if ( isInitialized() ) myGameSystem.stop();
+        if ( hasSurface() ) myGameSystem.stop();
 
-        myInitialized = true;
+        myHasSurfaceFlag = true;
         myGameSystem.start();
         }
 
@@ -139,11 +139,11 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
         Log.debug( "surfaceDestroyed" );
         Assert.equals( "surface holder should not have changed", mySurfaceHolder, aSurfaceHolder );
         myGameSystem.stop();
-        myInitialized = false;
+        myHasSurfaceFlag = false;
         }
 
 
-    private boolean myInitialized;
+    private boolean myHasSurfaceFlag;
 
     private final GameSystem myGameSystem;
 
