@@ -80,12 +80,12 @@ public final class AndroidGameView extends SurfaceView implements DirectScreen, 
 
     public final void initialize() throws Exception
         {
+        mySurfaceProjection.setScreenSize( getWidth(), getHeight() );
         myGameSystem.graphics.initialize();
         }
 
     public final void beginFrame() throws InterruptedException
         {
-        mySurfaceProjection.setScreenSize( getWidth(), getHeight() );
         myGameSystem.graphics.beginFrame();
         }
 

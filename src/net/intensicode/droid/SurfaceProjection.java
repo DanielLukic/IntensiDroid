@@ -23,6 +23,7 @@ public final class SurfaceProjection
     public final void setScreenSize( final int aWidth, final int aHeight )
         {
         if ( screen.width == aWidth && screen.height == aHeight ) return;
+        Log.info( "setScreenSize {}x{}", aWidth, aHeight );
         screen.setTo( aWidth, aHeight );
         updateProjection();
         }
@@ -30,6 +31,7 @@ public final class SurfaceProjection
     public final void setTargetSize( final int aWidth, final int aHeight )
         {
         if ( target.width == aWidth && target.height == aHeight ) return;
+        Log.info( "setTargetSize {}x{}", aWidth, aHeight );
         target.width = aWidth;
         target.height = aHeight;
         updateProjection();
@@ -60,5 +62,8 @@ public final class SurfaceProjection
         offsetY = yDelta / factor / 2f;
 
         scaleX = scaleY = factor;
+
+        Log.info( "Offset: {},{}", offsetX, offsetY );
+        Log.info( "Scale: {},{}", scaleX, scaleY );
         }
     }

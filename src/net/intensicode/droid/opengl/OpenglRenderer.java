@@ -1,6 +1,5 @@
 package net.intensicode.droid.opengl;
 
-import android.opengl.GLDebugHelper;
 import net.intensicode.PlatformContext;
 import net.intensicode.core.*;
 import net.intensicode.droid.*;
@@ -124,17 +123,29 @@ public final class OpenglRenderer
         final float right = mySurfaceProjection.target.width + mySurfaceProjection.offsetX;
         final float bottom = mySurfaceProjection.target.height + mySurfaceProjection.offsetY;
         final float top = -mySurfaceProjection.offsetY;
+
+        Log.info( "left: {}", left );
+        Log.info( "right: {}", right );
+        Log.info( "bottom: {}", bottom );
+        Log.info( "top: {}", top );
+
         myGL.glOrthof( left, right, bottom, top, -1, 1 );
         myGL.glMatrixMode( GL10.GL_MODELVIEW );
 
-        final float unscaledOffsetX = mySurfaceProjection.offsetX * mySurfaceProjection.scaleX;
-        final float unscaledOffsetY = mySurfaceProjection.offsetY * mySurfaceProjection.scaleY;
-        fixDrawTextureExtensionOffset( unscaledOffsetX, unscaledOffsetY );
+        myOffsetX = mySurfaceProjection.offsetX * mySurfaceProjection.scaleX;
+        myOffsetY = mySurfaceProjection.offsetY * mySurfaceProjection.scaleY;
 
         myWidth = mySurfaceProjection.target.width;
         myHeight = mySurfaceProjection.target.height;
         myScaleX = mySurfaceProjection.scaleX;
         myScaleY = mySurfaceProjection.scaleY;
+
+        Log.info( "myOffsetX: {}", myOffsetX );
+        Log.info( "myOffsetY: {}", myOffsetY );
+        Log.info( "myWidth: {}", myWidth );
+        Log.info( "myHeight: {}", myHeight );
+        Log.info( "myScaleX: {}", myScaleX );
+        Log.info( "myScaleY: {}", myScaleY );
 
         loadMaximumTextureSizeFromOpenglProperties();
 
@@ -169,15 +180,6 @@ public final class OpenglRenderer
         myUtilities.attach( myGL );
         myGeometryDrawer.attach( myGL );
         myTextureStateManager.attach( myGL );
-        }
-
-    private void fixDrawTextureExtensionOffset( final float aOffsetX, final float aOffsetY )
-        {
-        myOffsetX = aOffsetX;
-        myOffsetY = aOffsetY;
-        //#if DEBUG_OPENGL
-        Log.info( "OpenglGraphics DTE offset: {} {}", myOffsetX, myOffsetY );
-        //#endif
         }
 
     private void loadMaximumTextureSizeFromOpenglProperties()
