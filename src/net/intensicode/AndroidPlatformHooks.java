@@ -46,6 +46,7 @@ public class AndroidPlatformHooks implements PlatformHooks
 
     public void onCreate( final GameSystem aGameSystem )
         {
+        myGameSystem = aGameSystem;
         }
 
     public void onDestroy( final Activity aActivity )
@@ -58,6 +59,13 @@ public class AndroidPlatformHooks implements PlatformHooks
         }
 
     // From PlatformHooks
+
+    public void checkForUpdate( final String aUpdateUrl, final int aVersionNumber, final UpdateCallback aCallback )
+        {
+        //#if UPDATE
+        new Updater( myGameSystem ).check( aUpdateUrl, aVersionNumber, aCallback );
+        //#endif
+        }
 
     public void trackState( final String aCategory, final String aAction, final String aLabel )
         {
@@ -105,6 +113,8 @@ public class AndroidPlatformHooks implements PlatformHooks
     public void triggerNewFullscreenAd()
         {
         }
+
+    private GameSystem myGameSystem;
 
     private static AndroidPlatformHooks theInstance;
     }
