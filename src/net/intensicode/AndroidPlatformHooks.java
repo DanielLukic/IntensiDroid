@@ -63,7 +63,7 @@ public class AndroidPlatformHooks implements PlatformHooks
     public void checkForUpdate( final String aUpdateUrl, final int aVersionNumber, final UpdateCallback aCallback )
         {
         //#if UPDATE
-        new Updater( myGameSystem ).check( aUpdateUrl, aVersionNumber, aCallback );
+        Updater.check( aUpdateUrl, aVersionNumber, aCallback );
         //#endif
         }
 

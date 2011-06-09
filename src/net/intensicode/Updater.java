@@ -1,6 +1,5 @@
 package net.intensicode;
 
-import net.intensicode.core.GameSystem;
 import net.intensicode.util.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -13,12 +12,7 @@ import java.io.IOException;
 
 class Updater
     {
-    public Updater( final GameSystem aGameSystem )
-        {
-        myGameSystem = aGameSystem;
-        }
-
-    public void check( final String aBaseUrl, final int aVersionNumber, final UpdateCallback aCallback )
+    public static void check( final String aBaseUrl, final int aVersionNumber, final UpdateCallback aCallback )
         {
         try
             {
@@ -33,7 +27,7 @@ class Updater
                 }
             else
                 {
-                aCallback.onUpdateAvailable( new BasicUpdateContext( myGameSystem, json ), updateVersion );
+                aCallback.onUpdateAvailable( new BasicUpdateContext( json ), updateVersion );
                 }
             }
         catch ( Exception e )
@@ -42,7 +36,7 @@ class Updater
             }
         }
 
-    public String get( final String aUrl ) throws IOException
+    public static String get( final String aUrl ) throws IOException
         {
         Log.info( "using update url {}", aUrl );
         final DefaultHttpClient client = new DefaultHttpClient();
@@ -57,7 +51,10 @@ class Updater
         throw new IOException( "update check failed: " + statusLine );
         }
 
-    private final GameSystem myGameSystem;
+    private Updater()
+        {
+        // nop
+        }
 
     private static final int HTTP_OK = 200;
     }
