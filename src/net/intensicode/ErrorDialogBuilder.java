@@ -68,7 +68,7 @@ public final class ErrorDialogBuilder implements DialogInterface.OnClickListener
 
         final AlertDialog.Builder builder = new AlertDialog.Builder( myActivity );
         if ( myTitleOrNull != null ) builder.setTitle( myTitleOrNull );
-        builder.setCancelable( true );
+        builder.setCancelable( false );
         builder.setView( view );
         builder.setNegativeButton( "EXIT", this );
         if ( !myCriticalErrorFlag ) builder.setPositiveButton( "CONTINUE", this );
