@@ -14,6 +14,17 @@ class Updater
     {
     public static void check( final String aBaseUrl, final int aVersionNumber, final UpdateCallback aCallback )
         {
+        new Thread()
+        {
+        public void run()
+            {
+            checkBlocking( aBaseUrl, aVersionNumber, aCallback );
+            }
+        }.start();
+        }
+
+    public static void checkBlocking( final String aBaseUrl, final int aVersionNumber, final UpdateCallback aCallback )
+        {
         try
             {
             final String updateInfo = get( aBaseUrl );
