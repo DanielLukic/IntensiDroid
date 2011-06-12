@@ -44,9 +44,17 @@ public class AndroidPlatformHooks implements PlatformHooks
         {
         }
 
+    public void onStart( final Activity aActivity )
+        {
+        }
+
     public void onCreate( final GameSystem aGameSystem )
         {
         myGameSystem = aGameSystem;
+        }
+
+    public void onStop( final Activity aActivity )
+        {
         }
 
     public void onDestroy( final Activity aActivity )
