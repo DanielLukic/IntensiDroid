@@ -83,6 +83,10 @@ public class AndroidPlatformHooks implements PlatformHooks
         {
         }
 
+    public void trackException( final String aErrorId, final String aMessage, final Throwable aOptionalThrowable )
+        {
+        }
+
     public void showBannerAd()
         {
         }

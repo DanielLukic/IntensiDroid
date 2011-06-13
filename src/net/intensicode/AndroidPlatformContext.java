@@ -167,6 +167,11 @@ final class AndroidPlatformContext implements PlatformContext
             myErrorDialogBuilder.createDialog();
             }
         } );
+
+        if ( myGameSystem != null )
+            {
+            myGameSystem.platform.hooks().trackException( aCritical ? "critical" : "error", aMessage, aOptionalThrowable );
+            }
         }
 
     public final void storePreferences( final String aPreferencesId, final String aPropertyKey, final boolean aValue )
